@@ -18,6 +18,8 @@ include <NopSCADlib/core.scad>
 include <purchased/tubes.scad>
 include <purchased/pins.scad>
 include <purchased/plates.scad>
+include <purchased/structural_tubes.scad>
+include <purchased/bolts.scad>
 
 include <utils/bend.scad>;    // bend_operator_force_ceiling is a variable, so include
 use <utils/layout.scad>
@@ -25,6 +27,7 @@ use <utils/pin_sizing.scad>
 use <custom/forming_die.scad>
 use <custom/drive_link.scad>
 use <custom/frame_link.scad>
+use <custom/base.scad>
 
 $fn = 90;
 
@@ -38,6 +41,7 @@ bend_angle  = 180;
 
 drive_plate = plate_0p250in;
 frame_plate = plate_0p250in;
+base_plate  = plate_0p375in;
 
 tube_length = 600;
 
@@ -58,7 +62,7 @@ tube_length = 600;
 moment    = bend_plastic_moment_Nm(tube);
 socket    = drive_link_socket_radius(tube, clr);
 handle    = bend_handle_length_mm(moment, socket);
-layers    = layout_layers(tube, drive_plate, frame_plate);
+layers    = layout_layers(tube, drive_plate, frame_plate, base_plate);
 t_drive   = plate_thickness(drive_plate);
 t_frame   = plate_thickness(frame_plate);
 t_die     = forming_die_thickness(tube);
@@ -87,6 +91,15 @@ frame_pin   = pin_smallest_at_least(
                   pin_required_diameter(frame_force, t_die, t_drive + t_frame,
                                         pin_material_yield));
 
+// The bolts that join the link pair at the grip. They carry the operator's own pull across
+// the gap between the links, not the drive torque, so they are small - and each runs
+// through a spacer tube, or tightening them would simply pull the pair together.
+spacer_bolt  = pin_smallest_at_least(
+                   pin_required_diameter(bend_operator_force_N(moment, handle),
+                                         layout_drive_gap(layers), t_drive,
+                                         pin_material_yield));
+spacer_tube  = structural_smallest_for_bore(pin_pivot_hole(pin_diameter(spacer_bolt)));
+
 // The U-strap holds the tube to the die against the same force the followbar applies.
 ustrap_pin = pin_smallest_at_least(
                  pin_required_diameter(followbar_force, t_die, t_frame, pin_material_yield));
@@ -97,13 +110,37 @@ drive_angle  = len(drive_angles) ? drive_angles[0] : 0;
 // undef on a die with no room for drive holes, and the link then draws no hole.
 drive_hole_r = len(drive_angles) ? drive_radius : undef;
 
+// The base plate's footprint comes from the frame link, so the anchor radius is known
+// before the bolt is. Size the bolt against a nominal inset, then the real inset - and so
+// the real radius - follows from the bolt that comes out.
+op_force     = bend_operator_force_N(moment, handle);
+link_w       = frame_link_width(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
+                                pin_diameter(followbar_pin));
+base_nom_r   = base_nominal_anchor_radius(tube, clr, link_w);
+anchor_bolt0 = bolt_smallest_at_least(
+                   bend_anchor_bolt_diameter(
+                       base_anchor_shear_N(moment, base_nom_r, op_force),
+                       bolt_material_yield));
+// Second pass against the radius that bolt actually leaves. The first pass is always
+// optimistic because a bolt's own edge distance eats the radius it is sized on.
+anchor_bolt  = bolt_smallest_at_least(
+                   bend_anchor_bolt_diameter(
+                       base_anchor_shear_N(moment,
+                           base_actual_anchor_radius(tube, clr, link_w,
+                                                     bolt_diameter(anchor_bolt0)),
+                           op_force),
+                       bolt_material_yield));
+
 bend_report(tube, clr, handle);
 forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
                    pin_diameter(drive_pin), pin_diameter(ustrap_pin));
 drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
-                  pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle), handle);
+                  pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle),
+                  handle, pin_diameter(spacer_bolt));
 frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
                   pin_diameter(followbar_pin));
+base_report(tube, clr, base_plate, link_w, moment, op_force, anchor_bolt,
+            bolt_material_yield, layout_working_height(layers));
 
 echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
          pin_governing_mode(frame_force, t_die, t_drive + t_frame, pin_material_yield),
@@ -116,17 +153,26 @@ echo(str("         drive radius ", nominal_r, " mm nominal -> ", drive_radius,
 echo(str("stack:   ", layout_height(layers), " mm overall, ", layout_frame_gap(layers),
          " mm between the frame links"));
 
+// The base is drawn in the frame link's own frame, so its features have to be turned onto
+// the link's axis to sit under it.
+function rotate_pt(axis, p) = [axis[0] * p[0] - axis[1] * p[1],
+                               axis[1] * p[0] + axis[0] * p[1]];
+
 module forming_die_stl()
     forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
                 pin_diameter(drive_pin), pin_diameter(ustrap_pin));
 
 module drive_link_stl()
     drive_link(tube, clr, drive_plate, pin_diameter(frame_pin), pin_diameter(drive_pin),
-               drive_hole_r, bend_operator_force_N(moment, handle), handle);
+               drive_hole_r, bend_operator_force_N(moment, handle), handle,
+               pin_diameter(spacer_bolt));
 
 module frame_link_stl()
     frame_link(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
                pin_diameter(followbar_pin));
+
+module base_stl()
+    base(tube, clr, base_plate, link_w, bolt_diameter(anchor_bolt));
 
 //! The stack, with the tube where it goes in. The handle, the followbar, the U-strap and
 //! the base are not built yet.
@@ -146,13 +192,37 @@ assembly("main") {
         translate_z(layout_z(layers, layer))
             stl_colour(pp3_colour) stl("frame_link") frame_link_stl();
 
-    translate_z(layout_bottom(layers))
+    translate_z(layout_z(layers, "base"))
+        rotate(atan2(frame_link_axis(tube, clr)[1], frame_link_axis(tube, clr)[0]))
+            stl_colour(pp4_colour) stl("base") base_stl();
+
+    translate_z(layout_z(layers, "frame link lower"))
         pin(frame_pin, layout_pin_length(layers, "frame link lower"));
+
+    // Four anchor bolts at the base's corners, heads up, running down through whatever
+    // the machine is bolted to.
+    for (p = base_anchor_positions(tube, clr, link_w,
+                                   plate_eye_radius(bolt_clearance_hole_d(
+                                       bolt_diameter(anchor_bolt))) + 1))
+        translate(concat(rotate_pt(frame_link_axis(tube, clr),
+                                   p + [frame_link_reach(tube, clr) / 2, 0]),
+                         [layout_z(layers, "base") + layout_thickness(layers, "base")]))
+            rotate([180, 0, 0])
+                bolt(anchor_bolt, layout_thickness(layers, "base") + 30);
 
     if (!is_undef(drive_hole_r))
         rotate(drive_angle)
             translate([drive_hole_r, 0, layout_z(layers, "drive link lower")])
                 pin(drive_pin, layout_pin_length(layers, "drive link lower"));
+
+    for (r = drive_link_spacer_radii(handle, pin_diameter(spacer_bolt)))
+        rotate(drive_angle)
+            translate([r, 0, layout_z(layers, "drive link lower")]) {
+                pin(spacer_bolt, layout_pin_length(layers, "drive link lower"));
+
+                translate_z(t_drive)
+                    structural_tube(spacer_tube, layout_drive_gap(layers));
+            }
 
     translate([clr, -tube_length / 2 + forming_die_tail_length(tube, clr) / 2, 0])
         rotate([90, 0, 0])

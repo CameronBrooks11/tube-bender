@@ -32,18 +32,23 @@ started from actually measured, and which of its features survived, is in
 | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span> |  |
 |---:|---:|:---|
 |  | | **Vitamins** |
+| &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1 in dia x 78mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 230mm x 77mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2025mm x 77mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 249mm x 201mm |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 289mm x 155mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm |
-| &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 45mm |
+| &nbsp;&nbsp;17&nbsp; | &nbsp;&nbsp;17&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.stl |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;drive_link.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;forming_die.stl |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;frame_link.stl |
-| &nbsp;&nbsp;5&nbsp; | &nbsp;&nbsp;5&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+| &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
 
 <span></span>
 [Top](#TOP)
@@ -54,19 +59,28 @@ started from actually measured, and which of its features survived, is in
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
+|4| Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 1 in dia x 78mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Pin clevis 5/16 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 7/8 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm|
-|2| Plate mild steel 1/4 in, blank 230mm x 77mm|
+|2| Plate mild steel 1/4 in, blank 2025mm x 77mm|
 |2| Plate mild steel 1/4 in, blank 249mm x 201mm|
+|1| Plate mild steel 3/8 in, blank 289mm x 155mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm|
+|2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 45mm|
 
 
 ### 3D Printed parts
 
-| 2 x [drive_link.stl](stls/drive_link.stl) | 1 x [forming_die.stl](stls/forming_die.stl) | 2 x [frame_link.stl](stls/frame_link.stl) |
+| 1 x [base.stl](stls/base.stl) | 2 x [drive_link.stl](stls/drive_link.stl) | 1 x [forming_die.stl](stls/forming_die.stl) |
 |---|---|---|
-| ![drive_link.stl](stls/drive_link.png) | ![forming_die.stl](stls/forming_die.png) | ![frame_link.stl](stls/frame_link.png) 
+| ![base.stl](stls/base.png) | ![drive_link.stl](stls/drive_link.png) | ![forming_die.stl](stls/forming_die.png) 
+
+
+| 2 x [frame_link.stl](stls/frame_link.stl) |
+|---|
+| ![frame_link.stl](stls/frame_link.png) 
 
 
 

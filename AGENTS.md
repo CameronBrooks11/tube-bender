@@ -58,8 +58,18 @@ scoping ones.
 The rule: **`include` any file you read a constant or a list from; `use` files you only
 call.** A lookup over a registry lives beside the registry, not in the singular file.
 
+Better still where it fits: **export the calculation, not the constant.** A function crosses
+a `use` boundary safely, so a file that would otherwise have to export a number can export
+the thing it wanted the number for instead, and the boundary becomes safe by construction
+rather than by everyone remembering. `base_nominal_anchor_radius()` is the pattern.
+
 Related: OpenSCAD does not error on a missing argument, it passes `undef`. Changing a
 function's signature silently mis-computes every call site you forget. Grep for the name.
+
+Also related: **top-level names are global and the last assignment wins everywhere.** Two
+`let`-like config values sharing a name do not shadow, they collide, and the collision can
+make an earlier expression depend on a later one and resolve to `undef`. Reusing
+`nominal_r` for two different two-pass sizings did exactly that.
 
 ## `offset(0)` on a unioned 2D outline before extruding
 

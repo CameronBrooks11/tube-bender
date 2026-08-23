@@ -38,12 +38,16 @@ layout_running_clearance = 0.5;
 
 //! The stack, bottom to top, as `[name, z of underside, thickness]`. Everything that
 //! places a part reads this rather than adding thicknesses up again.
-function layout_layers(tube, drive_plate, frame_plate) =
+function layout_layers(tube, drive_plate, frame_plate, base_plate) =
     let (td  = forming_die_thickness(tube),
          tdl = plate_thickness(drive_plate),
          tfl = plate_thickness(frame_plate),
+         tb  = plate_thickness(base_plate),
          c   = layout_running_clearance)
     [
+        // No clearance under the frame link: the base is bolted hard to it and nothing
+        // there moves. Every gap above it does.
+        ["base",             -td / 2 - 2 * c - tdl - tfl - tb, tb ],
         ["frame link lower", -td / 2 - 2 * c - tdl - tfl, tfl],
         ["drive link lower", -td / 2 - c - tdl,           tdl],
         ["forming die",      -td / 2,                     td ],
@@ -59,8 +63,12 @@ function layout_z(layers, name) =
 function layout_thickness(layers, name) =
     [for (l = layers) if (l[0] == name) l[2]][0];
 
-//! Underside of the whole stack, mm.
+//! Underside of the whole stack, mm - the face that sits on the mounting surface.
 function layout_bottom(layers) = layers[0][1];
+
+//! Height of the tube's plane above the mounting surface, mm. Everything the machine does
+//! happens at this height, so it is what a bench or a pedestal has to keep clear.
+function layout_working_height(layers) = -layout_bottom(layers);
 
 //! Top of the whole stack, mm.
 function layout_top(layers) = layers[len(layers) - 1][1] + layers[len(layers) - 1][2];
@@ -78,3 +86,9 @@ function layout_pin_length(layers, from_layer, cotter_allowance = 6) =
 function layout_frame_gap(layers) =
     layout_z(layers, "frame link upper") -
     (layout_z(layers, "frame link lower") + layout_thickness(layers, "frame link lower"));
+
+//! Clear distance between the drive links' inner faces, mm - what a spacer tube between
+//! them has to be, and the span a bolt through them has to cross.
+function layout_drive_gap(layers) =
+    layout_z(layers, "drive link upper") -
+    (layout_z(layers, "drive link lower") + layout_thickness(layers, "drive link lower"));

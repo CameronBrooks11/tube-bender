@@ -416,3 +416,72 @@ machine is to work, which is the more useful number.
 
 Nothing below 1/2 in would have caught this. `just check-sizes` now drives the whole model
 at every registered size rather than only the bend arithmetic, and that is what found it.
+
+
+## 14. The handle is the link, and the base is four bolts
+
+### There is no separate handle
+
+The drive link runs the full handle length and the pair of them, joined by two spacer bolts
+at the grip, is what the operator holds. That is what the prototype does, and there is a
+reason worth writing down for why a bolted-on handle is worse rather than merely different:
+
+**The moment at a handle's root is the full bending moment, whatever the handle's length.**
+`F x (L - r)` with `F x L = Mp` is `Mp` for any small `r`. So a separate handle needs a root
+section as big as the link's, plus a joint that carries it, plus that joint to physically
+fit. At 1-1/2 in the smallest registered tube whose bore clears the link pair is a 3 in
+member weighing 15 kg — the same as the plate pair it would replace. The joint buys nothing
+and costs a joint.
+
+What it does cost is mass: **15.6 kg of handle** at 1-1/2 in, because the link is constant
+width for 1.95 m and only the section at the drive hole needs to be that wide. Tapering it
+is on the roadmap and would take most of that back.
+
+### The base reacts a torque, and two bolts could not
+
+The first attempt put two anchor bolts on the frame link's own axis, between its eyes, and
+ran the drive torque out through them. It failed at both ends of the range and the sweep
+said so:
+
+- at **1/8 in** the whole frame link is 22 mm long, and after the pivot eye and the
+  followbar eye there is no room left at all — the required span came out **negative**;
+- at **2 in** the span the link can offer is 97 mm, which asks for a bolt **bigger than
+  the series carries**.
+
+Bigger bolts do not fix either, and they make the first one worse: a bigger bolt needs a
+bigger edge distance, which eats the span, which raises the load. **The load path was
+wrong, not the fastener.**
+
+What replaced it:
+
+- The **lower frame link is welded to the base plate.** No bolts in that joint at all.
+- The frame link pair is already joined at both ends — the frame pin at the pivot, the
+  followbar pin at the far end — so the two frame bolts were a third fixing on a two-point
+  member.
+- The torque leaves through **four anchor bolts at the base plate's corners**. Four bolts
+  on a wide rectangle instead of two on a narrow one divides the shear by four and roughly
+  doubles the arm at the same time. At 1-1/2 in that is 1890 N per bolt against 3167 N
+  allowable, on 1/2 in bolts.
+
+The plate's size comes from the footprint it has to weld to and stand on, not from any
+fastener, which is what breaks the circularity.
+
+### Sizing anything against its own edge distance needs two passes
+
+Choosing a bolt makes the radius it sits on **smaller**, because its edge distance comes
+out of the plate. So the load goes up after the bolt is chosen, and one pass is optimistic:
+a 3/8 in bolt picked against the nominal radius came out 1.6 % over its own allowable at
+the radius it then had. The second pass settles it, and an assert now catches the case
+where it would not.
+
+The same shape appears in the drive pin — the die's drive radius depends on the hole, which
+depends on the pin — and is handled the same way, with both passes printed so the
+convergence can be judged rather than assumed.
+
+### What the anchor bolts are not
+
+They are not the thing that fails first. A 1/2 in bolt will not shear at these loads. What
+fails first is **whatever the plate is bolted to**: the report prints the bearing pressure
+and says plainly that it is fine on steel and wants checking against a bench top. A
+pedestal is on the roadmap, and its post is the same section-modulus problem as everything
+else here — bending from `F x h` plus torsion from `Mp`.

@@ -16,6 +16,7 @@
  */
 
 include <NopSCADlib/core.scad>;
+include <pin_sizing.scad>;   // the allowable fractions are variables
 
 use <../purchased/tube.scad>
 use <../purchased/tube_material.scad>
@@ -226,13 +227,25 @@ function plate_width_for_moment(moment_Nmm, t, fb, d = 0) =
 //
 
 //! Shear per bolt, N, for a two-bolt base pattern spanning `span_mm`.
+//!
+//! Two bolts a distance `s` apart resisting a torque `M` about the point between them each
+//! sit `s/2` from it, so the couple is `F x s` and `F = M / s`. No factor of two: an
+//! earlier version of this carried one, which asked for a span twice what the model it
+//! described requires. Conservative, but not the stated model, and it put the anchor bolts
+//! off the end of the frame link.
+//!
+//! The operator's own pull adds directly and is shared, hence `F/2`.
 function bend_anchor_bolt_shear_N(moment_Nm, span_mm, force_N = bend_operator_force_ceiling) =
     moment_Nm / (span_mm / 1000) + force_N / 2;
 
-//! Smallest two-bolt span, mm, that keeps each bolt under `bolt_shear_capacity_N` with
-//! the safety factor applied.
-function bend_anchor_min_span_mm(moment_Nm, bolt_shear_capacity_N) =
-    moment_Nm / (bolt_shear_capacity_N / bend_anchor_safety_factor / 2) * 1000;
+//! Shear an anchor bolt of `d` mm may carry, N, with the safety factor applied.
+function bend_anchor_bolt_allowable_N(d, yield_MPa) =
+    pin_allowable_shear_fraction * yield_MPa * PI * d * d / 4 / bend_anchor_safety_factor;
+
+//! Diameter, mm, an anchor bolt has to be to carry `force_N` at that allowable.
+function bend_anchor_bolt_diameter(force_N, yield_MPa) =
+    sqrt(4 * force_N * bend_anchor_safety_factor
+             / (PI * pin_allowable_shear_fraction * yield_MPa));
 
 //
 // Departures.
