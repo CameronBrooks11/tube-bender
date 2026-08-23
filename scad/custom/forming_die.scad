@@ -194,8 +194,17 @@ module forming_die_outline(tube, clr, bend_angle, frame_pin_d, ustrap_pin_d) {
 }
 
 //! The forming die. `bend_angle` is the bend it has to be able to make, before overbend.
+//! Tapping drill for a bolt threaded into the die, mm. 85 % of nominal is the usual
+//! approximation for a 75 % thread in steel; a real tap chart beats it and the difference
+//! does not reach any other dimension here.
+function forming_die_tap_drill(bolt_d) = 0.85 * bolt_d;
+
+//! The forming die. `plate_bolts` are the positions the die plates screw into, passed in
+//! rather than derived here because the plates are derived FROM the die and a file cannot
+//! read the file that reads it.
 module forming_die(tube, clr, bend_angle = 180,
-                   frame_pin_d, drive_pin_d, ustrap_pin_d) {
+                   frame_pin_d, drive_pin_d, ustrap_pin_d,
+                   plate_bolts = [], plate_bolt_d = 0) {
     t      = forming_die_thickness(tube);
     gr     = forming_die_groove_radius(tube);
     arc    = forming_die_arc(bend_angle);
@@ -248,6 +257,12 @@ module forming_die(tube, clr, bend_angle = 180,
         // The U-strap's pin.
         translate(strap)
             cylinder(d = pin_index_hole(ustrap_pin_d), h = t + 2 * eps, center = true);
+
+        // Tapped through for the die plates, one from each face.
+        for (p = plate_bolts)
+            translate(p)
+                cylinder(d = forming_die_tap_drill(plate_bolt_d), h = t + 2 * eps,
+                         center = true);
     }
 }
 

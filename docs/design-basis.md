@@ -521,35 +521,52 @@ at that radius out of the full circle, and `bend_mechanism_departures()` names i
 bend will not fit. At 180 degrees there is 130 degrees to spare; the check exists because
 nothing about it is obvious, and a 300 degree die would not fit.
 
-### The U-strap is not built, and this is why
+### The clamp, and the plates that had to come first
 
-The clamp that holds the tube to the die is a real part on both reference machines and on
-the prototype, and it is **deliberately absent** rather than forgotten. Its mounting has a
-topology problem that this die cannot solve, and the honest thing is to write the
-constraints down rather than invent a fixing that would not work.
+The clamp holds the tube to the die while the die drags it round. Its mounting has a
+topology problem, and it is worth setting out because the answer was not the clamp.
 
 What has to be true at once:
 
 1. It must sit **outboard of the tube** on the die's tail, where the die has no material —
-   the tail's outer face is the tube's groove.
-2. It must be **removable**. A closed channel would be simpler and stronger, and it was
-   considered and rejected: you could then only load a tube by threading it in from an
-   end, which makes multi-bend parts impossible. JD2's own worked example is a four-bend
-   rollbar.
+   the tail's outer face *is* the tube's groove.
+2. It must be **removable**. A closed channel in the tail would be simpler and stronger,
+   and it was considered and rejected: you could then only load a tube by threading it in
+   from an end, which makes multi-bend parts impossible. JD2's own worked example is a
+   four-bend rollbar.
 3. It cannot stand **above or below the die**, because the drive links are there and they
    sweep every radius.
-4. The only die material it can reach is **inboard of the groove**, and the path there is
-   blocked — by the tube below the groove's flanks, and by only 3.2 mm of land above them.
+4. The only die material it can reach is **inboard of the groove**, and the path is blocked
+   — by the tube below the groove's flanks and by 3.2 mm of land above them.
 
-The prototype solved it, and the solution is instructive: its die assembly carries a
-**plate above and below the die halves**, and the locker's 6.35 mm tongue runs in a slot
-in those plates. The plates are what create the z-space that constraint 3 and 4 deny, and
-the slot is what stops the clamp rotating about its single pin.
+Nothing about the die can satisfy all four. What can is a **plate on each face of the
+die**, in the gap between the die and the drive links, whose tail **overhangs the tube**.
+That overhang is the only material anywhere that the clamp can be pinned to. At 1-1/2 in
+it reaches r = 169 mm, past the tube's outer surface at 133 mm.
 
-So the next step is not a U-strap. It is **giving the die its plates back** — which is
-also what makes the sliced-die roadmap item natural, since a plated die is already a
-stack. The clamp follows from that in a few lines. Building the clamp first would mean
-choosing a fixing that the die cannot actually offer.
+So the clamp is a block like the followbar — capping the outboard half of the tube —
+held by **two pins through the die plates**. Two rather than one, because one pin plus a
+tube being dragged along its own axis is a hinge. Pulling the pins takes it off, which is
+constraint 2. A bolt through the block presses the tube so it cannot slide: JD2 requires it
+for wall under 0.065 in, and says to put a slice of larger tube between the bolt and the
+work so it does not dimple [JD2-M32 p.7] — a consumable, not a part, and not modelled.
 
-The die's U-strap pin hole and the pin sized for it are left in place, because they are
-right either way.
+**The prototype got here first.** Its die assembly carries a plate above and below the die
+halves, and its clamp has a 6.35 mm tongue running in a slot in those plates. This model
+reached the plates from the constraints, and then found them already in the teardown.
+
+### What the clamp load actually is
+
+The tube is dragged round by the clamp, so the clamp carries the **tangential force in the
+tube — the bending moment over the radius it is bent on**, `Mp / CLR`. At 1-1/2 in that is
+8348 N. It is the same moment the drive pin sees, arriving at a different radius.
+
+That force reaches the die through the plates, so the plate bolts carry it as a force plus
+the moment it makes about the pivot — which is the full bending moment, because that is
+what the clamp is holding. Standard bolt group: `F/n + M/(n r)`.
+
+### The plates make the sliced die natural
+
+A die with plates bolted to it is already a stack. Whatever the roadmap's laser-cut sliced
+die turns out to be, it inherits the same bolt circle and the same interfaces, so that item
+got cheaper by being blocked on this one.

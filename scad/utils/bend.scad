@@ -165,6 +165,13 @@ function bend_operator_force_N(moment_Nm, length_mm) = moment_Nm / (length_mm / 
 //! large as the die's material allows.
 function bend_drive_pin_force_N(moment_Nm, radius_mm) = moment_Nm / (radius_mm / 1000);
 
+//! Force the clamp has to hold the tube against, N.
+//!
+//! The tube is dragged round the die by the clamp, so the clamp carries the tangential
+//! force in the tube - the bending moment over the radius it is bent on. It is the same
+//! moment the drive pin sees, arriving at a different radius.
+function bend_clamp_force_N(moment_Nm, clr) = moment_Nm / (clr / 1000);
+
 //
 // The followbar, and what it does to the frame.
 //

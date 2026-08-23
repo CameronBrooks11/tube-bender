@@ -8,10 +8,10 @@
 //! the tube, the pins come from the loads they carry, and the base bolt pattern comes from
 //! the torque it has to react.
 //!
-//! Built so far: the forming die, the frame and drive links, the followbar, the base and
-//! every pin and bolt between them. Not yet built: the clamp that holds the tube to the
-//! die, which needs the die to carry plates before it has anything to bolt to - see
-//! design-basis section 15 - and the ratchet, the sliced die and a pedestal.
+//! Every part of the working mechanism is built and derived: the forming die and its
+//! plates, the clamp, the followbar, the frame and drive links, the base, and every pin
+//! and bolt between them. Still on the roadmap: a ratchet, tapered links, a pedestal, and
+//! a sliced die that can be cut from flat sheet.
 //!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -34,6 +34,8 @@ use <custom/drive_link.scad>
 use <custom/frame_link.scad>
 use <custom/base.scad>
 use <custom/followbar.scad>
+use <custom/die_plate.scad>
+use <custom/clamp.scad>
 
 $fn = 90;
 
@@ -48,6 +50,8 @@ bend_angle  = 180;
 drive_plate = plate_0p250in;
 frame_plate = plate_0p250in;
 base_plate  = plate_0p375in;
+die_plate_stock = plate_0p250in;
+die_plate_bolts = 6;
 
 tube_length = 600;
 
@@ -68,7 +72,7 @@ tube_length = 600;
 moment    = bend_plastic_moment_Nm(tube);
 socket    = drive_link_socket_radius(tube, clr);
 handle    = bend_handle_length_mm(moment, socket);
-layers    = layout_layers(tube, drive_plate, frame_plate, base_plate);
+layers    = layout_layers(tube, drive_plate, frame_plate, base_plate, die_plate_stock);
 t_drive   = plate_thickness(drive_plate);
 t_frame   = plate_thickness(frame_plate);
 t_die     = forming_die_thickness(tube);
@@ -106,9 +110,20 @@ spacer_bolt  = pin_smallest_at_least(
                                          pin_material_yield));
 spacer_tube  = structural_smallest_for_bore(pin_pivot_hole(pin_diameter(spacer_bolt)));
 
-// The U-strap holds the tube to the die against the same force the followbar applies.
-ustrap_pin = pin_smallest_at_least(
-                 pin_required_diameter(followbar_force, t_die, t_frame, pin_material_yield));
+// The clamp drags the tube round the die, so it carries the tangential force in the tube.
+// Its two pins share that, through the die plates.
+clamp_force = bend_clamp_force_N(moment, clr);
+ustrap_pin  = pin_smallest_at_least(
+                  pin_required_diameter(clamp_force / 2, t_die,
+                                        plate_thickness(die_plate_stock),
+                                        pin_material_yield));
+clamp_bolt  = bolt_smallest_at_least(tube_od(tube) / 4);
+plate_bolt  = bolt_smallest_at_least(
+                  sqrt(4 * die_plate_bolt_shear_N(moment, clr,
+                           die_plate_bolt_radius(tube, clr, pin_diameter(frame_pin),
+                                                 pin_diameter(drive_pin), tube_od(tube) / 4),
+                           die_plate_bolts)
+                       / (PI * pin_allowable_shear_fraction * bolt_material_yield)));
 
 drive_angles = forming_die_drive_angles(tube, clr, pin_diameter(frame_pin),
                                         pin_diameter(drive_pin), bend_angle);
@@ -134,6 +149,10 @@ drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
                   handle, pin_diameter(spacer_bolt));
 frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d);
 followbar_report(tube, clr, fb_pin_d, followbar_force);
+die_plate_report(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
+                 pin_diameter(drive_pin), pin_diameter(ustrap_pin), plate_bolt,
+                 bolt_material_yield, die_plate_bolts, moment);
+clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
 base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bolt,
             bolt_material_yield, layout_working_height(layers));
 
@@ -162,9 +181,23 @@ echo(str("stack:   ", layout_height(layers), " mm overall, ", layout_frame_gap(l
 function rotate_pt(axis, p) = [axis[0] * p[0] - axis[1] * p[1],
                                axis[1] * p[0] + axis[0] * p[1]];
 
+plate_bolt_pos = die_plate_bolt_positions(tube, clr, pin_diameter(frame_pin),
+                                          pin_diameter(drive_pin),
+                                          bolt_diameter(plate_bolt), bend_angle,
+                                          die_plate_bolts);
+
 module forming_die_stl()
     forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
-                pin_diameter(drive_pin), pin_diameter(ustrap_pin));
+                pin_diameter(drive_pin), pin_diameter(ustrap_pin),
+                plate_bolt_pos, bolt_diameter(plate_bolt));
+
+module die_plate_stl()
+    die_plate(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
+              pin_diameter(drive_pin), pin_diameter(ustrap_pin),
+              bolt_diameter(plate_bolt), die_plate_bolts);
+
+module clamp_stl()
+    clamp(tube, clr, pin_diameter(ustrap_pin), bolt_diameter(clamp_bolt));
 
 module drive_link_stl()
     drive_link(tube, clr, drive_plate, pin_diameter(frame_pin), pin_diameter(drive_pin),
@@ -185,6 +218,19 @@ module base_stl()
 module main_assembly()
 assembly("main") {
     stl_colour(pp1_colour) stl("forming_die") forming_die_stl();
+
+    for (layer = ["die plate lower", "die plate upper"])
+        translate_z(layout_z(layers, layer))
+            stl_colour(pp4_colour) stl("die_plate") die_plate_stl();
+
+    translate([clr, 0, 0])
+        stl_colour(pp2_colour) stl("clamp") clamp_stl();
+
+    for (p = die_plate_clamp_pins(tube, clr, pin_diameter(ustrap_pin)))
+        translate(concat(p, [layout_z(layers, "die plate lower")]))
+            pin(ustrap_pin, layout_z(layers, "die plate upper")
+                            + layout_thickness(layers, "die plate upper")
+                            - layout_z(layers, "die plate lower") + 6);
 
     // The links are drawn with their drive hole on +x, so the pair has to be turned to
     // whichever die drive hole the pin is in. Drawing them at zero while the pin sits at

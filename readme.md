@@ -9,10 +9,10 @@ handle. What is new here is that it is derived rather than drawn - the die comes
 the tube, the pins come from the loads they carry, and the base bolt pattern comes from
 the torque it has to react.
 
-Built so far: the forming die, the frame and drive links, the followbar, the base and
-every pin and bolt between them. Not yet built: the clamp that holds the tube to the
-die, which needs the die to carry plates before it has anything to bolt to - see
-design-basis section 15 - and the ratchet, the sliced die and a pedestal.
+Every part of the working mechanism is built and derived: the forming die and its
+plates, the clamp, the followbar, the frame and drive links, the base, and every pin
+and bolt between them. Still on the roadmap: a ratchet, tapered links, a pedestal, and
+a sliced die that can be cut from flat sheet.
 
 Why the numbers are what they are, and what each one rests on, is in
 [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -38,25 +38,30 @@ started from actually measured, and which of its features survived, is in
 |---:|---:|:---|
 |  | | **Vitamins** |
 | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1 in dia x 78mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 78mm, 98306A868 |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 91mm, 98306A868 |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2025mm x 77mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 229mm x 191mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 230mm x 201mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 274mm x 155mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 45mm |
-| &nbsp;&nbsp;19&nbsp; | &nbsp;&nbsp;19&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm |
+| &nbsp;&nbsp;24&nbsp; | &nbsp;&nbsp;24&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.stl |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;die_plate.stl |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;drive_link.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;forming_die.stl |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;frame_link.stl |
-| &nbsp;&nbsp;7&nbsp; | &nbsp;&nbsp;7&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+| &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
 
 <span></span>
 [Top](#TOP)
@@ -68,29 +73,37 @@ started from actually measured, and which of its features survived, is in
 |Qty|Description|
 |---:|:----------|
 |4| Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 1 in dia x 78mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 3/4 in dia x 78mm, 98306A868|
-|2| Pin clevis 5/16 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 7/8 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 1 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 3/4 in dia x 91mm, 98306A868|
+|2| Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm|
+|1| Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm|
 |1| Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm|
 |2| Plate mild steel 1/4 in, blank 2025mm x 77mm|
+|2| Plate mild steel 1/4 in, blank 229mm x 191mm|
 |2| Plate mild steel 1/4 in, blank 230mm x 201mm|
 |1| Plate mild steel 3/8 in, blank 274mm x 155mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm|
-|2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 45mm|
+|2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm|
 
 
 ### 3D Printed parts
 
-| 1 x [base.stl](stls/base.stl) | 2 x [drive_link.stl](stls/drive_link.stl) | 1 x [followbar.stl](stls/followbar.stl) |
+| 1 x [base.stl](stls/base.stl) | 1 x [clamp.stl](stls/clamp.stl) | 2 x [die_plate.stl](stls/die_plate.stl) |
 |---|---|---|
-| ![base.stl](stls/base.png) | ![drive_link.stl](stls/drive_link.png) | ![followbar.stl](stls/followbar.png) 
+| ![base.stl](stls/base.png) | ![clamp.stl](stls/clamp.png) | ![die_plate.stl](stls/die_plate.png) 
 
 
-| 1 x [forming_die.stl](stls/forming_die.stl) | 2 x [frame_link.stl](stls/frame_link.stl) |
-|---|---|
-| ![forming_die.stl](stls/forming_die.png) | ![frame_link.stl](stls/frame_link.png) 
+| 2 x [drive_link.stl](stls/drive_link.stl) | 1 x [followbar.stl](stls/followbar.stl) | 1 x [forming_die.stl](stls/forming_die.stl) |
+|---|---|---|
+| ![drive_link.stl](stls/drive_link.png) | ![followbar.stl](stls/followbar.png) | ![forming_die.stl](stls/forming_die.png) 
+
+
+| 2 x [frame_link.stl](stls/frame_link.stl) |
+|---|
+| ![frame_link.stl](stls/frame_link.png) 
 
 
 

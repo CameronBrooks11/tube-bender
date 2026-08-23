@@ -38,21 +38,25 @@ layout_running_clearance = 0.5;
 
 //! The stack, bottom to top, as `[name, z of underside, thickness]`. Everything that
 //! places a part reads this rather than adding thicknesses up again.
-function layout_layers(tube, drive_plate, frame_plate, base_plate) =
+function layout_layers(tube, drive_plate, frame_plate, base_plate, die_plate) =
     let (td  = forming_die_thickness(tube),
+         tdp = plate_thickness(die_plate),
          tdl = plate_thickness(drive_plate),
          tfl = plate_thickness(frame_plate),
          tb  = plate_thickness(base_plate),
-         c   = layout_running_clearance)
+         c   = layout_running_clearance,
+         // The die plates are bolted hard to the die, so they move with it and take no
+         // clearance against it. Everything outside them turns relative to it and does.
+         fl  = -td / 2 - tdp - c - tdl - c - tfl)
     [
-        // No clearance under the frame link: the base is bolted hard to it and nothing
-        // there moves. Every gap above it does.
-        ["base",             -td / 2 - 2 * c - tdl - tfl - tb, tb ],
-        ["frame link lower", -td / 2 - 2 * c - tdl - tfl, tfl],
-        ["drive link lower", -td / 2 - c - tdl,           tdl],
-        ["forming die",      -td / 2,                     td ],
-        ["drive link upper",  td / 2 + c,                 tdl],
-        ["frame link upper",  td / 2 + 2 * c + tdl,       tfl],
+        ["base",             fl - tb,           tb ],
+        ["frame link lower", fl,                tfl],
+        ["drive link lower", -td / 2 - tdp - c - tdl, tdl],
+        ["die plate lower",  -td / 2 - tdp,     tdp],
+        ["forming die",      -td / 2,           td ],
+        ["die plate upper",   td / 2,           tdp],
+        ["drive link upper",  td / 2 + tdp + c, tdl],
+        ["frame link upper",  td / 2 + tdp + c + tdl + c, tfl],
     ];
 
 //! Underside of a named layer, mm.
