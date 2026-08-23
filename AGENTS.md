@@ -61,7 +61,8 @@ call.** A lookup over a registry lives beside the registry, not in the singular 
 Better still where it fits: **export the calculation, not the constant.** A function crosses
 a `use` boundary safely, so a file that would otherwise have to export a number can export
 the thing it wanted the number for instead, and the boundary becomes safe by construction
-rather than by everyone remembering. `base_nominal_anchor_radius()` is the pattern.
+rather than by everyone remembering. `forming_die_drive_pitch()` is the pattern: the pitch
+is a variable the die owns, and every consumer reads the function instead.
 
 Related: OpenSCAD does not error on a missing argument, it passes `undef`. Changing a
 function's signature silently mis-computes every call site you forget. Grep for the name.

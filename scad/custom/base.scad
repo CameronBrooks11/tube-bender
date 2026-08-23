@@ -40,18 +40,13 @@ include <../utils/bend.scad>;
 //! looks deliberate.
 function base_margin(bolt_d) = bolt_clearance_hole_d(bolt_d);
 
-// Nominal inset of an anchor bolt from the plate's edge, mm, used to get a radius to size
-// the bolt against before the bolt is known. The real inset comes from the bolt.
-//
-// Deliberately private, and reached through the function below rather than exported: a
-// variable does not cross a `use` boundary, and a caller that reads one through `use` gets
-// undef silently. Exposing the CALCULATION rather than the constant makes the boundary
-// safe by construction. See AGENTS.md.
-base_nominal_inset = 12;
-
-//! The anchor radius to size the first bolt against, before its real inset is known.
-function base_nominal_anchor_radius(tube, clr, link_width, followbar_pin_d) =
-    base_anchor_radius(tube, clr, link_width, base_nominal_inset);
+// There was a base_nominal_anchor_radius() here, to size a first bolt against a nominal
+// inset before the real one was known. base_anchor_bolt() stopped needing it when the
+// two-pass sizing was replaced by a direct filter, and it was left behind - DEAD, and
+// broken with it: it called base_anchor_radius() with four arguments where the signature
+// takes five, so the inset arrived as undef and the whole thing returned undef. Nothing
+// called it, so nothing noticed. This is the missing-argument failure AGENTS.md warns
+// about, sitting in the file for however long.
 
 //! The radius a bolt of `bolt_d` actually gets, once its own edge distance is taken out of
 //! the plate. Always SMALLER than the nominal, so the load goes UP when a bolt is chosen -
