@@ -123,6 +123,26 @@ three. Add the check there and read `just report` before drawing the part.
 
 Assert only what is physically impossible or unbuildable. Echo everything else.
 
+## Moving parts: check engagement, not clearance
+
+Anything that indexes has two separate questions and the easy one hides the hard one.
+
+**Clearance** asks whether two parts can be in the same place. It is tempting to answer it
+with the envelope of everywhere a part goes over a whole cycle - and that is the wrong
+envelope, because a collision needs two things in one place *at the same time*. The drive
+links sweep every radius and occupy only one narrow band of angle, and reading the first as
+the answer cost a working die lock for a round and put a stack reorder on the roadmap that
+was never needed.
+
+**Engagement** asks whether the right parts are in the same place when they need to be. It
+is the question that gets skipped, and clearance cannot stand in for it. A die lock that
+cleared every obstacle and satisfied the hole phase still engaged on two strokes out of
+five, because on the other three the die had not rotated far enough to be under it at all.
+
+So: **enumerate the cycle and check every step of it.** Five lines of arithmetic printing
+LOCKS or no hole at the pin for each stroke found that in seconds; no clearance check ever
+would have. Then look for the closed form - there was one, and it is exact.
+
 ## Provenance
 
 Every number that came from outside is cited in `docs/references.md` with a verification
