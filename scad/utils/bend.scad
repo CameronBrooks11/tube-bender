@@ -198,6 +198,27 @@ function bend_followbar_station(tube, clr) =
 function bend_followbar_force_N(moment_Nm, station_mm) = moment_Nm / (station_mm / 1000);
 
 //
+// Sweep. The drive links turn with the die and reach past everything; the followbar and
+// its pin stand still in their path. Nothing stops them meeting except keeping the bend
+// out of that sector.
+//
+
+//! Angular half-width, degrees, that a bar of `width_mm` occupies at `radius_mm`.
+function bend_angular_half_width(width_mm, radius_mm) =
+    radius_mm <= width_mm / 2 ? 90 : asin(width_mm / 2 / radius_mm);
+
+//! Degrees of sector the drive link must be kept clear of, either side of the followbar:
+//! the link's own half-width plus the followbar's, at the followbar's radius.
+function bend_followbar_keepout(link_width_mm, followbar_length_mm, radius_mm) =
+    bend_angular_half_width(link_width_mm, radius_mm)
+        + bend_angular_half_width(followbar_length_mm, radius_mm);
+
+//! Degrees of swing left for the drive link once the followbar's keep-out is taken out of
+//! the circle. The bend plus its overbend has to fit inside this.
+function bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm) =
+    360 - 2 * bend_followbar_keepout(link_width_mm, followbar_length_mm, radius_mm);
+
+//
 // Sizing a plate in bending. Used for both links.
 //
 
@@ -258,6 +279,15 @@ function bend_anchor_bolt_diameter(force_N, yield_MPa) =
 // 2.99999... and a bare `< 3` test reports a departure on the very radius the rule picked.
 // Four of the fifteen registered sizes tripped it before this comment existed.
 clr_tolerance = 0.01;
+
+//! As bend_departures, plus the ones that need the machine's geometry rather than only
+//! the tube's. Kept separate so the tube-only checks can run before anything is designed.
+function bend_mechanism_departures(bend_angle, link_width_mm, followbar_length_mm,
+                                   radius_mm) = [
+    if (bend_angle + bend_overbend_degrees
+            > bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm))
+        "the drive link cannot swing the bend without sweeping through the followbar",
+];
 
 function bend_departures(tube, clr) = [
     if (clr < bend_min_clr(tube) - clr_tolerance)

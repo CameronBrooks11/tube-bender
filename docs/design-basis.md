@@ -485,3 +485,71 @@ fails first is **whatever the plate is bolted to**: the report prints the bearin
 and says plainly that it is fine on steel and wants checking against a bench top. A
 pedestal is on the roadmap, and its post is the same section-modulus problem as everything
 else here — bending from `F x h` plus torsion from `Mp`.
+
+
+## 15. The followbar, and the clamp that is not built
+
+### The followbar closes a placeholder rather than adding a parameter
+
+Where the followbar's pin sits was carried as a placeholder from Phase 3 to Phase 4 — one
+tube diameter outboard of the tube, on the prototype's precedent, because the part it
+belonged to did not exist. It is now derived: half the tube to reach the groove's deepest
+point, a machining web behind that, then half the pin. At 1-1/2 in that is **19 mm closer
+in than the guess**, which shortens the frame link's reach and takes its bending moment
+from 815 to 757 N·m.
+
+That is the whole argument for declaring interfaces instead of inventing numbers. The
+guess was not wildly wrong, and it was wrong.
+
+### It is only as tall as the die, and that is a kinematic constraint
+
+The followbar sits in the die's own z band and no taller, because the drive links occupy
+the bands either side and **they sweep every radius**. Anything standing proud of the die
+is in their path.
+
+The pin that holds the followbar has the same problem and cannot be solved the same way —
+it has to reach the frame links, which means crossing the drive links' band. So the
+constraint is angular rather than axial: **the bend has to fit in the part of the circle
+the followbar is not in.**
+
+```
+sweep:   315 deg free of the followbar, and the bend needs 185 deg
+```
+
+`bend_available_sweep()` takes the drive link's own angular half-width and the followbar's
+at that radius out of the full circle, and `bend_mechanism_departures()` names it if the
+bend will not fit. At 180 degrees there is 130 degrees to spare; the check exists because
+nothing about it is obvious, and a 300 degree die would not fit.
+
+### The U-strap is not built, and this is why
+
+The clamp that holds the tube to the die is a real part on both reference machines and on
+the prototype, and it is **deliberately absent** rather than forgotten. Its mounting has a
+topology problem that this die cannot solve, and the honest thing is to write the
+constraints down rather than invent a fixing that would not work.
+
+What has to be true at once:
+
+1. It must sit **outboard of the tube** on the die's tail, where the die has no material —
+   the tail's outer face is the tube's groove.
+2. It must be **removable**. A closed channel would be simpler and stronger, and it was
+   considered and rejected: you could then only load a tube by threading it in from an
+   end, which makes multi-bend parts impossible. JD2's own worked example is a four-bend
+   rollbar.
+3. It cannot stand **above or below the die**, because the drive links are there and they
+   sweep every radius.
+4. The only die material it can reach is **inboard of the groove**, and the path there is
+   blocked — by the tube below the groove's flanks, and by only 3.2 mm of land above them.
+
+The prototype solved it, and the solution is instructive: its die assembly carries a
+**plate above and below the die halves**, and the locker's 6.35 mm tongue runs in a slot
+in those plates. The plates are what create the z-space that constraint 3 and 4 deny, and
+the slot is what stops the clamp rotating about its single pin.
+
+So the next step is not a U-strap. It is **giving the die its plates back** — which is
+also what makes the sliced-die roadmap item natural, since a plated die is already a
+stack. The clamp follows from that in a few lines. Building the clamp first would mean
+choosing a fixing that the die cannot actually offer.
+
+The die's U-strap pin hole and the pin sized for it are left in place, because they are
+right either way.

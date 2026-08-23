@@ -8,6 +8,11 @@
 //! the tube, the pins come from the loads they carry, and the base bolt pattern comes from
 //! the torque it has to react.
 //!
+//! Built so far: the forming die, the frame and drive links, the followbar, the base and
+//! every pin and bolt between them. Not yet built: the clamp that holds the tube to the
+//! die, which needs the die to carry plates before it has anything to bolt to - see
+//! design-basis section 15 - and the ratchet, the sliced die and a pedestal.
+//!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
 //! started from actually measured, and which of its features survived, is in
@@ -28,6 +33,7 @@ use <custom/forming_die.scad>
 use <custom/drive_link.scad>
 use <custom/frame_link.scad>
 use <custom/base.scad>
+use <custom/followbar.scad>
 
 $fn = 90;
 
@@ -114,22 +120,11 @@ drive_hole_r = len(drive_angles) ? drive_radius : undef;
 // before the bolt is. Size the bolt against a nominal inset, then the real inset - and so
 // the real radius - follows from the bolt that comes out.
 op_force     = bend_operator_force_N(moment, handle);
+fb_pin_d     = pin_diameter(followbar_pin);
 link_w       = frame_link_width(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
-                                pin_diameter(followbar_pin));
-base_nom_r   = base_nominal_anchor_radius(tube, clr, link_w);
-anchor_bolt0 = bolt_smallest_at_least(
-                   bend_anchor_bolt_diameter(
-                       base_anchor_shear_N(moment, base_nom_r, op_force),
-                       bolt_material_yield));
-// Second pass against the radius that bolt actually leaves. The first pass is always
-// optimistic because a bolt's own edge distance eats the radius it is sized on.
-anchor_bolt  = bolt_smallest_at_least(
-                   bend_anchor_bolt_diameter(
-                       base_anchor_shear_N(moment,
-                           base_actual_anchor_radius(tube, clr, link_w,
-                                                     bolt_diameter(anchor_bolt0)),
-                           op_force),
-                       bolt_material_yield));
+                                fb_pin_d);
+anchor_bolt  = base_anchor_bolt(tube, clr, link_w, fb_pin_d, moment, op_force,
+                                bolt_material_yield, bolts);
 
 bend_report(tube, clr, handle);
 forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
@@ -137,10 +132,19 @@ forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
 drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
                   pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle),
                   handle, pin_diameter(spacer_bolt));
-frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
-                  pin_diameter(followbar_pin));
-base_report(tube, clr, base_plate, link_w, moment, op_force, anchor_bolt,
+frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d);
+followbar_report(tube, clr, fb_pin_d, followbar_force);
+base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bolt,
             bolt_material_yield, layout_working_height(layers));
+
+// The drive links turn with the die and sweep every radius; the followbar and its pin do
+// not move. The bend has to fit in what is left of the circle.
+fb_radius = frame_link_reach(tube, clr, fb_pin_d);
+for (d = bend_mechanism_departures(bend_angle, link_w, bend_followbar_length(tube), fb_radius))
+    echo(str("DEPARTURE: ", d));
+echo(str("sweep:   ", round(bend_available_sweep(link_w, bend_followbar_length(tube), fb_radius)),
+         " deg free of the followbar, and the bend needs ",
+         forming_die_arc(bend_angle), " deg"));
 
 echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
          pin_governing_mode(frame_force, t_die, t_drive + t_frame, pin_material_yield),
@@ -169,10 +173,12 @@ module drive_link_stl()
 
 module frame_link_stl()
     frame_link(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
-               pin_diameter(followbar_pin));
+               fb_pin_d);
+
+module followbar_stl() followbar(tube, fb_pin_d);
 
 module base_stl()
-    base(tube, clr, base_plate, link_w, bolt_diameter(anchor_bolt));
+    base(tube, clr, base_plate, link_w, fb_pin_d, bolt_diameter(anchor_bolt));
 
 //! The stack, with the tube where it goes in. The handle, the followbar, the U-strap and
 //! the base are not built yet.
@@ -188,12 +194,20 @@ assembly("main") {
             rotate(drive_angle)
                 stl_colour(pp2_colour) stl("drive_link") drive_link_stl();
 
+    translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d)
+                         - [followbar_pin_offset(tube, fb_pin_d), 0], [0]))
+        stl_colour(pp1_colour) stl("followbar") followbar_stl();
+
+    translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d),
+                     [layout_z(layers, "frame link lower")]))
+        pin(followbar_pin, layout_pin_length(layers, "frame link lower"));
+
     for (layer = ["frame link lower", "frame link upper"])
         translate_z(layout_z(layers, layer))
             stl_colour(pp3_colour) stl("frame_link") frame_link_stl();
 
     translate_z(layout_z(layers, "base"))
-        rotate(atan2(frame_link_axis(tube, clr)[1], frame_link_axis(tube, clr)[0]))
+        rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1], frame_link_axis(tube, clr, fb_pin_d)[0]))
             stl_colour(pp4_colour) stl("base") base_stl();
 
     translate_z(layout_z(layers, "frame link lower"))
@@ -201,11 +215,11 @@ assembly("main") {
 
     // Four anchor bolts at the base's corners, heads up, running down through whatever
     // the machine is bolted to.
-    for (p = base_anchor_positions(tube, clr, link_w,
+    for (p = base_anchor_positions(tube, clr, link_w, fb_pin_d,
                                    plate_eye_radius(bolt_clearance_hole_d(
                                        bolt_diameter(anchor_bolt))) + 1))
-        translate(concat(rotate_pt(frame_link_axis(tube, clr),
-                                   p + [frame_link_reach(tube, clr) / 2, 0]),
+        translate(concat(rotate_pt(frame_link_axis(tube, clr, fb_pin_d),
+                                   p + [frame_link_reach(tube, clr, fb_pin_d) / 2, 0]),
                          [layout_z(layers, "base") + layout_thickness(layers, "base")]))
             rotate([180, 0, 0])
                 bolt(anchor_bolt, layout_thickness(layers, "base") + 30);

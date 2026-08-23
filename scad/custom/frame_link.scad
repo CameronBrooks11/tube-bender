@@ -45,51 +45,49 @@ include <NopSCADlib/core.scad>;
 use <../purchased/bolt.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
+use <followbar.scad>
 
 include <../utils/bend.scad>;
 include <../utils/pin_sizing.scad>;   // pin_allowable_bending_fraction is a variable, so include
 
-//! How far outboard of the tube's outer surface the followbar's pin sits, mm.
-//!
-//! PLACEHOLDER, to be closed by the followbar. One tube diameter is enough room for a
-//! block that reaches in to the tube and a pin behind it, and it is what the prototype's
-//! guide used - but the followbar has not been designed, so this is the frame link
-//! reaching for something that is not there yet rather than a derived dimension.
-function frame_link_followbar_offset(tube) = tube_od(tube);
-
 //! Where the followbar's pin sits, [x, y] mm. Outboard of the tube, downstream of the
 //! die's tail by the followbar's station.
-function frame_link_followbar_pos(tube, clr) =
-    [clr + tube_od(tube) / 2 + frame_link_followbar_offset(tube),
+//!
+//! The outboard offset used to be a placeholder - one tube diameter, on the prototype's
+//! precedent - because the followbar did not exist to derive it from. It does now, and it
+//! puts the pin 19 mm closer in than the guess did, which shortens this link's reach and
+//! with it the moment it carries.
+function frame_link_followbar_pos(tube, clr, followbar_pin_d) =
+    [clr + followbar_pin_offset(tube, followbar_pin_d),
      -bend_followbar_station(tube, clr)];
 
 //! Distance from the pivot to the followbar's pin, mm - the link's lever arm.
-function frame_link_reach(tube, clr) = norm(frame_link_followbar_pos(tube, clr));
+function frame_link_reach(tube, clr, followbar_pin_d) = norm(frame_link_followbar_pos(tube, clr, followbar_pin_d));
 
 //! Peak bending moment in ONE link, N.mm, taken at the pivot.
-function frame_link_moment_Nmm(tube, clr, moment_Nm) =
+function frame_link_moment_Nmm(tube, clr, moment_Nm, followbar_pin_d) =
     bend_followbar_force_N(moment_Nm, bend_followbar_station(tube, clr))
-        * frame_link_reach(tube, clr) / 2;
+        * frame_link_reach(tube, clr, followbar_pin_d) / 2;
 
 //! Width of the link, mm.
 function frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) =
     let (hole = pin_pivot_hole(frame_pin_d),
          fb   = pin_allowable_bending_fraction * plate_yield(plate),
-         wb   = plate_width_for_moment(frame_link_moment_Nmm(tube, clr, moment_Nm),
+         wb   = plate_width_for_moment(frame_link_moment_Nmm(tube, clr, moment_Nm, followbar_pin_d),
                                        plate_thickness(plate), fb, hole))
         max(wb,
             2 * plate_eye_radius(hole),
             2 * plate_eye_radius(pin_pivot_hole(followbar_pin_d)));
 
 //! Unit vector from the pivot towards the followbar - the axis the link lies on.
-function frame_link_axis(tube, clr) =
-    frame_link_followbar_pos(tube, clr) / frame_link_reach(tube, clr);
+function frame_link_axis(tube, clr, followbar_pin_d) =
+    frame_link_followbar_pos(tube, clr, followbar_pin_d) / frame_link_reach(tube, clr, followbar_pin_d);
 
 //! One frame link, lying on z = 0, pivot at the origin.
 module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) {
     w    = frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d);
-    fb   = frame_link_followbar_pos(tube, clr);
-    axis = frame_link_axis(tube, clr);
+    fb   = frame_link_followbar_pos(tube, clr, followbar_pin_d);
+    axis = frame_link_axis(tube, clr, followbar_pin_d);
 
     render_2D_plate(plate)
       plate_2D(plate, abs(fb[0]) + w, abs(fb[1]) + w)
@@ -111,14 +109,14 @@ module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) {
 //! Echo what the link comes out as.
 module frame_link_report(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) {
     w  = frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d);
-    fb = frame_link_followbar_pos(tube, clr);
+    fb = frame_link_followbar_pos(tube, clr, followbar_pin_d);
     p  = bend_followbar_force_N(moment_Nm, bend_followbar_station(tube, clr));
 
     echo(str("frame link: ", plate_size(plate), " plate, ", w, " mm wide, reach ",
-             frame_link_reach(tube, clr), " mm"));
+             frame_link_reach(tube, clr, followbar_pin_d), " mm"));
     echo(str("            followbar pin at [", fb[0], ", ", fb[1], "] mm, ",
              round(p), " N on it, station ", bend_followbar_station(tube, clr),
              " mm downstream"));
-    echo(str("            peak moment ", round(frame_link_moment_Nmm(tube, clr, moment_Nm) / 1000),
+    echo(str("            peak moment ", round(frame_link_moment_Nmm(tube, clr, moment_Nm, followbar_pin_d) / 1000),
              " N.m per link at the pivot, as a cantilever"));
 }
