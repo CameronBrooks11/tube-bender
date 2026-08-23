@@ -362,17 +362,38 @@ clr_tolerance = 0.01;
 //! and only ONE stroke - the pitch, plus whatever the last one is over-pulled by - has to
 //! fit between the followbar's keep-outs. With none, JD2 drives such dies on the U-strap
 //! pin instead [JD2-M32 p.7], nothing indexes, and the whole arc has to fit.
+//! `home_deg` is the world angle each stroke starts at - where the drive link picks up a
+//! hole - and `followbar_deg` is the direction the followbar stands in. With those the band
+//! is PLACED rather than merely sized, so the last check below asks whether it actually
+//! overlaps the followbar rather than only whether there was room for it somewhere.
 function bend_mechanism_departures(bend_angle, link_width_mm, followbar_length_mm,
-                                   radius_mm, pitch_deg, n_holes) =
+                                   radius_mm, pitch_deg, n_holes, home_deg,
+                                   followbar_deg) =
     let (sweep = bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm),
          arc   = bend_angle + bend_overbend_degrees,
-         last  = pitch_deg + bend_stroke_overrun(bend_angle, n_holes, pitch_deg))
+         over  = bend_stroke_overrun(bend_angle, n_holes, pitch_deg),
+         last  = pitch_deg + over,
+         // The band the link's material occupies, and the sector the followbar holds, both
+         // measured about the pivot. The band runs from the home angle to one stroke past
+         // it, widened by the link's own half-width; the last stroke is the long one.
+         bh    = bend_angular_half_width(link_width_mm, radius_mm),
+         fh    = bend_angular_half_width(followbar_length_mm, radius_mm),
+         lo    = home_deg - bh,
+         hi    = home_deg + last + bh,
+         // Two arcs overlap iff their midpoints are closer than the sum of their
+         // half-widths. Taken on midpoints rather than endpoints because endpoint
+         // comparisons on a circle need a case for every way the pair can wrap.
+         sep   = abs(((followbar_deg - (lo + hi) / 2 + 540) % 360) - 180))
     [
         if (n_holes == 0 && arc > sweep)
             "the die has no drive holes, so the link must swing the whole bend - and it sweeps through the followbar doing it",
         if (n_holes > 0 && last > sweep)
             str("the last stroke needs ", round(last),
                 " deg to finish the arc and the followbar leaves only ", round(sweep)),
+        if (n_holes > 0 && last <= sweep && sep < (hi - lo) / 2 + fh)
+            str("the stroke overlaps the followbar where it stands - the band runs ",
+                round(lo), " to ", round(hi), " deg and the followbar holds ",
+                round(followbar_deg - fh), " to ", round(followbar_deg + fh)),
     ];
 
 function bend_departures(tube, clr) = [

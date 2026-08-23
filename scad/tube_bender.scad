@@ -228,8 +228,15 @@ drive_w   = drive_link_width_at(drive_plate, op_force, handle,
                                 pin_diameter(spacer_bolt), fb_radius);
 stroke_overrun = bend_stroke_overrun(bend_angle, n_drive_holes, forming_die_drive_pitch());
 
+// The band is placed, not just sized: each stroke starts where the drive link picks up a
+// hole, which at the start of a bend is the first hole's own angle.
+drive_home_deg = drive_inset;
+followbar_deg  = atan2(frame_link_followbar_pos(tube, clr, fb_pin_d)[1],
+                       frame_link_followbar_pos(tube, clr, fb_pin_d)[0]);
+
 for (d = bend_mechanism_departures(bend_angle, drive_w, bend_followbar_length(tube),
-                                   fb_radius, forming_die_drive_pitch(), n_drive_holes))
+                                   fb_radius, forming_die_drive_pitch(), n_drive_holes,
+                                   drive_home_deg, followbar_deg))
     echo(str("DEPARTURE: ", d));
 
 echo(str("sweep:   ", round(bend_available_sweep(drive_w, bend_followbar_length(tube), fb_radius)),
