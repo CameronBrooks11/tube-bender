@@ -617,3 +617,51 @@ knowing exactly what that costs is better than not offering it.
 Each slice should come out as its own DXF. NopSCADlib names made parts through modules,
 which does not fit a count that varies with the tube, so the stack currently exports as one
 STL. That is a build-system problem rather than a modelling one.
+
+
+## 17. The ratchet, and why it is not built
+
+```
+cycle:   6 strokes of 1.22 m at the handle's end, re-pinning the drive pin between each
+handle:  1947 mm, needing 490 N of pull
+```
+
+Six pulls, each swinging the end of a two-metre handle through a metre and a quarter, and
+between every one of them the drive pin comes out and goes into the next hole in the die.
+That is what a bend costs on this machine as built, and it is the case for a ratchet.
+
+But the stroke length is the lesser half of it. **The real problem is what happens when the
+drive pin comes out.** Nothing then holds the die, so the tube springs back before it can
+be re-pinned, and every stroke gives back part of what the last one gained. JD2 solves that
+with two things working together: a die lock pin, spring-loaded in a collar on the frame
+link, that "slides along the upper surface of the forming die" until it drops into a drive
+hole and locks it; and an anti-springback ratchet on the drive link's spacer tube
+[JD2-M32 p.7, p.8].
+
+### The lock pin has the clamp's problem again
+
+To reach the die's drive holes from a frame link, the pin has to cross the drive links'
+band — and the drive links sweep every radius, so there is nothing at that radius they do
+not pass through. The options all cost something real:
+
+- a **slot in the drive link** at the drive circle — which is exactly where its bending
+  moment peaks and its section is already weakest;
+- a **ratchet ring** above the upper drive link, keyed to the die, which the pin engages
+  instead — an extra part, and it has to be driven by something that also crosses the band;
+- **reordering the stack** so the die sits against a frame link — which puts both drive
+  links on one side of it and loads the drive pin asymmetrically.
+
+The third is probably right and it is not a small change: it moves the die out of the
+middle of the stack, which every z position in `layout.scad` is written around, and the
+drive pin's bending model assumes a symmetric double-shear joint that it would no longer
+be.
+
+This is the same shape of problem the clamp had, and it was resolved the same way — by
+changing what the die offers rather than by inventing a fixing. Writing the constraint down
+is what let that one get solved; the same is being done here rather than fitting a pawl
+somewhere it cannot reach.
+
+### What is safe to say now
+
+The cycle is reported at every size, so the cost of not having a ratchet is visible rather
+than discovered on the bench. Nothing in the model assumes one exists.

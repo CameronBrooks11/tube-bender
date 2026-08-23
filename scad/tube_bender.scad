@@ -8,10 +8,11 @@
 //! the tube, the pins come from the loads they carry, and the base bolt pattern comes from
 //! the torque it has to react.
 //!
-//! Every part of the working mechanism is built and derived: the forming die and its
-//! plates, the clamp, the followbar, the frame and drive links, the base, and every pin
-//! and bolt between them. Still on the roadmap: a ratchet, tapered links, a pedestal, and
-//! a sliced die that can be cut from flat sheet.
+//! Every part of the working mechanism is built and derived: the forming die - machined
+//! from one plate or stacked from flat-cut slices, behind the same interface - its plates,
+//! the clamp, the followbar, the tapered frame and drive links, and a bench base or a
+//! pedestal. Still to do: a ratchet and its die lock, which need the stack reordered
+//! before they have anywhere to reach - see design-basis section 17.
 //!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -201,6 +202,9 @@ echo(str("         drive radius ", nominal_r, " mm nominal -> ", drive_radius,
          " mm with the chosen pin"));
 echo(str("stack:   ", layout_height(layers), " mm overall, ", layout_frame_gap(layers),
          " mm between the frame links"));
+echo(str("cycle:   ", bend_strokes(bend_angle, forming_die_drive_pitch()), " strokes of ",
+         round(bend_stroke_travel_mm(forming_die_drive_pitch(), handle) / 10) / 100,
+         " m at the handle's end, re-pinning the drive pin between each"));
 
 // The base is drawn in the frame link's own frame, so its features have to be turned onto
 // the link's axis to sit under it.

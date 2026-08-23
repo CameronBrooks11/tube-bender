@@ -205,6 +205,19 @@ function bend_followbar_station(tube, clr) =
 function bend_followbar_force_N(moment_Nm, station_mm) = moment_Nm / (station_mm / 1000);
 
 //
+// The operating cycle. What the machine actually asks of the person using it.
+//
+
+//! How many pulls a full bend takes: the drive pin is moved to the next die hole each
+//! time the link runs out of the pitch between them.
+function bend_strokes(bend_angle, hole_pitch_deg) =
+    ceil((bend_angle + bend_overbend_degrees) / hole_pitch_deg);
+
+//! How far the end of the handle travels in one stroke, mm.
+function bend_stroke_travel_mm(hole_pitch_deg, handle_length_mm) =
+    PI * handle_length_mm * hole_pitch_deg / 180;
+
+//
 // Sweep. The drive links turn with the die and reach past everything; the followbar and
 // its pin stand still in their path. Nothing stops them meeting except keeping the bend
 // out of that sector.

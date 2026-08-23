@@ -71,6 +71,9 @@ function die_web(tube) = max(3, tube_od(tube) / 4);
 //! frame will report a departure if the two disagree.
 die_drive_hole_pitch = 36;
 
+//! The same, reachable across a `use` boundary - a variable is not.
+function forming_die_drive_pitch() = die_drive_hole_pitch;
+
 //
 // Derived geometry. Every consumer reads these rather than recomputing them.
 //

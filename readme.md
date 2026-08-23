@@ -9,10 +9,11 @@ handle. What is new here is that it is derived rather than drawn - the die comes
 the tube, the pins come from the loads they carry, and the base bolt pattern comes from
 the torque it has to react.
 
-Every part of the working mechanism is built and derived: the forming die and its
-plates, the clamp, the followbar, the frame and drive links, the base, and every pin
-and bolt between them. Still on the roadmap: a ratchet, tapered links, a pedestal, and
-a sliced die that can be cut from flat sheet.
+Every part of the working mechanism is built and derived: the forming die - machined
+from one plate or stacked from flat-cut slices, behind the same interface - its plates,
+the clamp, the followbar, the tapered frame and drive links, and a bench base or a
+pedestal. Still to do: a ratchet and its die lock, which need the stack reordered
+before they have anywhere to reach - see design-basis section 17.
 
 Why the numbers are what they are, and what each one rests on, is in
 [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
