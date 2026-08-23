@@ -24,9 +24,11 @@
  *   is at CLR + OD/2 and the followbar has to reach it - and it cannot be less or the
  *   groove would be cut away.
  * - **arc** is the bend angle plus the overbend the tube springs back through.
- * - **tail length** is the clamp's grip length, 3 x OD.
+ * - **tail length** is the clamp's grip length, 2 x OD for a smooth cavity.
  * - **drive circle** is as large as the material between the groove root and the hole
  *   allows, because the whole drive torque goes through one pin.
+ * - **tail depth** is the groove and a web behind it, and nothing else. It used to clear a
+ *   U-strap pin that the die has not carried since the clamp moved to the die plates.
  *
  * Sets no $fn, so the resolution of the calling file carries through.
  */
@@ -118,15 +120,19 @@ function forming_die_tail_length(tube, clr) = bend_clamp_length(tube, clr);
 function forming_die_hub_radius(tube, frame_pin_d) =
     pin_pivot_hole(frame_pin_d) / 2 + die_web(tube);
 
-//! Radial depth of the tail, mm: enough to carry the groove, the U-strap pin behind it,
-//! and a web on each side of that pin.
-function forming_die_tail_depth(tube, ustrap_pin_d) =
-    forming_die_groove_radius(tube) + 2 * die_web(tube) + pin_index_hole(ustrap_pin_d);
-
-//! Where the U-strap pin sits, [x, y], on the tail behind the groove and half way along it.
-function forming_die_ustrap_pin_pos(tube, clr, ustrap_pin_d) =
-    [forming_die_root_radius(tube, clr) - die_web(tube) - pin_index_hole(ustrap_pin_d) / 2,
-     -forming_die_tail_length(tube, clr) / 2];
+//! Radial depth of the tail, mm: the groove, and a web behind it.
+//!
+//! It used to carry a U-strap pin as well, from the design that pinned the clamp INTO the
+//! die's tail. That design does not exist any more - §15 of the design basis works through
+//! why the clamp cannot reach the die at all, and it is pinned to the die plates instead,
+//! whose tails overhang the tube where nothing else can.
+//!
+//! The pin went, the hole in the die did not. It stayed drilled through the tail with
+//! nothing to put in it, and the tail stayed sized to clear it: 63.5 mm deep at 1-1/2 in
+//! where 28.6 carries the groove. Same fault as the drive link that drew a hole for a die
+//! with no drive holes, found the same way - by asking what mates with what.
+function forming_die_tail_depth(tube) =
+    forming_die_groove_radius(tube) + die_web(tube);
 
 //! Largest drive circle the material allows, mm: the hole and its web have to stay inside
 //! the groove root.
@@ -174,9 +180,9 @@ function forming_die_blank_plan(tube, clr) =
 
 // The die's plan outline: a sector from the pivot out to the CLR, the hub that encloses
 // the pivot, and the tangent tail that carries the clamp.
-module forming_die_outline(tube, clr, bend_angle, frame_pin_d, ustrap_pin_d) {
+module forming_die_outline(tube, clr, bend_angle, frame_pin_d) {
     arc   = forming_die_arc(bend_angle);
-    depth = forming_die_tail_depth(tube, ustrap_pin_d);
+    depth = forming_die_tail_depth(tube);
     lc    = forming_die_tail_length(tube, clr);
     steps = max(8, ceil(arc / 3));
 
@@ -206,13 +212,12 @@ function forming_die_tap_drill(bolt_d) = 0.85 * bolt_d;
 //! rather than derived here because the plates are derived FROM the die and a file cannot
 //! read the file that reads it.
 module forming_die(tube, clr, bend_angle = 180,
-                   frame_pin_d, drive_pin_d, ustrap_pin_d,
+                   frame_pin_d, drive_pin_d,
                    plate_bolts = [], plate_bolt_d = 0) {
     t      = forming_die_thickness(tube);
     gr     = forming_die_groove_radius(tube);
     arc    = forming_die_arc(bend_angle);
     lc     = forming_die_tail_length(tube, clr);
-    strap  = forming_die_ustrap_pin_pos(tube, clr, ustrap_pin_d);
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
     r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);
 
@@ -223,8 +228,8 @@ module forming_die(tube, clr, bend_angle = 180,
     assert(forming_die_hub_radius(tube, frame_pin_d)
                < forming_die_root_radius(tube, clr) - die_web(tube),
            "forming die: the pivot hub reaches the groove - the frame pin is too big for this die");
-    assert(forming_die_tail_depth(tube, ustrap_pin_d) < clr,
-           "forming die: the tail is deeper than the die's radius - the U-strap pin does not fit behind the groove");
+    assert(forming_die_tail_depth(tube) < clr,
+           "forming die: the tail is deeper than the die's radius - the groove would cut past the pivot");
 
     // The BOM has to say what to BUY, not only what to make. NopSCADlib files the .stl
     // under "Printed" because those are its only two categories for a made part; this die
@@ -237,7 +242,7 @@ module forming_die(tube, clr, bend_angle = 180,
 
     difference() {
         linear_extrude(t, center = true)
-            forming_die_outline(tube, clr, bend_angle, frame_pin_d, ustrap_pin_d);
+            forming_die_outline(tube, clr, bend_angle, frame_pin_d);
 
         // The groove, round the bend and on down the tail.
         rotate_extrude(angle = arc)
@@ -257,10 +262,6 @@ module forming_die(tube, clr, bend_angle = 180,
                 translate([r_drv, 0])
                     cylinder(d = pin_index_hole(drive_pin_d), h = t + 2 * eps, center = true);
 
-        // The U-strap's pin.
-        translate(strap)
-            cylinder(d = pin_index_hole(ustrap_pin_d), h = t + 2 * eps, center = true);
-
         // Tapped through for the die plates, one from each face.
         for (p = plate_bolts)
             translate(p)
@@ -270,7 +271,7 @@ module forming_die(tube, clr, bend_angle = 180,
 }
 
 //! Echo what the die comes out as, before it is drawn.
-module forming_die_report(tube, clr, bend_angle, frame_pin_d, drive_pin_d, ustrap_pin_d) {
+module forming_die_report(tube, clr, bend_angle, frame_pin_d, drive_pin_d) {
     blank  = forming_die_blank(tube);
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
     r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);

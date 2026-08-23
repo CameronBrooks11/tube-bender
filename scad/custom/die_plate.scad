@@ -10,7 +10,12 @@
  *
  * The die itself cannot offer it. Its tail ends at the CLR, which is where the tube's
  * groove is; there is 3.2 mm of land above and below that groove and nothing beyond it.
- * The bands either side of the die belong to the drive links, which sweep every radius.
+ * The bands either side of the die belong to the drive links, and the clamp cannot share
+ * them: it is FIXED TO THE DIE and turns with it, so it visits every angle in the arc,
+ * including whichever one a drive link is standing in. (That is what separates it from the
+ * die lock pin, which is fixed to the FRAME, never moves, and can therefore live in an
+ * angle the links do not reach - see design-basis section 17.)
+ *
  * The plates fit in the gap that is left - outside the die, inside the drive links - and
  * their tail overhangs the tube where nothing else can.
  *
@@ -76,7 +81,7 @@ module die_plate(tube, clr, plate, bend_angle, frame_pin_d, drive_pin_d, clamp_p
     arc   = forming_die_arc(bend_angle);
     lc    = forming_die_tail_length(tube, clr);
     edge  = die_plate_tail_edge(tube, clr, clamp_pin_d);
-    depth = edge - (clr - forming_die_tail_depth(tube, clamp_pin_d));
+    depth = edge - (clr - forming_die_tail_depth(tube));
     steps = max(8, ceil(arc / 3));
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
     r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);

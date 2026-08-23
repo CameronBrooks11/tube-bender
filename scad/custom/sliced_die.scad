@@ -91,11 +91,11 @@ function sliced_die_wrap(tube, clr, slice_plate) =
 
 //! One slice's 2D profile - the die's own outline, at that slice's radius.
 module sliced_die_slice_2D(tube, clr, slice_plate, i, bend_angle, frame_pin_d, drive_pin_d,
-                           ustrap_pin_d, plate_bolts, plate_bolt_d) {
+                           plate_bolts, plate_bolt_d) {
     r      = sliced_die_slice_radius(tube, clr, slice_plate, i);
     arc    = forming_die_arc(bend_angle);
     lc     = forming_die_tail_length(tube, clr);
-    depth  = forming_die_tail_depth(tube, ustrap_pin_d);
+    depth  = forming_die_tail_depth(tube);
     steps  = max(8, ceil(arc / 3));
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
     r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);
@@ -119,9 +119,6 @@ module sliced_die_slice_2D(tube, clr, slice_plate, i, bend_angle, frame_pin_d, d
                 rotate(a) translate([r_drv, 0])
                     circle(d = pin_index_hole(drive_pin_d));
 
-            translate(forming_die_ustrap_pin_pos(tube, clr, ustrap_pin_d))
-                circle(d = pin_index_hole(ustrap_pin_d));
-
             for (p = plate_bolts)
                 translate(p) circle(d = bolt_clearance_hole_d(plate_bolt_d));
         }
@@ -129,7 +126,7 @@ module sliced_die_slice_2D(tube, clr, slice_plate, i, bend_angle, frame_pin_d, d
 
 //! The whole stack, mid-plane on z = 0, in the die's own frame.
 module sliced_die(tube, clr, slice_plate, bend_angle, frame_pin_d, drive_pin_d,
-                  ustrap_pin_d, plate_bolts = [], plate_bolt_d = 0) {
+                  plate_bolts = [], plate_bolt_d = 0) {
     n = sliced_die_count(tube, slice_plate);
     t = sliced_die_slice_thickness(tube, slice_plate);
 
@@ -143,8 +140,7 @@ module sliced_die(tube, clr, slice_plate, bend_angle, frame_pin_d, drive_pin_d,
             color(plate_colour(slice_plate))
                 linear_extrude(t)
                     sliced_die_slice_2D(tube, clr, slice_plate, i, bend_angle, frame_pin_d,
-                                        drive_pin_d, ustrap_pin_d, plate_bolts,
-                                        plate_bolt_d);
+                                        drive_pin_d, plate_bolts, plate_bolt_d);
 }
 
 //! Echo what the stack approximates, and what it gives up doing so.

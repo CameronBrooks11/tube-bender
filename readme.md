@@ -12,8 +12,8 @@ the torque it has to react.
 Every part of the working mechanism is built and derived: the forming die - machined
 from one plate or stacked from flat-cut slices, behind the same interface - its plates,
 the clamp, the followbar, the tapered frame and drive links, and a bench base or a
-pedestal. Still to do: a ratchet and its die lock, which need the stack reordered
-before they have anywhere to reach - see design-basis section 17.
+pedestal. Still to do: the die lock that holds the die against springback while the
+drive pin is out - see design-basis section 17.
 
 Why the numbers are what they are, and what each one rests on, is in
 [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -39,7 +39,7 @@ started from actually measured, and which of its features survived, is in
 |---:|---:|:---|
 |  | | **Vitamins** |
 | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 91mm, 98306A868 |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM |
@@ -47,11 +47,11 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2025mm x 77mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2034mm x 87mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 229mm x 191mm |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 230mm x 201mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 240mm x 211mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 171mm x 171mm |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 274mm x 155mm |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 283mm x 174mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm |
@@ -77,7 +77,7 @@ started from actually measured, and which of its features survived, is in
 |Qty|Description|
 |---:|:----------|
 |4| Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 1 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 1-1/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 3/4 in dia x 91mm, 98306A868|
 |2| Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |2| Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM|
@@ -85,11 +85,11 @@ started from actually measured, and which of its features survived, is in
 |1| Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm|
 |1| Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm|
 |1| Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm|
-|2| Plate mild steel 1/4 in, blank 2025mm x 77mm|
+|2| Plate mild steel 1/4 in, blank 2034mm x 87mm|
 |2| Plate mild steel 1/4 in, blank 229mm x 191mm|
-|2| Plate mild steel 1/4 in, blank 230mm x 201mm|
+|2| Plate mild steel 1/4 in, blank 240mm x 211mm|
 |1| Plate mild steel 3/8 in, blank 171mm x 171mm|
-|1| Plate mild steel 3/8 in, blank 274mm x 155mm|
+|1| Plate mild steel 3/8 in, blank 283mm x 174mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm|
 |2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm|
 |1| Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm|

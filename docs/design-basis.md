@@ -558,8 +558,11 @@ What has to be true at once:
    and it was considered and rejected: you could then only load a tube by threading it in
    from an end, which makes multi-bend parts impossible. JD2's own worked example is a
    four-bend rollbar.
-3. It cannot stand **above or below the die**, because the drive links are there and they
-   sweep every radius.
+3. It cannot stand **above or below the die**, because the drive links are there. Note the
+   reason carefully, because §17 gets it wrong in the other direction: the clamp is fixed
+   to the die and **turns with it**, so it visits every angle in the arc and will meet a
+   drive link at one of them. A part fixed to the *frame* does not move at all and can live
+   in an angle the links never reach — which is exactly how the die lock is mounted.
 4. The only die material it can reach is **inboard of the groove**, and the path is blocked
    — by the tube below the groove's flanks and by 3.2 mm of land above them.
 

@@ -168,7 +168,7 @@ assert(!is_undef(spacer_bolt),   "no registered pin is big enough for the SPACER
 
 bend_report(tube, clr, handle);
 forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
-                   pin_diameter(drive_pin), pin_diameter(ustrap_pin));
+                   pin_diameter(drive_pin));
 drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
                   pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle),
                   handle, pin_diameter(spacer_bolt));
@@ -267,12 +267,10 @@ plate_bolt_pos = die_plate_bolt_positions(tube, clr, pin_diameter(frame_pin),
 module forming_die_stl()
     if (die_style == "sliced")
         sliced_die(tube, clr, slice_plate, bend_angle, pin_diameter(frame_pin),
-                   pin_diameter(drive_pin), pin_diameter(ustrap_pin),
-                   plate_bolt_pos, bolt_diameter(plate_bolt));
+                   pin_diameter(drive_pin), plate_bolt_pos, bolt_diameter(plate_bolt));
     else
         forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
-                    pin_diameter(drive_pin), pin_diameter(ustrap_pin),
-                    plate_bolt_pos, bolt_diameter(plate_bolt));
+                    pin_diameter(drive_pin), plate_bolt_pos, bolt_diameter(plate_bolt));
 
 module die_plate_stl()
     die_plate(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
