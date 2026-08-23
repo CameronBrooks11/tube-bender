@@ -35,16 +35,22 @@ function pin_is_orderable(type) = !is_undef(pin_part_no(type));
 //! failure, so it is a machining allowance rather than a calculated fit.
 pin_pivot_clearance = 0.4;
 
-//! Clearance on the diameter for a pin that is pulled and repositioned by hand mid-bend.
+//! Clearance on the diameter for a pin that is pulled and repositioned by hand mid-bend,
+//! as a FRACTION of the pin diameter.
+//!
 //! JD2 drills 1 in drive holes for a 7/8 in drive pin - 1/8 in oversize - "to provide
-//! easier pin installation" [JD2-M32 p.7]. That is the number, not a tolerance to tighten.
-pin_index_clearance = inch(1/8);
+//! easier pin installation" [JD2-M32 p.7]. That is a real number for a real machine, and
+//! it is stated as an absolute; it is carried here as the ratio it implies, 1/8 over 7/8,
+//! because their bender is ONE size covering 1/2 to 2 in tube while this one scales. An
+//! absolute 3.2 mm on the 6 mm drive pin a 3/8 in bender wants is not a clearance, it is
+//! a slot.
+pin_index_clearance_fraction = (1/8) / (7/8);
 
 //! Hole diameter for a pin that turns in it.
-function pin_pivot_hole(type) = pin_diameter(type) + pin_pivot_clearance;
+function pin_pivot_hole(diameter) = diameter + pin_pivot_clearance;
 
 //! Hole diameter for a pin that is indexed by hand.
-function pin_index_hole(type) = pin_diameter(type) + pin_index_clearance;
+function pin_index_hole(diameter) = diameter * (1 + pin_index_clearance_fraction);
 
 //! Draw a clevis pin, head down, shank running up from z = 0.
 module pin(type) {

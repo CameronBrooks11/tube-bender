@@ -103,6 +103,42 @@ because it is the source that would replace the plain plastic-moment floor used 
 a real bending-moment model. Nothing in the current design rests on it.
 → roadmap for `docs/design-basis.md` §6
 
+**Bend Tooling Inc. (n.d.).** *Encyclopedia: clamp die.*
+<https://bendtooling.com/encyclopedia/clamp-die/> **[VN]** · **read**
+Cited as **[BENDTOOLING-CLAMP]**. Clamp die length `L = t x k - r`, t the tube diameter,
+k a rigidity constant, r the centreline radius; and the minimum: "A minimum value for L,
+if the clamp die cavity is smooth, is around two times the tube diameter." Serrations and
+knurling permit L to be about half a smooth cavity's. This is what the die's tail length
+is cut from.
+→ `docs/design-basis.md` §12, `scad/utils/bend.scad`
+
+**Benderparts (n.d.).** *Tube Bending Formulas — Rotary-Draw Precision Calculations.*
+<https://www.benderparts.com/tube-bending-formulas/> **[VN]** · **read**
+Cited as **[BENDERPARTS-FORMULAS]**. Confirms `Fw = T / W` and `Fd = R / T` in the same
+direction as [BENDTOOLING], gives the rigidity constant a default of 2 — which is where
+`k = 5` comes from — and states smooth clamps start around 2 x OD of engagement and
+serrated around 1 x. Carries no clamp-length formula and no groove-depth rule, which is
+itself useful: two vendors' formula sheets and neither specifies the groove.
+→ `docs/design-basis.md` §12, `scad/utils/bend.scad`
+
+**Tools For Bending (n.d.).** *Tooling Design.*
+<https://www.toolsforbending.com/tooling/tooling-design/> **[VN]** · **read**
+Bend die and clamp die "hardened tool steel or alloy steel, heat treated and nitrided";
+pressure die "alloy steel and nitrided". **Cited here as a correction.** A claim about the
+part line and groove depth was attributed to this page from a search summary and used in
+`forming_die.scad`; the page was then fetched and does not contain it. The claim is
+withdrawn. Nothing in the model rests on this source except the material note.
+→ `docs/design-basis.md` §5
+
+**The Fabricator (n.d.).** *Getting a grip.*
+<https://www.thefabricator.com/tubepipejournal/article/bending/getting-a-grip> **[TP]** · **unread**
+Cited as **[FABRICATOR-GRIP]**, and cited only to record that it could NOT be read: the
+site returns 403. A summary of it supplied the "grip length at least 3 x OD" rule and the
+"3 x OD at 1 D falling to 1 x OD at 5 D" scaling, and the 3 was used in the model until
+the two sources above were read and both said 2. The scaling may well be right; it is not
+in the model because nobody here has seen it stated.
+→ nothing; recorded so the next person does not re-import it from a summary
+
 ## Material properties
 
 **Totten Tubes (n.d.).** *ASTM A513 Specification Information — Hardness Limits and Tensile

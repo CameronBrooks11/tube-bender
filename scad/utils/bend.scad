@@ -73,6 +73,50 @@ function bend_clr_is_catalogued(tube, clr) =
     len([for (r = clr_catalogued(tube)) if (abs(r - clr) < 0.01) r]) > 0;
 
 //
+// Clamp and overbend - what the die has to carry beyond the bend itself.
+//
+
+//! Floor on the clamp's grip length, as a multiple of tube OD, for a SMOOTH clamp cavity.
+//!
+//! Bend Tooling: "A minimum value for L, if the clamp die cavity is smooth, is around two
+//! times the tube diameter" [BENDTOOLING-CLAMP]. Benderparts says the same - smooth clamps
+//! start around 2 x OD of engagement, serrated around 1 x [BENDERPARTS-FORMULAS].
+//!
+//! An earlier version of this file used 3, from a summary of a trade article that could
+//! not be retrieved to check. The two sources that WERE read both say 2, and the tail of
+//! the die is a third shorter for it. Serrating or knurling the cavity permits about half
+//! this - Bend Tooling again - which is not modelled, because a serrated clamp is a
+//! surface finish this model has no way to describe.
+bend_grip_factor = 2;
+
+//! Rigidity constant `k` in the clamp length below. Bend Tooling gives the relation as
+//! `T x (Kr x 2.5) - R` with Kr a rigidity constant [BENDTOOLING]; Benderparts gives Kr a
+//! default of 2 [BENDERPARTS-FORMULAS], so k is 5.
+bend_clamp_rigidity_k = 5;
+
+//! Length of tube the clamp grips, mm: `L = OD x k - CLR`, floored at the smooth-cavity
+//! minimum.
+//!
+//! The two terms are not independent. k = 5 with a floor of 2 means the formula returns
+//! exactly the floor at 3 D of bend, 3 x OD at a 2 D bend, and the floor for anything
+//! easier - so the clamp lengthens only as the bend gets tight, which is the behaviour
+//! the sources describe. Every die in this machine's range sits at 3 D or above, so the
+//! floor governs; the formula is kept because the floor is not the reason it governs.
+function bend_clamp_length(tube, clr) =
+    max(tube_od(tube) * bend_clamp_rigidity_k - clr,
+        bend_grip_factor * tube_od(tube));
+
+//! Degrees of overbend the die must carry past the target angle so the tube springs back
+//! to it. JD2 measures 3 to 4 degrees on 1-1/2 in x 0.120 in welded mild steel and says
+//! chromoly springs back roughly twice as far [JD2-M32 p.9, p.11].
+//!
+//! REASONED, NOT CITED: 5 degrees. It is JD2's measured band plus a margin, on one
+//! material and one size. Springback scales with yield over modulus and with D of bend,
+//! and Bend Tooling states outright that no effective formula for it exists
+//! [BENDTOOLING] - so this is a die allowance, not a prediction. Bend to a template.
+bend_overbend_degrees = 5;
+
+//
 // Drive torque.
 //
 
@@ -95,6 +139,11 @@ function bend_handle_length_mm(moment_Nm, force_N = bend_operator_force_ceiling)
 //! Operator pull, N, implied by a handle of `length_mm`. The inverse, for checking a
 //! handle somebody has already decided on against the ceiling.
 function bend_operator_force_N(moment_Nm, length_mm) = moment_Nm / (length_mm / 1000);
+
+//! Force on the drive pin, N, for a pin engaging the die at `radius_mm` from the pivot.
+//! The whole drive torque passes through this one pin, so the drive circle wants to be as
+//! large as the die's material allows.
+function bend_drive_pin_force_N(moment_Nm, radius_mm) = moment_Nm / (radius_mm / 1000);
 
 //
 // Anchorage. The tube's far end is free, so the base reacts a TORQUE about the vertical

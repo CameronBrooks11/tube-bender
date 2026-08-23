@@ -121,6 +121,14 @@ theoretically perfect for the tube size and bend radius", to support the tube ju
 the point of bend [JD2-M32 p.5]. And the followbar's grooves ride *slightly lower* than
 the die's groove so the followbar can rise under load rather than bind [JD2-M32 p.5].
 
+**A withdrawn claim.** An earlier draft of this section also stated that the part line
+sits on the tube centreline with the bend die containing 50 % of the tube and the clamp
+and pressure die grooves somewhat less, cited to a tooling vendor's design page. That page
+was then retrieved and **does not contain it** — it carries die materials and hardness and
+nothing about groove depth. The statement came from a search summary that had blended
+sources. It is removed rather than re-attributed, because the only honest position is that
+**no source read here specifies the bend die's groove profile**.
+
 **Decision.** v1 cuts a true half-round groove of radius `od/2` and exposes a
 `groove_seat` factor plus a followbar drop, both defaulting to a plain fit, with the
 non-circular profile and the followbar angle recorded on the roadmap. Reason: the exact
@@ -289,3 +297,56 @@ Two gaps in the library have to be filled locally, and both are the expected kin
 
 Costed BOMs come from `parts.py`, which `bom.py` calls per part for a price and URL. That
 is where McMaster part numbers live.
+
+
+## 12. The forming die
+
+Everything about the die falls out of the tube, the CLR and the pins. Nothing about it is
+a remembered dimension.
+
+**Thickness = OD + 1/4 in.** The groove is a half-round of OD/2 on the rim, so the die has
+to be at least as thick as the tube is wide; an eighth of an inch of land above and below
+keeps the groove from running out tangentially at the faces. That the sum lands on a stock
+plate thickness for every tube in the range — tube ODs step in eighths, and plate steps in
+eighths to 1 in and quarters above — is a coincidence, but it is why the land is 1/8 in
+and not 3 mm.
+
+**Outer radius = CLR.** Not a free choice. It cannot be larger: the tube's own outer
+surface is at CLR + OD/2 and the followbar has to reach it. It cannot be smaller without
+cutting the groove away.
+
+**Arc = bend angle + 5 degrees** of overbend for springback. JD2 measures 3 to 4 degrees on
+1-1/2 in x 0.120 in welded mild steel and says chromoly springs back about twice as far
+[JD2-M32]. The 5 is that band plus margin, on one material at one size — a die allowance,
+not a prediction. Bend Tooling states outright that no effective springback formula exists
+[BENDTOOLING].
+
+**Clamp tail = `max(OD x 5 - CLR, 2 x OD)`.** Bend Tooling gives the clamp die length as
+`L = t x k - r` and puts the minimum for a smooth cavity "around two times the tube
+diameter" [BENDTOOLING-CLAMP]; Benderparts gives the rigidity constant a default of 2, so
+`k = Kr x 2.5 = 5`, and says the same about smooth versus serrated engagement
+[BENDERPARTS-FORMULAS]. The two terms are not independent: k = 5 against a floor of 2
+returns exactly the floor at 3 D, 3 x OD at a 2 D bend, and the floor for anything easier.
+
+*This corrected a real error.* The first version used a flat 3 x OD grip length, taken
+from a summary of a trade article that returned 403 when it was finally fetched. Both
+sources that could be read say 2. The die's tail is a third shorter for it — 76 mm rather
+than 114 mm on the 1-1/2 in die — which is the difference between a rule looked up and a
+rule quoted.
+
+**Drive circle** is as large as the material allows, because the whole drive torque goes
+through one pin: the hole and its web have to stay inside the groove root. Whether drive
+holes fit *at all* is derived, not assumed. JD2 reaches the same conclusion by hand —
+"die sets with a radius smaller than 3 in will generally not have drive holes because there
+is no room to drill them" [JD2-M32] — but their pins are one size for a whole 1/2 to 2 in
+machine, so their cutoff is not this one's.
+
+At the 1-1/2 in check size the derivation returns **five drive holes**, which is what JD2
+drills. That is a coincidence worth noticing rather than evidence, since the pitch is
+currently the prototype's 36 degrees and the frame has not been built yet — the pitch
+should equal the drive link's swing, and when the frame exists it will say so if it does
+not.
+
+**Pins are not yet derived.** The die takes the frame, drive and U-strap pin diameters as
+inputs and reports the force on the drive pin (12.7 kN at 1-1/2 in) so the choice can be
+checked. Sizing them needs the drive link's geometry.

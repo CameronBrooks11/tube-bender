@@ -3,7 +3,11 @@ Vitamins:
  a
  i
  n
+ 1|  1 Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm
  1|  1 Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm
+
+Printed:
+ 1|  1 forming_die.stl
 
 Assemblies:
   1 main_assembly

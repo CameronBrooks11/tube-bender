@@ -21,3 +21,6 @@ openscad.log
 
 __pycache__/
 *.pyc
+
+# NopSCADlib writes these when a rendered PNG changes and removes them next run.
+*_diff.png

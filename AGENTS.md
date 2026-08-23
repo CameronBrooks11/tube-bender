@@ -45,6 +45,41 @@ rather than invent a plausible number — see the missing chromoly row.
 NopSCADlib's own registries stop short of this machine in two places, so large imperial
 fasteners and structural plate are registered project-side against the same row shapes.
 
+## `include` for anything with constants, `use` for behaviour only
+
+`use` brings a file's **modules and functions but not its variables**, and a default
+argument is evaluated in the scope of the file that *defines* the function. So a file that
+only `use`s a registry gets `undef` for every constant in it — and `undef` propagates
+through arithmetic without a word. This cost three separate bugs in one sitting:
+`plate_smallest_at_least()` returned `undef` for every thickness ever asked of it,
+`forming_die_arc()` returned `undef`, and both looked like design failures rather than
+scoping ones.
+
+The rule: **`include` any file you read a constant or a list from; `use` files you only
+call.** A lookup over a registry lives beside the registry, not in the singular file.
+
+Related: OpenSCAD does not error on a missing argument, it passes `undef`. Changing a
+function's signature silently mis-computes every call site you forget. Grep for the name.
+
+## `offset(0)` on a unioned 2D outline before extruding
+
+Where several 2D regions meet along a shared edge, `union()` leaves degenerate vertices at
+the seam. Extruding that and cutting across the seam gives CGAL a mesh it calls *not
+closed* and refuses to render — with no clue where. `offset(0)` runs the region through
+Clipper's cleanup and the same model builds. `render()` does not fix it.
+
+`forming_die_outline()` carries one. Removing it brings the failure straight back.
+
+Note also that **exporting `.csg` does not build the mesh**, so `just check-scad` cannot
+catch this class of fault at all. Export an STL or a PNG when the geometry is in question.
+
+## The BOM says "Printed" for machined parts
+
+NopSCADlib has two categories for a made part, `stl()` and `dxf()`. The forming die is
+machined, so it goes under `stl()` and the BOM files it under "Printed". The stock it is
+cut from is declared separately as a `vitamin()`, because a parts list has to say what to
+*buy*.
+
 ## Units: imperial identity, millimetre arithmetic
 
 A row's name and `size` field are its imperial size, because that is what you order and
