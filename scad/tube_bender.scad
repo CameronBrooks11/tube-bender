@@ -10,9 +10,8 @@
 //!
 //! Every part of the working mechanism is built and derived: the forming die - machined
 //! from one plate or stacked from flat-cut slices, behind the same interface - its plates,
-//! the clamp, the followbar, the tapered frame and drive links, and a bench base or a
-//! pedestal. Still to do: the die lock that holds the die against springback while the
-//! drive pin is out - see design-basis section 17.
+//! the clamp, the followbar, the tapered frame and drive links, the die lock that holds the
+//! die against springback between strokes, and a bench base or a pedestal.
 //!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -39,6 +38,7 @@ use <custom/die_plate.scad>
 use <custom/clamp.scad>
 use <custom/pedestal.scad>
 use <custom/sliced_die.scad>
+use <custom/die_lock.scad>
 
 $fn = 90;
 
@@ -97,8 +97,13 @@ t_centre  = layout_central_thickness(layers);
 nominal_pin   = tube_od(tube) / 2;
 nominal_r     = forming_die_drive_radius(tube, clr, nominal_pin);
 drive_force_0 = bend_drive_pin_force_N(moment, nominal_r);
+// The drive pin and the LOCK pin go in the same holes, at different angles, so they are
+// one size and the hole is sized once. The lock crosses more of the stack - frame link to
+// frame link, where the drive pin stops at the drive links - so its span governs both.
 drive_pin     = pin_smallest_at_least(
-                    pin_required_diameter(drive_force_0, t_centre, t_drive, pin_material_yield));
+                    pin_required_diameter(drive_force_0, t_centre, t_drive + t_frame,
+                                          pin_material_yield));
+lock_pin      = drive_pin;
 
 // Pass 2: the radius the chosen pin actually gives, and the force that goes with it.
 drive_radius = forming_die_drive_radius(tube, clr, pin_diameter(drive_pin));
@@ -143,9 +148,10 @@ plate_bolt  = bolt_smallest_at_least(
 
 drive_angles = forming_die_drive_angles(tube, clr, pin_diameter(frame_pin),
                                         pin_diameter(drive_pin), bend_angle);
-drive_angle  = len(drive_angles) ? drive_angles[0] : 0;
+n_drive_holes = len(drive_angles);
+drive_angle  = n_drive_holes ? drive_angles[0] : 0;
 // undef on a die with no room for drive holes, and the link then draws no hole.
-drive_hole_r = len(drive_angles) ? drive_radius : undef;
+drive_hole_r = n_drive_holes ? drive_radius : undef;
 
 // The base plate's footprint comes from the frame link, so the anchor radius is known
 // before the bolt is. Size the bolt against a nominal inset, then the real inset - and so
@@ -156,6 +162,14 @@ link_w       = frame_link_width(tube, clr, frame_plate, moment, pin_diameter(fra
                                 fb_pin_d);
 anchor_bolt  = base_anchor_bolt(tube, clr, link_w, fb_pin_d, moment, op_force,
                                 bolt_material_yield, bolts);
+
+// The die lock. One pitch past the last drive hole, on the drive circle - the one angle a
+// hole reaches at the end of every stroke. The frame link grows an arm to it.
+drive_inset    = forming_die_drive_inset(tube, clr, pin_diameter(drive_pin));
+lock_pos       = n_drive_holes ? die_lock_pos(tube, clr, pin_diameter(drive_pin),
+                                              drive_inset, forming_die_drive_pitch(),
+                                              n_drive_holes)
+                               : undef;
 
 // A pin the series cannot reach comes back undef and propagates through everything
 // downstream without a word - the frame link's width, the base's bolt pattern, the report.
@@ -203,11 +217,15 @@ if (mount == "pedestal")
 // what stands still - and it is asked for at the followbar's radius, where the collision
 // would happen, rather than at the drive hole where the link is at its widest.
 fb_radius = frame_link_reach(tube, clr, fb_pin_d);
+// Two widths, and they are not interchangeable. The link tapers, so what sweeps past the
+// followbar out at fb_radius is much narrower than what sweeps past the die lock in at the
+// drive circle - where the link is at its peak width, because that is where its moment is.
+drive_w_peak = drive_link_width(drive_plate, op_force, handle, drive_hole_r,
+                                pin_diameter(frame_pin), pin_diameter(drive_pin));
 drive_w   = drive_link_width_at(drive_plate, op_force, handle,
                                 is_undef(drive_hole_r) ? 0 : drive_hole_r,
                                 pin_diameter(frame_pin), pin_diameter(drive_pin),
                                 pin_diameter(spacer_bolt), fb_radius);
-n_drive_holes = len(drive_angles);
 stroke_overrun = bend_stroke_overrun(bend_angle, n_drive_holes, forming_die_drive_pitch());
 
 for (d = bend_mechanism_departures(bend_angle, drive_w, bend_followbar_length(tube),
@@ -221,6 +239,22 @@ echo(str("sweep:   ", round(bend_available_sweep(drive_w, bend_followbar_length(
                        : str("no drive holes, so the link swings the whole ",
                              forming_die_arc(bend_angle)),
          " deg"));
+
+die_lock_report(tube, clr, pin_diameter(drive_pin), lock_pin, drive_w_peak, die_web(tube),
+                forming_die_drive_pitch(), drive_inset, n_drive_holes, moment, frame_plate,
+                link_w);
+
+lock_clearance = die_lock_clearance_deg(drive_w_peak, pin_diameter(lock_pin), die_web(tube),
+                                        die_lock_radius(tube, clr, pin_diameter(drive_pin)));
+lock_arm_w     = die_lock_arm_width(moment, t_frame,
+                                    pin_allowable_bending_fraction * plate_yield(frame_plate),
+                                    pin_pivot_hole(pin_diameter(lock_pin)));
+
+for (d = die_lock_departures(forming_die_drive_pitch(), n_drive_holes,
+                             die_lock_separation_deg(forming_die_drive_pitch(),
+                                                     n_drive_holes),
+                             lock_clearance, lock_arm_w, link_w))
+    echo(str("DEPARTURE: ", d));
 
 echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
          pin_governing_mode(frame_force, t_centre, t_drive + t_frame, pin_material_yield),
@@ -286,8 +320,8 @@ module drive_link_stl()
                pin_diameter(spacer_bolt));
 
 module frame_link_stl()
-    frame_link(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
-               fb_pin_d);
+    frame_link(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d,
+               lock_pos, pin_diameter(lock_pin));
 
 module followbar_stl() followbar(tube, fb_pin_d);
 
@@ -356,6 +390,14 @@ assembly("main") {
                          [layout_z(layers, "base") + layout_thickness(layers, "base")]))
             rotate([180, 0, 0])
                 bolt(anchor_bolt, layout_thickness(layers, "base") + 30);
+
+    // The die lock, through the whole stack into whichever drive hole is under it. The
+    // assembly is drawn with the die at zero, and at zero the lock is just past the die's
+    // trailing edge with nothing under it - which is right. A straight tube has nothing to
+    // spring back; the die turns into the pin during the first stroke.
+    if (!is_undef(lock_pos))
+        translate(concat(lock_pos, [layout_z(layers, "frame link lower")]))
+            pin(lock_pin, layout_pin_length(layers, "frame link lower"));
 
     if (!is_undef(drive_hole_r))
         rotate(drive_angle)

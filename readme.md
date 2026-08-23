@@ -11,9 +11,8 @@ the torque it has to react.
 
 Every part of the working mechanism is built and derived: the forming die - machined
 from one plate or stacked from flat-cut slices, behind the same interface - its plates,
-the clamp, the followbar, the tapered frame and drive links, and a bench base or a
-pedestal. Still to do: the die lock that holds the die against springback while the
-drive pin is out - see design-basis section 17.
+the clamp, the followbar, the tapered frame and drive links, the die lock that holds the
+die against springback between strokes, and a bench base or a pedestal.
 
 Why the numbers are what they are, and what each one rests on, is in
 [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -44,18 +43,19 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2034mm x 87mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 229mm x 191mm |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 240mm x 211mm |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 309mm x 233mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 171mm x 171mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 283mm x 174mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm |
-| &nbsp;&nbsp;26&nbsp; | &nbsp;&nbsp;26&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
@@ -82,12 +82,13 @@ started from actually measured, and which of its features survived, is in
 |2| Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |2| Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 7/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm|
 |1| Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm|
 |1| Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm|
 |2| Plate mild steel 1/4 in, blank 2034mm x 87mm|
 |2| Plate mild steel 1/4 in, blank 229mm x 191mm|
-|2| Plate mild steel 1/4 in, blank 240mm x 211mm|
+|2| Plate mild steel 1/4 in, blank 309mm x 233mm|
 |1| Plate mild steel 3/8 in, blank 171mm x 171mm|
 |1| Plate mild steel 3/8 in, blank 283mm x 174mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm|

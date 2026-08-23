@@ -713,29 +713,99 @@ once: the same link is angularly narrow far out and angularly enormous close in.
 the link is 34.5 mm wide on a 23 mm drive circle, so its half-width there is 48 degrees and
 the band is nearly four times the swing that generated it.
 
-### What that leaves
+### Where it goes, and it is not two pitches
 
-Two constraints on where the lock pin goes, and they pull against each other.
+Two constraints looked like the whole problem, and one of them turned out to be a
+distraction.
 
-**Clearance.** The band must miss the pin by the link's half-width at the pin's radius plus
-the pin's own. At 1-1/2 in that is `asin(38.7 / 73)` = 32 degrees for the link and about 10
-for the pin, so 42 degrees.
+**Clearance.** The drive link's band must miss the pin by the link's half-width at the
+pin's radius plus the pin's own. At 1-1/2 in that is 53 degrees.
 
-**Phase.** A lock is only worth having if a hole is *at* the pin when the stroke ends —
-otherwise springback is lost before it drops in. A hole sits at angle `beta` exactly when
-`beta` is congruent to `psi` modulo the pitch, and since the die advances by exactly one
-pitch per stroke, **if it holds once it holds every stroke.**
+**Phase.** A lock is only worth having if a hole is *at* the pin when the stroke ends. A
+hole sits at angle `beta` exactly when `beta` is congruent to the stroke's home angle
+modulo the pitch, and because the die advances by exactly one pitch per stroke, if that
+holds once it holds every stroke.
 
-Together: the separation must be at least the clearance and a whole number of pitches. At
-1-1/2 in the smallest that works is 72 degrees — two pitches.
+From those two this section originally concluded that the pin sits on the frame link's own
+axis, nudged by up to half a pitch to fix the phase, two pitches clear of the drive band.
+**That is wrong, and the model is what said so.** Both constraints are satisfied and the
+lock still does not work, because there is a third thing neither of them describes:
 
-The die's hole phase is the knob to turn, because the inset that currently sets it is a
-minimum rather than a target and has slack in it. Turning the frame link instead does not
-work: it points at the followbar, which is not free.
+> **The die has to be there.**
+
+The frame link points at the followbar, which is off the die's arc at the start of a bend.
+The die's sector only rotates over that angle in the last 45 degrees. Phasing the holes to a
+pin on the frame link's axis locks **the last two strokes of five and no others** — the
+phase is right and the die is somewhere else.
+
+More generally: the holes cover a window of only `(n-1) x pitch` in the die's own frame, and
+the bend is longer than that window. So *where* the pin sits decides *which* strokes it
+catches, and most angles catch some and miss others.
+
+### One angle catches all of them
+
+Holes sit at `a_i = inset + i x pitch` for `i` in `0 .. n-1`. Stroke `k` ends with the die
+turned through `k x pitch`, so hole `n - k` is then at
+
+```
+a_(n-k) + k x pitch  =  inset + (n-k) x pitch + k x pitch  =  inset + n x pitch
+```
+
+The same angle for every `k` from 1 to `n`. **One pitch past the last drive hole**, and it
+is exact rather than optimised — a hole arrives under the pin at the end of every stroke
+without exception.
+
+```
+die lock: 7/8 in dia pin through the whole stack on r 73 mm at 198 deg - one pitch past the
+          last drive hole, so a hole reaches it at the end of all 5 strokes
+          on its own arm off the frame link, 57 mm wide for 477 N.m per link, drawn at the
+          link's 87
+          the drive band must clear it by 53 deg and stands 180 deg = 5 pitches off
+```
+
+At the die's start position that angle is just past the trailing edge of its arc, so the pin
+begins a bend over air. Correct: a straight tube has nothing to spring back, and the die
+rotates into the pin during the first stroke.
+
+The clearance constraint survives as a check rather than a driver. The separation is
+`n x pitch` by construction — 180 degrees at 1-1/2 in, against 53 needed — so it is checked
+in both directions round the circle and never governs at any registered size.
+
+### The frame link grows a second arm
+
+198 degrees is nowhere near the followbar, so the frame link reaches it with an arm off the
+same pivot. That is cheap — one more lobe on a plate already being cut — and the arm never
+has to clear anything, because it lives in the frame links' own z bands, the same way the
+followbar arm already runs straight over the die. **Only the pin crosses the drive links'
+plane**, and only the pin needs the angular clearance.
+
+The two arms carry unrelated loads and neither helps the other: the followbar arm reacts the
+tube's push as a cantilever, the lock arm takes the springback moment back into the frame,
+`Mp / 2` per link at the pivot. Both are drawn at the link's one width, which the followbar
+sizes; the lock arm's own requirement is reported beside it and is under it at every size —
+57 mm against 87 at 1-1/2 in, 84 against 106 at 2 in.
+
+### It goes all the way through, and that is worth two pin sizes
+
+Not a plunger hanging off the upper link. The angular exclusion holds at every radius, so
+both drive links are clear and the pin can run the whole stack as a symmetric double-shear
+joint like the frame pin.
+
+That is not tidiness. Cantilevered off one frame link the span is from that link's
+mid-plane to the die's, 39 mm at 1-1/2 in, and it wants **1-1/8 in**. Through the stack the
+span is the standard `(t_centre + t_outer) / 2` and it wants **7/8**. A 1-1/8 in spring
+plunger is not a plunger.
+
+The drive pin and the lock pin go in the **same holes** at different angles, so they are one
+size and the hole is sized once — on the lock's span, which is the longer of the two.
+
+The cost is that the lock is inserted and pulled by hand like the drive pin, where JD2's
+drops in by itself. A spring collar over the through pin would get that back; it is a
+fitting rather than a load path and is not modelled.
 
 ### The exception
 
 A die too small to carry drive holes is not indexed at all. JD2 drives those on the U-strap
-pin instead [JD2-M32 p.7], the link really does swing the whole arc, and there is no fixed
-band for a lock pin to hide in. **1/8 in and 1/4 in get no die lock**, and the model reports
-that rather than drawing one.
+pin instead [JD2-M32 p.7], the link really does swing the whole arc, and there is nothing to
+lock into. **1/8 in and 1/4 in get no die lock.** That is what those sizes *are*, not a band
+they fall outside, so it is reported as a plain fact and not as a departure.

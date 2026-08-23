@@ -33,6 +33,26 @@
  * anchor bolts at the base's corners - four bolts on a wide rectangle rather than two on
  * a narrow one, which divides the shear by four and doubles the arm at the same time.
  *
+ * ## It carries the die lock, on a second arm
+ *
+ * A pin at the die's drive radius drops into a drive hole and holds the die while the
+ * drive pin is out. die_lock.scad derives where it has to be - one pitch past the last
+ * drive hole - and that is nowhere near the followbar, so this link grows a SECOND ARM off
+ * the same pivot to reach it.
+ *
+ * The two arms carry unrelated loads and neither helps the other: the followbar arm reacts
+ * the tube's push as a cantilever, the lock arm reacts the springback moment back into the
+ * frame. Both are drawn at this link's one width, which the followbar sizes and which the
+ * report checks against what the lock arm needs.
+ *
+ * The arm itself never has to clear anything - it lives in the frame links' own z bands,
+ * clear of the die and the drive links the same way the followbar arm already runs
+ * straight over the die. Only the PIN crosses the drive links' plane, and die_lock.scad
+ * checks that angle.
+ *
+ * The position arrives as an argument rather than being derived here: it depends on the
+ * die's hole count and phase, and a link cannot read the die it is being placed against.
+ *
  * ## What is not here
  *
  * The followbar itself, declared as an interface and left.
@@ -83,19 +103,33 @@ function frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pi
 function frame_link_axis(tube, clr, followbar_pin_d) =
     frame_link_followbar_pos(tube, clr, followbar_pin_d) / frame_link_reach(tube, clr, followbar_pin_d);
 
-//! One frame link, lying on z = 0, pivot at the origin.
-module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) {
+//! One frame link, lying on z = 0, pivot at the origin. `lock_pos` is where the die lock
+//! pin passes through, in this link's own frame - which is the world's, because the frame
+//! links are the parts that do not turn. Undef on a die with no drive holes to lock into.
+module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d,
+                  lock_pos = undef, lock_pin_d = 0) {
     w    = frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d);
     fb   = frame_link_followbar_pos(tube, clr, followbar_pin_d);
     axis = frame_link_axis(tube, clr, followbar_pin_d);
+    lock = !is_undef(lock_pos);
 
     render_2D_plate(plate)
-      plate_2D(plate, abs(fb[0]) + w, abs(fb[1]) + w)
+      plate_2D(plate,
+               (lock ? abs(fb[0]) + abs(lock_pos[0]) : abs(fb[0])) + w,
+               (lock ? abs(fb[1]) + abs(lock_pos[1]) : abs(fb[1])) + w)
         offset(0)
             difference() {
-                hull() {
-                    circle(d = w);
-                    translate(fb) circle(d = w);
+                union() {
+                    hull() {
+                        circle(d = w);
+                        translate(fb) circle(d = w);
+                    }
+
+                    if (lock)
+                        hull() {
+                            circle(d = w);
+                            translate(lock_pos) circle(d = w);
+                        }
                 }
 
                 circle(d = pin_pivot_hole(frame_pin_d));
@@ -103,6 +137,8 @@ module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d) {
                 translate(fb)
                     circle(d = pin_pivot_hole(followbar_pin_d));
 
+                if (lock)
+                    translate(lock_pos) circle(d = pin_pivot_hole(lock_pin_d));
             }
 }
 

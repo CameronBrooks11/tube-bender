@@ -28,7 +28,7 @@
             "pin(pin_0p750in, 91): Pin clevis 3/4 in dia x 91mm, 98306A868": {
                 "count": 1
             },
-            "plate_2D(plate_0p250in, 240, 211): Plate mild steel 1/4 in, blank 240mm x 211mm": {
+            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309mm x 233mm": {
                 "count": 2
             },
             "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm": {
@@ -45,6 +45,9 @@
             },
             "bolt(bolt_0p500in, 40): Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 4
+            },
+            "pin(pin_0p875in, 91): Pin clevis 7/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 1
             },
             "pin(pin_0p875in, 84): Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1

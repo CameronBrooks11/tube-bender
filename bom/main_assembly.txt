@@ -8,10 +8,11 @@ Vitamins:
   2 Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM
   1 Pin clevis 3/4 in dia x 91mm, 98306A868
   1 Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM
+  1 Pin clevis 7/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM
   1 Pin clevis 1-1/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM
   2 Plate mild steel 1/4 in, blank 2034mm x 87mm
   2 Plate mild steel 1/4 in, blank 229mm x 191mm
-  2 Plate mild steel 1/4 in, blank 240mm x 211mm
+  2 Plate mild steel 1/4 in, blank 309mm x 233mm
   1 Plate mild steel 3/8 in, blank 171mm x 171mm
   1 Plate mild steel 3/8 in, blank 283mm x 174mm
   2 Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm
