@@ -49,10 +49,12 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2025mm x 77mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 229mm x 191mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 230mm x 201mm |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 171mm x 171mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 274mm x 155mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm |
-| &nbsp;&nbsp;24&nbsp; | &nbsp;&nbsp;24&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm |
+| &nbsp;&nbsp;26&nbsp; | &nbsp;&nbsp;26&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
@@ -61,7 +63,8 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;forming_die.stl |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;frame_link.stl |
-| &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;10&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;pedestal.stl |
+| &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
 
 <span></span>
 [Top](#TOP)
@@ -84,9 +87,11 @@ started from actually measured, and which of its features survived, is in
 |2| Plate mild steel 1/4 in, blank 2025mm x 77mm|
 |2| Plate mild steel 1/4 in, blank 229mm x 191mm|
 |2| Plate mild steel 1/4 in, blank 230mm x 201mm|
+|1| Plate mild steel 3/8 in, blank 171mm x 171mm|
 |1| Plate mild steel 3/8 in, blank 274mm x 155mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm|
 |2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm|
+|1| Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm|
 
 
 ### 3D Printed parts
@@ -101,9 +106,9 @@ started from actually measured, and which of its features survived, is in
 | ![drive_link.stl](stls/drive_link.png) | ![followbar.stl](stls/followbar.png) | ![forming_die.stl](stls/forming_die.png) 
 
 
-| 2 x [frame_link.stl](stls/frame_link.stl) |
-|---|
-| ![frame_link.stl](stls/frame_link.png) 
+| 2 x [frame_link.stl](stls/frame_link.stl) | 1 x [pedestal.stl](stls/pedestal.stl) |
+|---|---|
+| ![frame_link.stl](stls/frame_link.png) | ![pedestal.stl](stls/pedestal.png) 
 
 
 

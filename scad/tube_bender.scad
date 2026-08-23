@@ -36,6 +36,7 @@ use <custom/base.scad>
 use <custom/followbar.scad>
 use <custom/die_plate.scad>
 use <custom/clamp.scad>
+use <custom/pedestal.scad>
 
 $fn = 90;
 
@@ -52,6 +53,12 @@ frame_plate = plate_0p250in;
 base_plate  = plate_0p375in;
 die_plate_stock = plate_0p250in;
 die_plate_bolts = 6;
+
+// "bench" bolts the base straight down; "pedestal" stands it on a post. The pedestal's
+// height is the working plane above the floor, and the braced band the 490 N ceiling
+// assumes is 510 to 1780 mm - the report says whether this lands in it.
+mount           = "pedestal";
+pedestal_height = 950;
 
 tube_length = 600;
 
@@ -156,6 +163,18 @@ clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
 base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bolt,
             bolt_material_yield, layout_working_height(layers));
 
+// The pedestal post carries the operator's pull as bending and the drive torque as
+// torsion, at the same time.
+post          = structural_smallest_for_combined(op_force * pedestal_height, moment * 1000,
+                                                 pin_allowable_shear_fraction * 250);
+post_length   = pedestal_height - layout_working_height(layers);
+foot_bolt     = pedestal_foot_bolt(post, op_force, pedestal_height, moment,
+                                   bolt_material_yield, bolts);
+
+if (mount == "pedestal")
+    pedestal_report(post, base_plate, post_length, foot_bolt, bolt_material_yield,
+                    op_force, pedestal_height, moment);
+
 // The drive links turn with the die and sweep every radius; the followbar and its pin do
 // not move. The bend has to fit in what is left of the circle.
 fb_radius = frame_link_reach(tube, clr, fb_pin_d);
@@ -210,6 +229,8 @@ module frame_link_stl()
 
 module followbar_stl() followbar(tube, fb_pin_d);
 
+module pedestal_stl() pedestal(post, base_plate, post_length, bolt_diameter(foot_bolt));
+
 module base_stl()
     base(tube, clr, base_plate, link_w, fb_pin_d, bolt_diameter(anchor_bolt));
 
@@ -251,6 +272,10 @@ assembly("main") {
     for (layer = ["frame link lower", "frame link upper"])
         translate_z(layout_z(layers, layer))
             stl_colour(pp3_colour) stl("frame_link") frame_link_stl();
+
+    if (mount == "pedestal")
+        translate_z(layout_z(layers, "base"))
+            stl_colour(pp3_colour) stl("pedestal") pedestal_stl();
 
     translate_z(layout_z(layers, "base"))
         rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1], frame_link_axis(tube, clr, fb_pin_d)[0]))
