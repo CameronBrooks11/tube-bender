@@ -19,6 +19,7 @@ include <NopSCADlib/core.scad>;
 
 use <../purchased/tube.scad>
 use <../purchased/tube_material.scad>
+use <clr_catalogue.scad>
 
 //
 // Design ceilings. Each one is a citation, not a preference.
@@ -58,6 +59,18 @@ function bend_d_of_bend(tube, clr) = clr / tube_od(tube);
 
 //! Tightest centreline radius this machine should be asked for, mm.
 function bend_min_clr(tube) = bend_min_d_of_bend * tube_od(tube);
+
+//! The centreline radius to build unless told otherwise: the smallest radius the trade
+//! actually sells at or above the 3 x OD floor. Where neither catalogue reaches this OD
+//! there is nothing to snap to, so it falls back to the bare floor - which is a departure,
+//! not a default, and bend_departures() names it.
+function bend_default_clr(tube) =
+    let (c = clr_smallest_at_least(tube, bend_min_clr(tube)))
+        is_undef(c) ? bend_min_clr(tube) : c;
+
+//! Whether this radius is one somebody sells for this OD.
+function bend_clr_is_catalogued(tube, clr) =
+    len([for (r = clr_catalogued(tube)) if (abs(r - clr) < 0.01) r]) > 0;
 
 //
 // Drive torque.
@@ -103,10 +116,23 @@ function bend_anchor_min_span_mm(moment_Nm, bolt_shear_capacity_N) =
 
 //! The names of every published band this tube and CLR fall outside, as a list. Empty
 //! means nothing was violated; the caller decides what to do about a non-empty one.
+// Radii are compared in MILLIMETRES with a tolerance, never as a ratio against a whole
+// number. Every radius here is an inch conversion, so a die that is exactly 3 D lands on
+// 2.99999... and a bare `< 3` test reports a departure on the very radius the rule picked.
+// Four of the fifteen registered sizes tripped it before this comment existed.
+clr_tolerance = 0.01;
+
 function bend_departures(tube, clr) = [
-    if (bend_d_of_bend(tube, clr) < bend_min_d_of_bend) "D of bend below 3, needs a mandrel",
+    if (clr < bend_min_clr(tube) - clr_tolerance)
+        "D of bend below 3, needs a mandrel",
     if (tube_od(tube) < bend_od_range[0]) "OD below the 1/8 in floor",
     if (tube_od(tube) > bend_od_range[1]) "OD above the 2 in manual ceiling",
+    if (!bend_clr_is_catalogued(tube, clr))
+        len(clr_catalogued(tube)) == 0
+            ? "no catalogue covers this OD, so the CLR is the bare 3 x OD floor"
+            : is_undef(clr_smallest_at_least(tube, bend_min_clr(tube)))
+                ? "every radius sold for this OD is tighter than 3 x OD - the trade bends this size harder than the rule"
+                : "CLR is not one of the radii sold for this OD",
 ];
 
 //! Echo everything the configuration implies, before any of it is drawn.
@@ -123,6 +149,8 @@ module bend_report(tube, clr, force_N = bend_operator_force_ceiling) {
              " mm, wall factor ", fw, " (thin wall is a high number)"));
     echo(str("bend:    CLR ", clr, " mm = ", fd, " D of bend; minimum without a mandrel is ",
              bend_min_clr(tube), " mm"));
+    echo(str("         radii sold for this OD: ",
+             len(clr_catalogued(tube)) ? clr_catalogued(tube) : "none in either catalogue"));
     echo(str("torque:  plastic moment ", mp, " N.m at yield ",
              tube_material_yield_max(tube_material(tube)),
              " MPa - a FLOOR, friction and hardening are not in it"));

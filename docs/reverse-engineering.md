@@ -77,10 +77,19 @@ Tube centreline plane z = 38.10, the die split plane. Plates and links are 6.35 
 
 ## Hardware carried in the STEP
 
-- **McMaster 91236A849** hex head screw: shank d19.05 (3/4 in), hex 28.575 across flats,
-  head 12.7 thick, thread minor d15.75 → 3/4-10 UNC
-- **McMaster 98306A868** clevis pin: shank d19.05 (3/4 in), head d23.98, cotter hole
-  d3.96 (5/32 in)
+Both were measured off the McMaster CAD models embedded in the STEP, from the mesh rather
+than the B-rep bounding box — the spline poles of the thread overstate the extent by 2 mm.
+Both come out on exact imperial sizes, which is the check that the measurement is right.
+
+- **McMaster 91236A849** hex head screw, **3/4-10 UNC x 3-1/2 in**: shank d 19.05 (3/4 in),
+  hex 28.575 across flats (1-1/8 in) and 32.996 across corners, head 12.7 thick (1/2 in),
+  thread minor d 15.75, overall 101.6 (4 in)
+- **McMaster 98306A868** clevis pin, **3/4 in dia x 3-3/4 in long**: shank d 19.05, length
+  under head 95.25 (3.75 in), head d 23.9776 x 6.604 thick, cotter hole d 3.9624 (5/32 in)
+  centred 3.988 from the end
+
+The clevis pin is registered in `scad/purchased/pins.scad`; the hex screw is registered
+when the drive link that uses it is built.
 
 ---
 

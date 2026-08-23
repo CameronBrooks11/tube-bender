@@ -7,7 +7,7 @@ default:
     @just --list
 
 # Everything CI runs.
-check: check-scad
+check: check-scad check-sizes
 
 # Evaluate every SCAD file and report anything that does not build.
 check-scad:
@@ -75,3 +75,46 @@ report:
 clean:
     rm -rf assemblies bom deps dxfs stls tmp readme.html printme.html \
            cmd_times.txt openscad.echo openscad.log
+
+# Report every registered tube size, not just the selected one.
+check-sizes:
+    #!/usr/bin/env bash
+    # check-scad renders each file once, at its defaults, so a departure that only fires
+    # at one end of the size range never gets evaluated. This recipe walks the registry.
+    # It FAILS on a departure nothing expects and on an expected departure that stopped
+    # firing - a fix that goes unnoticed leaves a stale list behind.
+    set -uo pipefail
+    export OPENSCADPATH="{{LIBRARIES}}"
+    expected=(
+        "tube_0p375x0p049"  # Swagelok's only 3/8 in radius is 2.5 D, tighter than the floor
+        "tube_0p625x0p049"  # neither catalogue reaches 5/8 in
+    )
+    tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
+    cat > "$tmp/sweep.scad" <<SCAD
+    include <$PWD/scad/purchased/tubes.scad>
+    use <$PWD/scad/utils/bend.scad>
+    for (t = tubes) {
+        echo(str("ROW|", tube_name(t), "|", len(bend_departures(t, bend_default_clr(t)))));
+        bend_report(t, bend_default_clr(t));
+    }
+    SCAD
+    {{OPENSCAD}} -o "$tmp/sweep.csg" "$tmp/sweep.scad" 2>"$tmp/err" >/dev/null
+    if grep -q '^ERROR' "$tmp/err"; then
+        echo "FAIL  the sweep did not build"; grep '^ERROR' "$tmp/err" | sed 's/^/        /'; exit 1
+    fi
+    failed=0
+    while IFS='|' read -r name n; do
+        listed=0
+        for e in "${expected[@]}"; do [ "$e" = "$name" ] && listed=1; done
+        if [ "$n" != "0" ] && [ "$listed" = 0 ]; then
+            echo "FAIL  $name  departs and is not expected to"
+            grep -A6 "ROW|$name|" "$tmp/err" | grep 'DEPARTURE' | sed 's/^ECHO: "/        /; s/"$//'
+            failed=1
+        elif [ "$n" = "0" ] && [ "$listed" = 1 ]; then
+            echo "FAIL  $name  no longer departs, but is still listed - remove it from check-sizes"
+            failed=1
+        else
+            printf 'ok    %-22s %s\n' "$name" "$([ "$listed" = 1 ] && echo "known departure" || echo 'clean')"
+        fi
+    done < <(grep '^ECHO: "ROW|' "$tmp/err" | sed 's/^ECHO: "ROW|//; s/"$//')
+    exit $failed

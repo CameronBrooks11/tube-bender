@@ -16,6 +16,8 @@
 include <NopSCADlib/core.scad>
 
 include <purchased/tubes.scad>
+include <purchased/pins.scad>
+include <purchased/plates.scad>
 
 use <utils/bend.scad>
 
@@ -26,7 +28,7 @@ $fn = 90;
 // one thing to vary; for now the prototype size is the one being checked against.
 //
 tube = tube_1p500x0p095;
-clr  = inch(4 + 1/2);   // smallest catalogued Pro-Tools radius at or above 3 x OD
+clr  = bend_default_clr(tube);
 
 tube_length = 600;
 

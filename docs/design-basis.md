@@ -77,9 +77,24 @@ Sanity-checked against what is actually sold. Pro-Tools' own round-die matrix
 | 2 | 6, 7 | 3.0 – 3.5 |
 | 2-1/2 | 7 | 2.8 |
 
-Every entry sits between 2.8D and 4.8D, clustered on 3–4.5D. The small end agrees: the
-Swagelok hand bender's fixed radii are 0.56 in on 1/8 in tube (4.5D), 0.75 in on 1/4 in
-(3.0D), 0.94 in on 5/16 in (3.0D) and 1.5 in on 1/2 in (3.0D) [SWAGELOK-MS-13-43].
+Every entry sits between 2.8D and 4.8D, clustered on 3–4.5D.
+
+**The small end does not agree, and the disagreement is real.** The Swagelok hand bender's
+fixed radii are 0.56 in on 1/8 in tube (4.5D), 0.56 **and 0.75** in on 1/4 in (2.25D and
+3.0D), 0.94 in on 5/16 in (3.0D), 0.94 in on 3/8 in (**2.5D, and it is the only radius
+offered**) and 1.5 in on 1/2 in (3.0D) [SWAGELOK-MS-13-43]. So at 1/4 in and 3/8 in the
+trade routinely bends tighter than 3D, and at 3/8 in there is nothing else on offer.
+
+That is not a reason to move the floor. The 3D rule is about ovality and wrinkling in the
+unsupported span of a large tube, and thin instrumentation tube in a hand bender's fully
+enclosing groove is a different problem. But it does mean the floor is **reported, not
+enforced**, at the bottom of the range: `bend_departures()` distinguishes "you chose a
+radius nobody sells" from "every radius sold for this OD is tighter than 3 x OD", because
+those call for opposite responses.
+
+An earlier draft of this section quoted only the 3.0D options from the same table and
+concluded the small end agreed. It does not. The sweep in `just check-sizes` is what
+surfaced it.
 
 So `clr_min = 3 * od` is a floor the whole industry sits on or just above, and the model
 **echoes the D of bend and names it when it falls below 3**, rather than refusing — a
