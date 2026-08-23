@@ -67,6 +67,20 @@ function layout_z(layers, name) =
 function layout_thickness(layers, name) =
     [for (l = layers) if (l[0] == name) l[2]][0];
 
+//! Thickness of everything that turns WITH the die, mm - the die and both its plates.
+//!
+//! This is the central member of every pivot joint in the machine, and it is NOT the die
+//! alone. The plates are bolted hard to the die's faces, carry the same pivot bore and the
+//! same drive holes, and turn with it; a pin through the die is a pin through all three.
+//!
+//! Sizing on the die alone understated the bending span by two plate thicknesses. Bending
+//! governs every pin here, so that is not a rounding error: at 1-1/2 in it put the frame
+//! pin at 1 in where the span it actually crosses wants 1-1/8.
+function layout_central_thickness(layers) =
+    layout_thickness(layers, "forming die")
+        + layout_thickness(layers, "die plate lower")
+        + layout_thickness(layers, "die plate upper");
+
 //! Underside of the whole stack, mm - the face that sits on the mounting surface.
 function layout_bottom(layers) = layers[0][1];
 

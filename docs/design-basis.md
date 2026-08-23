@@ -366,6 +366,17 @@ at midspan and each outer member reacting `F/2` at its own centroid, so the span
 `t_centre + t_outer` and `M = F (t_centre + t_outer) / 4`. That is the standard
 conservative treatment — it ignores that the load is spread across each member's thickness.
 
+**The central member is the die *and its plates*, not the die.** The plates are bolted hard
+to the die's faces, carry the same pivot bore and the same drive holes, and turn with it, so
+a pin through the die is a pin through all three. Taking the die alone understated the span
+by two plate thicknesses — 12.7 mm at 1-1/2 in — and bending governs every pin here, so
+that is not a rounding error. `layout_central_thickness()` states it once, beside the stack
+it is a fact about.
+
+The U-strap pin is the exception and keeps the die's thickness, for a different reason: its
+central member is the **clamp**, which sits *between* the plates rather than turning with
+them, and the clamp is as thick as the die by construction.
+
 Allowables are AISC allowable stress design, stated in the Engineering Journal as
 "tension, Ft = 0.6Fy, and that in shear, Fv = 0.4Fy" [AISC-GOEL]. Bending uses the tension
 figure; AISC allows more for a solid round, so this is deliberately conservative. Bearing
@@ -377,13 +388,26 @@ that could be read.
 | | derived here | JD2 Model 32 |
 |---|---|---|
 | drive pin at 1-1/2 in | 7/8 in | 7/8 in |
-| frame pin at 2 in | 1-1/4 in | 1-1/4 in |
+| frame pin at 2 in | **1-3/8 in** | 1-1/4 in |
 | drive holes | 5 | 5 |
 | drive holes below a small die | none | none below 3 in CLR |
 
 JD2 sells one machine for the whole 1/2 to 2 in range, so their single pin size has to
 cover the top of it — which is exactly where the two tables meet. That is corroboration
-rather than proof, but four independent agreements is more than coincidence deserves.
+rather than proof, but the agreements are more than coincidence deserves.
+
+**The frame pin no longer agrees, and the disagreement was expected.** It read 1-1/4 in
+until the central member was corrected to include the die plates, and it is now one size
+over the reference machine. That is not evidence against either: **JD2's die is one piece
+and has no plates**, so their pin crosses a shorter span than ours by construction. The
+extra size is the price of a design decision this machine made and theirs did not — the
+plates that §15 shows the clamp cannot do without.
+
+Two further conservatisms sit on the same number and were left alone. Bending uses AISC's
+**tension** allowable, where a solid round is permitted more; and the drive torque is the
+tube's fully plastic moment, which §6 records as a floor. Either is worth about one size in
+the series. The model is not tuned to reproduce JD2 — where it lands elsewhere, that is
+reported rather than corrected.
 
 ### Link widths come from the section, not from the prototype
 

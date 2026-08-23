@@ -89,14 +89,16 @@ handle    = bend_handle_length_mm(moment, socket);
 layers    = layout_layers(tube, drive_plate, frame_plate, base_plate, die_plate_stock);
 t_drive   = plate_thickness(drive_plate);
 t_frame   = plate_thickness(frame_plate);
-t_die     = forming_die_thickness(tube);
+// The central member of every pivot joint: the die AND its plates, which are bolted to it
+// and turn with it. Not the die alone - see layout_central_thickness().
+t_centre  = layout_central_thickness(layers);
 
 // Pass 1: a nominal drive pin, to get a drive radius to size against.
 nominal_pin   = tube_od(tube) / 2;
 nominal_r     = forming_die_drive_radius(tube, clr, nominal_pin);
 drive_force_0 = bend_drive_pin_force_N(moment, nominal_r);
 drive_pin     = pin_smallest_at_least(
-                    pin_required_diameter(drive_force_0, t_die, t_drive, pin_material_yield));
+                    pin_required_diameter(drive_force_0, t_centre, t_drive, pin_material_yield));
 
 // Pass 2: the radius the chosen pin actually gives, and the force that goes with it.
 drive_radius = forming_die_drive_radius(tube, clr, pin_diameter(drive_pin));
@@ -112,7 +114,7 @@ followbar_pin   = pin_smallest_at_least(
 // need not act in the same direction, so adding them is conservative.
 frame_force = drive_force + followbar_force;
 frame_pin   = pin_smallest_at_least(
-                  pin_required_diameter(frame_force, t_die, t_drive + t_frame,
+                  pin_required_diameter(frame_force, t_centre, t_drive + t_frame,
                                         pin_material_yield));
 
 // The bolts that join the link pair at the grip. They carry the operator's own pull across
@@ -128,7 +130,7 @@ spacer_tube  = structural_smallest_for_bore(pin_pivot_hole(pin_diameter(spacer_b
 // Its two pins share that, through the die plates.
 clamp_force = bend_clamp_force_N(moment, clr);
 ustrap_pin  = pin_smallest_at_least(
-                  pin_required_diameter(clamp_force / 2, t_die,
+                  pin_required_diameter(clamp_force / 2, clamp_height(tube),
                                         plate_thickness(die_plate_stock),
                                         pin_material_yield));
 clamp_bolt  = bolt_smallest_at_least(tube_od(tube) / 4);
@@ -154,6 +156,15 @@ link_w       = frame_link_width(tube, clr, frame_plate, moment, pin_diameter(fra
                                 fb_pin_d);
 anchor_bolt  = base_anchor_bolt(tube, clr, link_w, fb_pin_d, moment, op_force,
                                 bolt_material_yield, bolts);
+
+// A pin the series cannot reach comes back undef and propagates through everything
+// downstream without a word - the frame link's width, the base's bolt pattern, the report.
+// Name it here, at the one place that knows which pin it was.
+assert(!is_undef(drive_pin),     "no registered pin is big enough for the DRIVE pin - extend pins.scad");
+assert(!is_undef(frame_pin),     "no registered pin is big enough for the FRAME pin - extend pins.scad");
+assert(!is_undef(followbar_pin), "no registered pin is big enough for the FOLLOWBAR pin - extend pins.scad");
+assert(!is_undef(ustrap_pin),    "no registered pin is big enough for the U-STRAP pin - extend pins.scad");
+assert(!is_undef(spacer_bolt),   "no registered pin is big enough for the SPACER bolts - extend pins.scad");
 
 bend_report(tube, clr, handle);
 forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
@@ -212,9 +223,9 @@ echo(str("sweep:   ", round(bend_available_sweep(drive_w, bend_followbar_length(
          " deg"));
 
 echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
-         pin_governing_mode(frame_force, t_die, t_drive + t_frame, pin_material_yield),
+         pin_governing_mode(frame_force, t_centre, t_drive + t_frame, pin_material_yield),
          "), drive ", pin_size(drive_pin), " (", round(drive_force), " N, ",
-         pin_governing_mode(drive_force, t_die, t_drive, pin_material_yield), ")"));
+         pin_governing_mode(drive_force, t_centre, t_drive, pin_material_yield), ")"));
 echo(str("         followbar ", pin_size(followbar_pin), " (", round(followbar_force),
          " N), U-strap ", pin_size(ustrap_pin)));
 echo(str("         drive radius ", nominal_r, " mm nominal -> ", drive_radius,

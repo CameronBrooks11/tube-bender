@@ -38,9 +38,18 @@ pin_0p875in  = ClevisPin("pin_0p875in",  "7/8 in dia",  inch(7/8));
 pin_1p000in  = ClevisPin("pin_1p000in",  "1 in dia",    inch(1));
 pin_1p125in  = ClevisPin("pin_1p125in",  "1-1/8 in dia",inch(1 + 1/8));
 pin_1p250in  = ClevisPin("pin_1p250in",  "1-1/4 in dia",inch(1 + 1/4));
+pin_1p375in  = ClevisPin("pin_1p375in",  "1-3/8 in dia",inch(1 + 3/8));
+pin_1p500in  = ClevisPin("pin_1p500in",  "1-1/2 in dia",inch(1 + 1/2));
 
 pins = [pin_0p1875in, pin_0p250in, pin_0p3125in, pin_0p375in, pin_0p4375in, pin_0p500in,
-        pin_0p625in, pin_0p750in, pin_0p875in, pin_1p000in, pin_1p125in, pin_1p250in];
+        pin_0p625in, pin_0p750in, pin_0p875in, pin_1p000in, pin_1p125in, pin_1p250in,
+        pin_1p375in, pin_1p500in];
+
+// The last two rows were added when the frame pin's span was corrected to include the die
+// plates. At 2 in that asked for 32.0 mm and the series stopped at 31.75 - a shortfall of
+// nine tenths of a percent, which is well inside the conservatism of taking AISC's TENSION
+// allowable for a solid round in bending. The series was extended rather than the
+// allowable relaxed: a bigger pin is cheap and the margin is not the place to find savings.
 
 //
 // Pin material. The prototype's pin is McMaster's "1004-1045 carbon steel", which is a
