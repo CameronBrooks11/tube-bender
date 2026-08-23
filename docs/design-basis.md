@@ -619,49 +619,96 @@ which does not fit a count that varies with the tube, so the stack currently exp
 STL. That is a build-system problem rather than a modelling one.
 
 
-## 17. The ratchet, and why it is not built
+## 17. The die lock, and the claim that was in the way
+
+### What the cycle actually costs
 
 ```
-cycle:   6 strokes of 1.22 m at the handle's end, re-pinning the drive pin between each
+cycle:   5 strokes of 1.22 m at the handle's end, re-pinning the drive pin between each
+         5 drive holes index 180 deg of the 185 deg groove, so the last is over-pulled to
+         41 deg and 1.39 m
 handle:  1947 mm, needing 490 N of pull
 ```
 
-Six pulls, each swinging the end of a two-metre handle through a metre and a quarter, and
+Five pulls, each swinging the end of a two-metre handle through a metre and a quarter, and
 between every one of them the drive pin comes out and goes into the next hole in the die.
-That is what a bend costs on this machine as built, and it is the case for a ratchet.
 
-But the stroke length is the lesser half of it. **The real problem is what happens when the
-drive pin comes out.** Nothing then holds the die, so the tube springs back before it can
-be re-pinned, and every stroke gives back part of what the last one gained. JD2 solves that
-with two things working together: a die lock pin, spring-loaded in a collar on the frame
-link, that "slides along the upper surface of the forming die" until it drops into a drive
-hole and locks it; and an anti-springback ratchet on the drive link's spacer tube
-[JD2-M32 p.7, p.8].
+**The stroke count is bounded by the holes, not by the pitch.** Each hole is used exactly
+once, so `n` holes give `n` strokes and `n x pitch` degrees of die rotation — one pitch
+more than the obvious guess, because engaging the last hole and pulling a pitch brings each
+of the remaining `n - 1` round in turn and the final pull adds one more. Five holes at 36
+degrees is 180, and a die with overbend wants 185, so **the last stroke is over-pulled**
+rather than a sixth hole being drilled where there is no room. Both reference machines
+carry five holes and must work the same way.
 
-### The lock pin has the clamp's problem again
+An earlier version of this file computed strokes as `ceil(arc / pitch)` with no reference
+to how many holes existed, and reported six. At 1/2 in, where the die carries four holes
+indexing 144 of the 185 degrees, it reported six against an actual four and said nothing
+about the 41 degrees the last one has to make up.
 
-To reach the die's drive holes from a frame link, the pin has to cross the drive links'
-band — and the drive links sweep every radius, so there is nothing at that radius they do
-not pass through. The options all cost something real:
+### The real problem is springback between strokes
 
-- a **slot in the drive link** at the drive circle — which is exactly where its bending
-  moment peaks and its section is already weakest;
-- a **ratchet ring** above the upper drive link, keyed to the die, which the pin engages
-  instead — an extra part, and it has to be driven by something that also crosses the band;
-- **reordering the stack** so the die sits against a frame link — which puts both drive
-  links on one side of it and loads the drive pin asymmetrically.
+Stroke length is the lesser half of the case for a ratchet. **Nothing holds the die while
+the drive pin is out**, so the tube springs back before it can be re-pinned and every
+stroke gives back part of what the last one gained. JD2 solves that with two things: a die
+lock pin, spring-loaded in a collar on the frame link, that "slides along the upper surface
+of the forming die" until it drops into a drive hole and locks it; and an anti-springback
+ratchet on the drive link's spacer tube [JD2-M32 p.7, p.8].
 
-The third is probably right and it is not a small change: it moves the die out of the
-middle of the stack, which every z position in `layout.scad` is written around, and the
-drive pin's bending model assumes a symmetric double-shear joint that it would no longer
-be.
+### The claim that said it could not be reached — withdrawn
 
-This is the same shape of problem the clamp had, and it was resolved the same way — by
-changing what the die offers rather than by inventing a fixing. Writing the constraint down
-is what let that one get solved; the same is being done here rather than fitting a pawl
-somewhere it cannot reach.
+This section previously said the lock pin could not be fitted without reordering the whole
+stack, on this reasoning:
 
-### What is safe to say now
+> *"To reach the die's drive holes from a frame link, the pin has to cross the drive links'
+> band — and the drive links sweep every radius, so there is nothing at that radius they do
+> not pass through."*
 
-The cycle is reported at every size, so the cost of not having a ratchet is visible rather
-than discovered on the bench. Nothing in the model assumes one exists.
+**That is withdrawn.** The drive links do sweep every radius, and it does not matter. What
+a fixed part has to avoid is the band the links occupy in ANGLE, and that band is narrow,
+because the machine indexes.
+
+Work the cycle: the link engages the hole at world angle `psi`, pulls through the pitch,
+the pin comes out, and the link swings **back** to `psi` — where the next hole has arrived,
+because the die carried it there. Every stroke starts and ends at the same two angles. Over
+a 180 degree bend the die turns 180 degrees and **the link never leaves a band one pitch
+wide**. The frame stands still at a fixed angle, so a lock pin dropped from it meets the
+drive link only if the two are angularly close.
+
+The error was not arithmetic. It was describing a mechanism by the envelope of everything
+it touches over a whole cycle, when what a collision needs is where two things are *at the
+same time*. The sweep check in `bend.scad` carried the same mistake — it asked whether the
+whole bend fitted between the followbar's keep-outs, which is the question for a machine
+that does not index. It passed only because it was about five times too strict.
+
+`bend_drive_band()` now states the band, and it is asked at a radius rather than answered
+once: the same link is angularly narrow far out and angularly enormous close in. At 1/2 in
+the link is 34.5 mm wide on a 23 mm drive circle, so its half-width there is 48 degrees and
+the band is nearly four times the swing that generated it.
+
+### What that leaves
+
+Two constraints on where the lock pin goes, and they pull against each other.
+
+**Clearance.** The band must miss the pin by the link's half-width at the pin's radius plus
+the pin's own. At 1-1/2 in that is `asin(38.7 / 73)` = 32 degrees for the link and about 10
+for the pin, so 42 degrees.
+
+**Phase.** A lock is only worth having if a hole is *at* the pin when the stroke ends —
+otherwise springback is lost before it drops in. A hole sits at angle `beta` exactly when
+`beta` is congruent to `psi` modulo the pitch, and since the die advances by exactly one
+pitch per stroke, **if it holds once it holds every stroke.**
+
+Together: the separation must be at least the clearance and a whole number of pitches. At
+1-1/2 in the smallest that works is 72 degrees — two pitches.
+
+The die's hole phase is the knob to turn, because the inset that currently sets it is a
+minimum rather than a target and has slack in it. Turning the frame link instead does not
+work: it points at the followbar, which is not free.
+
+### The exception
+
+A die too small to carry drive holes is not indexed at all. JD2 drives those on the U-strap
+pin instead [JD2-M32 p.7], the link really does swing the whole arc, and there is no fixed
+band for a lock pin to hide in. **1/8 in and 1/4 in get no die lock**, and the model reports
+that rather than drawing one.

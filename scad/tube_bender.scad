@@ -11,8 +11,8 @@
 //! Every part of the working mechanism is built and derived: the forming die - machined
 //! from one plate or stacked from flat-cut slices, behind the same interface - its plates,
 //! the clamp, the followbar, the tapered frame and drive links, and a bench base or a
-//! pedestal. Still to do: a ratchet and its die lock, which need the stack reordered
-//! before they have anywhere to reach - see design-basis section 17.
+//! pedestal. Still to do: the die lock that holds the die against springback while the
+//! drive pin is out - see design-basis section 17.
 //!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
@@ -183,14 +183,33 @@ if (mount == "pedestal")
     pedestal_report(post, base_plate, post_length, foot_bolt, bolt_material_yield,
                     op_force, pedestal_height, moment);
 
-// The drive links turn with the die and sweep every radius; the followbar and its pin do
-// not move. The bend has to fit in what is left of the circle.
+// The drive links turn with the die; the followbar and its pin do not move. What has to
+// fit between the followbar's keep-outs is ONE STROKE, not the whole bend - the link is
+// indexed, so it swings a pitch and comes back. A die with no drive holes is the exception
+// and is checked as one.
+//
+// The width that matters is the DRIVE link's, not the frame link's - the frame link is
+// what stands still - and it is asked for at the followbar's radius, where the collision
+// would happen, rather than at the drive hole where the link is at its widest.
 fb_radius = frame_link_reach(tube, clr, fb_pin_d);
-for (d = bend_mechanism_departures(bend_angle, link_w, bend_followbar_length(tube), fb_radius))
+drive_w   = drive_link_width_at(drive_plate, op_force, handle,
+                                is_undef(drive_hole_r) ? 0 : drive_hole_r,
+                                pin_diameter(frame_pin), pin_diameter(drive_pin),
+                                pin_diameter(spacer_bolt), fb_radius);
+n_drive_holes = len(drive_angles);
+stroke_overrun = bend_stroke_overrun(bend_angle, n_drive_holes, forming_die_drive_pitch());
+
+for (d = bend_mechanism_departures(bend_angle, drive_w, bend_followbar_length(tube),
+                                   fb_radius, forming_die_drive_pitch(), n_drive_holes))
     echo(str("DEPARTURE: ", d));
-echo(str("sweep:   ", round(bend_available_sweep(link_w, bend_followbar_length(tube), fb_radius)),
-         " deg free of the followbar, and the bend needs ",
-         forming_die_arc(bend_angle), " deg"));
+
+echo(str("sweep:   ", round(bend_available_sweep(drive_w, bend_followbar_length(tube), fb_radius)),
+         " deg free of the followbar; ",
+         n_drive_holes ? str("one stroke is ", forming_die_drive_pitch(), " deg and the last is ",
+                             round(forming_die_drive_pitch() + stroke_overrun))
+                       : str("no drive holes, so the link swings the whole ",
+                             forming_die_arc(bend_angle)),
+         " deg"));
 
 echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
          pin_governing_mode(frame_force, t_die, t_drive + t_frame, pin_material_yield),
@@ -202,9 +221,26 @@ echo(str("         drive radius ", nominal_r, " mm nominal -> ", drive_radius,
          " mm with the chosen pin"));
 echo(str("stack:   ", layout_height(layers), " mm overall, ", layout_frame_gap(layers),
          " mm between the frame links"));
-echo(str("cycle:   ", bend_strokes(bend_angle, forming_die_drive_pitch()), " strokes of ",
-         round(bend_stroke_travel_mm(forming_die_drive_pitch(), handle) / 10) / 100,
-         " m at the handle's end, re-pinning the drive pin between each"));
+if (n_drive_holes) {
+    echo(str("cycle:   ", bend_strokes(bend_angle, forming_die_drive_pitch(), n_drive_holes),
+             " strokes of ",
+             round(bend_stroke_travel_mm(forming_die_drive_pitch(), handle) / 10) / 100,
+             " m at the handle's end, re-pinning the drive pin between each"));
+    echo(str("         ", n_drive_holes, " drive holes index ",
+             bend_indexed_rotation(n_drive_holes, forming_die_drive_pitch()), " deg of the ",
+             forming_die_arc(bend_angle), " deg groove",
+             stroke_overrun > 0
+                 ? str(", so the last is over-pulled to ",
+                       round(forming_die_drive_pitch() + stroke_overrun), " deg and ",
+                       round(bend_stroke_travel_mm(forming_die_drive_pitch() + stroke_overrun,
+                                                   handle) / 10) / 100, " m")
+                 : " and nothing is left to over-pull"));
+} else {
+    echo(str("cycle:   1 stroke of ",
+             round(bend_stroke_travel_mm(forming_die_arc(bend_angle), handle) / 10) / 100,
+             " m at the handle's end - this die has no drive holes, so the link takes it",
+             " round in one go on the U-strap pin"));
+}
 
 // The base is drawn in the frame link's own frame, so its features have to be turned onto
 // the link's axis to sit under it.

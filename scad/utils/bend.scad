@@ -205,27 +205,78 @@ function bend_followbar_station(tube, clr) =
 function bend_followbar_force_N(moment_Nm, station_mm) = moment_Nm / (station_mm / 1000);
 
 //
-// The operating cycle. What the machine actually asks of the person using it.
+// The operating cycle. What the machine actually asks of the person using it - and, less
+// obviously, what decides where anything carried on the frame may be put.
+//
+// THE DRIVE LINK DOES NOT SWEEP THE BEND. It sweeps ONE PITCH, over and over. Engage the
+// hole that is at world angle psi, pull through the pitch, pull the pin, and swing the
+// link BACK to psi - where the next hole has arrived, because the die carried it there.
+// Every stroke starts and ends at the same two angles, so the die turns 180 degrees while
+// the link occupies a band one pitch wide.
+//
+// That is worth more than it sounds. An earlier version of this file had the link
+// sweeping the whole arc, which made the mechanism look like solid obstruction at every
+// angle and put a die lock out of reach - see docs/design-basis.md section 17. What the
+// frame has to clear is a narrow fixed band, and the rest of the circle is free for
+// things that stand still.
 //
 
 //! How many pulls a full bend takes: the drive pin is moved to the next die hole each
 //! time the link runs out of the pitch between them.
-function bend_strokes(bend_angle, hole_pitch_deg) =
-    ceil((bend_angle + bend_overbend_degrees) / hole_pitch_deg);
+//!
+//! Bounded by the holes there are. Each hole is used exactly once, so a die with `n` of
+//! them takes `n` pulls however many the pitch alone suggests - the shortfall comes out of
+//! the last stroke, not out of an extra one. A die with none is not indexed at all and the
+//! whole bend is one pull.
+function bend_strokes(bend_angle, hole_pitch_deg, n_holes) =
+    n_holes == 0 ? 1
+                 : min(n_holes, ceil((bend_angle + bend_overbend_degrees) / hole_pitch_deg));
 
 //! How far the end of the handle travels in one stroke, mm.
 function bend_stroke_travel_mm(hole_pitch_deg, handle_length_mm) =
     PI * handle_length_mm * hole_pitch_deg / 180;
 
+//! Degrees the die can be indexed through with `n` drive holes at `pitch_deg`.
+//!
+//! Exactly `n x pitch`, which is one pitch more than the obvious guess. Engage the last
+//! hole, pull a pitch, and each of the remaining `n - 1` holes arrives in turn - so the
+//! holes span `(n - 1) x pitch` of the die and the final pull adds one more.
+//!
+//! Five holes at 36 degrees is 180, and a die with overbend wants 185. Both reference
+//! machines carry five holes, so the last few degrees come from over-pulling the final
+//! stroke rather than from a sixth hole there is no room to drill.
+function bend_indexed_rotation(n_holes, pitch_deg) = n_holes * pitch_deg;
+
+//! Degrees the final stroke must be over-pulled past the pitch to finish the arc, or 0.
+//! Reported rather than forbidden - a few degrees is how these machines are worked, and
+//! the departure below is about whether the frame leaves room for it.
+//!
+//! Zero on an un-indexed die: there is no pitch to be over-pulled past, the single stroke
+//! IS the whole arc, and bend_mechanism_departures() checks that case on its own terms.
+function bend_stroke_overrun(bend_angle, n_holes, pitch_deg) =
+    n_holes == 0 ? 0
+                 : max(0, bend_angle + bend_overbend_degrees
+                              - bend_indexed_rotation(n_holes, pitch_deg));
+
 //
-// Sweep. The drive links turn with the die and reach past everything; the followbar and
-// its pin stand still in their path. Nothing stops them meeting except keeping the bend
-// out of that sector.
+// Sweep. The drive links turn with the die; the followbar, its pin, and anything else the
+// frame carries stand still in their path. What the links occupy is a BAND, and
+// everything fixed has to live outside it.
 //
 
 //! Angular half-width, degrees, that a bar of `width_mm` occupies at `radius_mm`.
 function bend_angular_half_width(width_mm, radius_mm) =
     radius_mm <= width_mm / 2 ? 90 : asin(width_mm / 2 / radius_mm);
+
+//! Angular sector, degrees, that the drive link's MATERIAL occupies at `radius_mm` over a
+//! whole bend: the swing of its centreline plus its own half-width either side.
+//!
+//! Asked at a radius rather than answered once, because the same link is angularly narrow
+//! far out and angularly enormous close in. At 1/2 in it is 34.5 mm wide on a 23 mm drive
+//! circle, so its half-width there is 48 degrees and the band is nearly four times the
+//! swing that generated it.
+function bend_drive_band(swing_deg, link_width_mm, radius_mm) =
+    swing_deg + 2 * bend_angular_half_width(link_width_mm, radius_mm);
 
 //! Degrees of sector the drive link must be kept clear of, either side of the followbar:
 //! the link's own half-width plus the followbar's, at the followbar's radius.
@@ -234,7 +285,11 @@ function bend_followbar_keepout(link_width_mm, followbar_length_mm, radius_mm) =
         + bend_angular_half_width(followbar_length_mm, radius_mm);
 
 //! Degrees of swing left for the drive link once the followbar's keep-out is taken out of
-//! the circle. The bend plus its overbend has to fit inside this.
+//! the circle.
+//!
+//! ONE STROKE has to fit in this, not the whole bend. The exception is a die too small to
+//! carry drive holes: nothing indexes it, the link takes it round in one go, and the whole
+//! arc has to fit. Both cases are checked in bend_mechanism_departures().
 function bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm) =
     360 - 2 * bend_followbar_keepout(link_width_mm, followbar_length_mm, radius_mm);
 
@@ -302,12 +357,23 @@ clr_tolerance = 0.01;
 
 //! As bend_departures, plus the ones that need the machine's geometry rather than only
 //! the tube's. Kept separate so the tube-only checks can run before anything is designed.
+//!
+//! `n_holes` is what makes the two cases different. With drive holes the link is indexed
+//! and only ONE stroke - the pitch, plus whatever the last one is over-pulled by - has to
+//! fit between the followbar's keep-outs. With none, JD2 drives such dies on the U-strap
+//! pin instead [JD2-M32 p.7], nothing indexes, and the whole arc has to fit.
 function bend_mechanism_departures(bend_angle, link_width_mm, followbar_length_mm,
-                                   radius_mm) = [
-    if (bend_angle + bend_overbend_degrees
-            > bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm))
-        "the drive link cannot swing the bend without sweeping through the followbar",
-];
+                                   radius_mm, pitch_deg, n_holes) =
+    let (sweep = bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm),
+         arc   = bend_angle + bend_overbend_degrees,
+         last  = pitch_deg + bend_stroke_overrun(bend_angle, n_holes, pitch_deg))
+    [
+        if (n_holes == 0 && arc > sweep)
+            "the die has no drive holes, so the link must swing the whole bend - and it sweeps through the followbar doing it",
+        if (n_holes > 0 && last > sweep)
+            str("the last stroke needs ", round(last),
+                " deg to finish the arc and the followbar leaves only ", round(sweep)),
+    ];
 
 function bend_departures(tube, clr) = [
     if (clr < bend_min_clr(tube) - clr_tolerance)
