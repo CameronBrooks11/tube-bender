@@ -1,0 +1,17 @@
+[
+    {
+        "name": "main_assembly",
+        "big": null,
+        "ngb": false,
+        "zoomed": 0,
+        "count": 1,
+        "assemblies": {},
+        "vitamins": {
+            "tube(tube_1p500x0p095, 600): Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm": {
+                "count": 1
+            }
+        },
+        "printed": {},
+        "routed": {}
+    }
+]

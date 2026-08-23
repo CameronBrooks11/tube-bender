@@ -1,0 +1,9 @@
+Vitamins:
+ M
+ a
+ i
+ n
+ 1|  1 Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm
+
+Assemblies:
+  1 main_assembly

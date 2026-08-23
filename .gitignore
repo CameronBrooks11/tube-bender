@@ -1,1 +1,23 @@
+# Reverse-engineering inputs and derived artefacts. Kept out of history on
+# purpose: the STEP is ~1.2 MB, the exploded parts and meshes are derived from
+# it, and the cloned reference repo is somebody else's history.
 reference/
+
+# Tooling venv (partspec + OCCT, used only to measure the STEP).
+.venv/
+
+# NopSCADlib build noise. The manual itself - readme.md, assemblies/, bom/,
+# dxfs/, stls/ - IS the deliverable and is committed; these are not.
+deps/
+tmp/
+**/deps/
+readme.html
+printme.html
+cmd_times.txt
+*.deps
+**/times.txt
+openscad.echo
+openscad.log
+
+__pycache__/
+*.pyc

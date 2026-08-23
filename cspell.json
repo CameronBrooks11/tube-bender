@@ -1,0 +1,11 @@
+{
+  "version": "0.2",
+  "language": "en-GB,en",
+  "words": [
+    "ASTM", "Chaffin", "chromoly", "codespell", "cs", "DOM", "ERW", "followbar",
+    "Hossfeld", "Kroemer", "mandrel", "nophead", "NopSCADlib", "OCCT", "openscad",
+    "OPENSCADPATH", "partspec", "protoolsusa", "roguefab", "Snook", "Swagelok",
+    "thefabricator", "Totten", "tottentubes", "vitamins", "waterjet"
+  ],
+  "ignorePaths": ["reference/**", ".venv/**", "readme.md", "readme.html", "printme.html"]
+}
