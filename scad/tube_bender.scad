@@ -37,6 +37,7 @@ use <custom/followbar.scad>
 use <custom/die_plate.scad>
 use <custom/clamp.scad>
 use <custom/pedestal.scad>
+use <custom/sliced_die.scad>
 
 $fn = 90;
 
@@ -57,6 +58,11 @@ die_plate_bolts = 6;
 // "bench" bolts the base straight down; "pedestal" stands it on a post. The pedestal's
 // height is the working plane above the floor, and the braced band the 490 N ceiling
 // assumes is 510 to 1780 mm - the report says whether this lands in it.
+// "machined" cuts the die from one thick plate and needs a mill; "sliced" stacks flat
+// plates a laser or waterjet can cut, and gives up wrap for it - see the report.
+die_style       = "machined";
+slice_plate     = plate_0p125in;
+
 mount           = "pedestal";
 pedestal_height = 950;
 
@@ -160,6 +166,7 @@ die_plate_report(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin)
                  pin_diameter(drive_pin), pin_diameter(ustrap_pin), plate_bolt,
                  bolt_material_yield, die_plate_bolts, moment);
 clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
+sliced_die_report(tube, clr, slice_plate);
 base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bolt,
             bolt_material_yield, layout_working_height(layers));
 
@@ -205,10 +212,16 @@ plate_bolt_pos = die_plate_bolt_positions(tube, clr, pin_diameter(frame_pin),
                                           bolt_diameter(plate_bolt), bend_angle,
                                           die_plate_bolts);
 
+// Both dies present the same interfaces, so nothing downstream chooses between them.
 module forming_die_stl()
-    forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
-                pin_diameter(drive_pin), pin_diameter(ustrap_pin),
-                plate_bolt_pos, bolt_diameter(plate_bolt));
+    if (die_style == "sliced")
+        sliced_die(tube, clr, slice_plate, bend_angle, pin_diameter(frame_pin),
+                   pin_diameter(drive_pin), pin_diameter(ustrap_pin),
+                   plate_bolt_pos, bolt_diameter(plate_bolt));
+    else
+        forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
+                    pin_diameter(drive_pin), pin_diameter(ustrap_pin),
+                    plate_bolt_pos, bolt_diameter(plate_bolt));
 
 module die_plate_stl()
     die_plate(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),

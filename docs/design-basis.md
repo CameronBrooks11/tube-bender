@@ -570,3 +570,50 @@ what the clamp is holding. Standard bolt group: `F/n + M/(n r)`.
 A die with plates bolted to it is already a stack. Whatever the roadmap's laser-cut sliced
 die turns out to be, it inherits the same bolt circle and the same interfaces, so that item
 got cheaper by being blocked on this one.
+
+
+## 16. Two dies behind one interface, and what the sliced one gives up
+
+The forming die is the only part that needs a mill. `sliced_die.scad` is the same die made
+from flat plates a laser or waterjet can cut — and it takes every dimension from the same
+functions in `forming_die.scad`, so the arc, hub, tail, drive circle and groove root are
+one expression used twice rather than two that agree until one moves. Nothing downstream
+chooses between them; `die_style` does.
+
+### No horizontal slicing can follow this groove
+
+The groove is a half-round, and near its edges its surface runs almost parallel to the
+die's axis — `dr/dz` goes to infinity at the part line. A stack always falls away from it
+somewhere, and the further out it goes the worse it gets.
+
+Each slice is cut to the groove's radius at **its own edge nearest the mid-plane**, so the
+stack is everywhere at or inside the true groove and never proud of it. The tube gets line
+contact on each rim. Cutting to each slice's mid-height instead would halve the gaps and
+put every corner *into* the tube's path — the wrong trade for a surface being formed.
+
+What that costs is **wrap**:
+
+```
+sliced die: 14 x 1/8 in slices, 3.18 mm each after facing
+            supports 113 deg of the tube's section against 180 machined,
+            and falls up to 10.53 mm away from the groove between rims
+            wall factor here is 15.8 - a stepped groove suits thick wall and marks thin
+```
+
+113 degrees against 180. Thinner slices buy more — 1/16 in stock gets it to about 133 —
+and no thickness reaches 180, because the last few degrees need a surface tangent to the
+die's axis. That is not a defect in the implementation; it is what slicing a half-round
+means, and the number is printed so the choice is made with it rather than around it.
+
+### Who it is for
+
+A stepped groove suits thick wall and marks thin, which is what **wall factor** measures,
+so the report gives that alongside. The machined die remains the default. The sliced one
+is there because a shop with a waterjet and no mill can build the whole machine, and
+knowing exactly what that costs is better than not offering it.
+
+### Not yet done
+
+Each slice should come out as its own DXF. NopSCADlib names made parts through modules,
+which does not fit a count that varies with the tube, so the stack currently exports as one
+STL. That is a build-system problem rather than a modelling one.
