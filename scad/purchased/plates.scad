@@ -11,25 +11,29 @@
 // than a claim needing a citation. The reference machines sit inside it: the prototype used
 // 1/4 in throughout, and Pro-Tools' 105 uses 5/8 in frame arms [PROTOOLS-105].
 //
-//                                          "name"              "size"      "description"                   t mm      colour
-plate_0p125in = ["plate_0p125in", "1/8 in",   "Plate mild steel",             3.175,  "silver"];
-plate_0p1875in= ["plate_0p1875in","3/16 in",  "Plate mild steel",             4.7625, "silver"];
-plate_0p250in = ["plate_0p250in", "1/4 in",   "Plate mild steel",             6.35,   "silver"];
-plate_0p3125in= ["plate_0p3125in","5/16 in",  "Plate mild steel",             7.9375, "silver"];
-plate_0p375in = ["plate_0p375in", "3/8 in",   "Plate mild steel",             9.525,  "silver"];
-plate_0p500in = ["plate_0p500in", "1/2 in",   "Plate mild steel",            12.7,    "silver"];
-plate_0p625in = ["plate_0p625in", "5/8 in",   "Plate mild steel",            15.875,  "silver"];
-plate_0p750in = ["plate_0p750in", "3/4 in",   "Plate mild steel",            19.05,   "silver"];
-plate_1p000in = ["plate_1p000in", "1 in",     "Plate mild steel",            25.4,    "silver"];
+// Yield is ASTM A36's specified minimum, 36 ksi = 250 MPa - the number the grade is named
+// for [ASTM-A36]. It is a MINIMUM, so a real plate is stronger; nothing here is sized on
+// the difference.
+//
+//                                          "name"              "size"      "description"                   t mm      colour     yield MPa
+plate_0p125in = ["plate_0p125in", "1/8 in",   "Plate mild steel",             3.175,  "silver", 250];
+plate_0p1875in= ["plate_0p1875in","3/16 in",  "Plate mild steel",             4.7625, "silver", 250];
+plate_0p250in = ["plate_0p250in", "1/4 in",   "Plate mild steel",             6.35,   "silver", 250];
+plate_0p3125in= ["plate_0p3125in","5/16 in",  "Plate mild steel",             7.9375, "silver", 250];
+plate_0p375in = ["plate_0p375in", "3/8 in",   "Plate mild steel",             9.525,  "silver", 250];
+plate_0p500in = ["plate_0p500in", "1/2 in",   "Plate mild steel",            12.7,    "silver", 250];
+plate_0p625in = ["plate_0p625in", "5/8 in",   "Plate mild steel",            15.875,  "silver", 250];
+plate_0p750in = ["plate_0p750in", "3/4 in",   "Plate mild steel",            19.05,   "silver", 250];
+plate_1p000in = ["plate_1p000in", "1 in",     "Plate mild steel",            25.4,    "silver", 250];
 // Above 1 in the series steps in quarters, not eighths. A die is as thick as the tube is
 // wide, and tube ODs step in eighths, so from 1 in up the blank is the next quarter and
 // the die gets faced down to size. That is the fabrication reality, not a rounding error.
-plate_1p250in = ["plate_1p250in", "1-1/4 in", "Plate mild steel",            31.75,   "silver"];
-plate_1p500in = ["plate_1p500in", "1-1/2 in", "Plate mild steel",            38.1,    "silver"];
-plate_1p750in = ["plate_1p750in", "1-3/4 in", "Plate mild steel",            44.45,   "silver"];
-plate_2p000in = ["plate_2p000in", "2 in",     "Plate mild steel",            50.8,    "silver"];
-plate_2p250in = ["plate_2p250in", "2-1/4 in", "Plate mild steel",            57.15,   "silver"];
-plate_2p500in = ["plate_2p500in", "2-1/2 in", "Plate mild steel",            63.5,    "silver"];
+plate_1p250in = ["plate_1p250in", "1-1/4 in", "Plate mild steel",            31.75,   "silver", 250];
+plate_1p500in = ["plate_1p500in", "1-1/2 in", "Plate mild steel",            38.1,    "silver", 250];
+plate_1p750in = ["plate_1p750in", "1-3/4 in", "Plate mild steel",            44.45,   "silver", 250];
+plate_2p000in = ["plate_2p000in", "2 in",     "Plate mild steel",            50.8,    "silver", 250];
+plate_2p250in = ["plate_2p250in", "2-1/4 in", "Plate mild steel",            57.15,   "silver", 250];
+plate_2p500in = ["plate_2p500in", "2-1/2 in", "Plate mild steel",            63.5,    "silver", 250];
 
 plates = [plate_0p125in, plate_0p1875in, plate_0p250in, plate_0p3125in, plate_0p375in,
           plate_0p500in, plate_0p625in, plate_0p750in, plate_1p000in, plate_1p250in,

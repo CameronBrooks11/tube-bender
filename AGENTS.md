@@ -5,7 +5,7 @@ these take precedence where they conflict.
 
 ## Commands
 
-- `just check` — the CI gate. Runs `check-scad`.
+- `just check` — the CI gate. Runs `check-scad`, `check-sizes` and `check-report`.
 - `just report` — echo what the current configuration implies, drawing nothing.
 - `just build` — NopSCADlib `make_all`: BOM, DXFs, STLs, assembly views, `readme.md`.
 - `just bom` — regenerate just the BOM.
@@ -84,6 +84,24 @@ cut from is declared separately as a `vitamin()`, because a parts list has to sa
 
 A row's name and `size` field are its imperial size, because that is what you order and
 what is stamped on the die. **All arithmetic is millimetres.** Convert once, at the row.
+
+## The three gates, and what each one cannot see
+
+`check-scad` evaluates every file once, at its defaults, in both directions. It cannot see
+a fault that only appears at one end of the size range, and — because a `.csg` export never
+builds the mesh — it cannot see a geometry fault at all.
+
+`check-sizes` drives the whole model with `-D tube=...` at every registered size. Two sizes
+are listed as known departures; it fails both ways, so a fix that removes one without
+removing its entry is caught too. This is the gate that finds parametric breakage: the
+`nan` link width at 1/8 in, which nothing at 1/2 in and up would have shown.
+
+`check-report` fails if any echoed value is `undef`, `nan` or `inf`. OpenSCAD does not
+error on an undefined variable or a missing argument — it yields `undef` and propagates it
+silently through arithmetic into the report. Every derived number in this model has been
+`undef` at least once.
+
+None of them build a mesh. When geometry is in question, export an STL or a PNG.
 
 ## Numbers before geometry
 

@@ -350,3 +350,69 @@ not.
 **Pins are not yet derived.** The die takes the frame, drive and U-strap pin diameters as
 inputs and reports the force on the drive pin (12.7 kN at 1-1/2 in) so the choice can be
 checked. Sizing them needs the drive link's geometry.
+
+
+## 13. Pins and links
+
+### Bending sizes every pin on this machine, not shear
+
+Each pin runs through a central member with an outer one either side, so it is in double
+shear — and it also bends across that span. The two are checked separately because **they
+do not agree**: bending asks for more than twice the diameter shear does. Sizing on shear
+alone gives the 1-1/2 in machine a 3/8 in drive pin where it needs 7/8 in.
+
+The bending model takes the pin as a simply supported beam, the central member's load `F`
+at midspan and each outer member reacting `F/2` at its own centroid, so the span is
+`t_centre + t_outer` and `M = F (t_centre + t_outer) / 4`. That is the standard
+conservative treatment — it ignores that the load is spread across each member's thickness.
+
+Allowables are AISC allowable stress design, stated in the Engineering Journal as
+"tension, Ft = 0.6Fy, and that in shear, Fv = 0.4Fy" [AISC-GOEL]. Bending uses the tension
+figure; AISC allows more for a solid round, so this is deliberately conservative. Bearing
+on the plates is **reported, not allowed for** — no bearing allowable was found in a source
+that could be read.
+
+### The derivation lands on the reference machines' hardware
+
+| | derived here | JD2 Model 32 |
+|---|---|---|
+| drive pin at 1-1/2 in | 7/8 in | 7/8 in |
+| frame pin at 2 in | 1-1/4 in | 1-1/4 in |
+| drive holes | 5 | 5 |
+| drive holes below a small die | none | none below 3 in CLR |
+
+JD2 sells one machine for the whole 1/2 to 2 in range, so their single pin size has to
+cover the top of it — which is exactly where the two tables meet. That is corroboration
+rather than proof, but four independent agreements is more than coincidence deserves.
+
+### Link widths come from the section, not from the prototype
+
+Each link is sized on the net section at its worst hole, at `0.6 Fy` for A36 plate
+[ASTM-A36]. The width solves a cubic — `w^3 - ws^2 w - d^3 = 0` — by five passes of a
+contraction map, which is converged to under a hundredth of a millimetre.
+
+The **drive link's** peak moment is not at the pivot. Cut it just outside the pivot eye and
+the outboard piece carries the handle force at the handle's length and the drive pin's
+force at the drive radius, and those two balance — that balance is what the machine is. The
+internal moment there is zero, rising outward to a peak **at the drive hole**, which is
+also the weakest section.
+
+The **frame link** is taken as a cantilever from the pivot to the followbar. That is
+conservative: the base will take some of it, but where the base grabs is not decided, and a
+link sized as a cantilever cannot be made worse by adding a support.
+
+### The force ceiling is a maximum, not a target
+
+Taking 490 N as the design pull breaks at the small end. A 1/8 in tube needs 1.4 N·m; at
+490 N that is a handle **2.8 mm long** — shorter than the machine it bolts to, so the
+moment between the socket and the handle's end went negative and the link width came out
+`nan`.
+
+The handle therefore also has a floor: one hand breadth of grip beyond where it attaches,
+10.0 cm at the 99th percentile male [HFDS-2009 Exh. 14.3.2.1 item 45]. Where the grip
+governs, the operator pulls less than the ceiling, and the model reports **the force
+actually needed** — 12 N at 1/8 in, 490 N at 1 in and above. That figure says how hard the
+machine is to work, which is the more useful number.
+
+Nothing below 1/2 in would have caught this. `just check-sizes` now drives the whole model
+at every registered size rather than only the bend arithmetic, and that is what found it.

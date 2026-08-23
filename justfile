@@ -7,7 +7,7 @@ default:
     @just --list
 
 # Everything CI runs.
-check: check-scad check-sizes
+check: check-scad check-sizes check-report
 
 # Evaluate every SCAD file and report anything that does not build.
 check-scad:
@@ -76,13 +76,17 @@ clean:
     rm -rf assemblies bom deps dxfs stls tmp readme.html printme.html \
            cmd_times.txt openscad.echo openscad.log
 
-# Report every registered tube size, not just the selected one.
+# Build the whole machine at every registered tube size, not just the selected one.
 check-sizes:
     #!/usr/bin/env bash
-    # check-scad renders each file once, at its defaults, so a departure that only fires
-    # at one end of the size range never gets evaluated. This recipe walks the registry.
-    # It FAILS on a departure nothing expects and on an expected departure that stopped
-    # firing - a fix that goes unnoticed leaves a stale list behind.
+    # check-scad renders each file once, at its defaults, so anything that only breaks at
+    # one end of the size range is never evaluated. This drives the real model with -D,
+    # so every size gets the full derivation - pins, links, die and all - and is checked
+    # for build errors, departures and undef alike.
+    #
+    # It FAILS both ways: an unexpected result is a regression, and an expected failure
+    # that stopped happening means the list has gone stale and a fix went unnoticed.
+    # Shrinking `expected` is the work.
     set -uo pipefail
     export OPENSCADPATH="{{LIBRARIES}}"
     expected=(
@@ -90,31 +94,48 @@ check-sizes:
         "tube_0p625x0p049"  # neither catalogue reaches 5/8 in
     )
     tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
-    cat > "$tmp/sweep.scad" <<SCAD
-    include <$PWD/scad/purchased/tubes.scad>
-    use <$PWD/scad/utils/bend.scad>
-    for (t = tubes) {
-        echo(str("ROW|", tube_name(t), "|", len(bend_departures(t, bend_default_clr(t)))));
-        bend_report(t, bend_default_clr(t));
-    }
-    SCAD
-    {{OPENSCAD}} -o "$tmp/sweep.csg" "$tmp/sweep.scad" 2>"$tmp/err" >/dev/null
-    if grep -q '^ERROR' "$tmp/err"; then
-        echo "FAIL  the sweep did not build"; grep '^ERROR' "$tmp/err" | sed 's/^/        /'; exit 1
-    fi
+    printf 'include <%s/scad/purchased/tubes.scad>\nfor (t = tubes) echo(str("NAME|", tube_name(t)));\n' "$PWD" > "$tmp/names.scad"
+    {{OPENSCAD}} -o "$tmp/names.csg" "$tmp/names.scad" 2>"$tmp/names.err" >/dev/null
+    names=$(grep -o 'NAME|[a-z0-9_]*' "$tmp/names.err" | cut -d'|' -f2)
+    if [ -z "$names" ]; then echo "FAIL  could not read the tube registry"; exit 1; fi
     failed=0
-    while IFS='|' read -r name n; do
+    for n in $names; do
         listed=0
-        for e in "${expected[@]}"; do [ "$e" = "$name" ] && listed=1; done
-        if [ "$n" != "0" ] && [ "$listed" = 0 ]; then
-            echo "FAIL  $name  departs and is not expected to"
-            grep -A6 "ROW|$name|" "$tmp/err" | grep 'DEPARTURE' | sed 's/^ECHO: "/        /; s/"$//'
-            failed=1
-        elif [ "$n" = "0" ] && [ "$listed" = 1 ]; then
-            echo "FAIL  $name  no longer departs, but is still listed - remove it from check-sizes"
-            failed=1
-        else
-            printf 'ok    %-22s %s\n' "$name" "$([ "$listed" = 1 ] && echo "known departure" || echo 'clean')"
+        for e in "${expected[@]}"; do [ "$e" = "$n" ] && listed=1; done
+        {{OPENSCAD}} -D "tube=$n" -o "$tmp/s.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
+        problem=""
+        if grep -q '^ERROR' "$tmp/err"; then
+            problem="$(grep -m1 '^ERROR' "$tmp/err" | sed 's/.*failed: //; s/ in file.*//' | cut -c1-72)"
+        elif grep '^ECHO' "$tmp/err" | grep -qiE 'undef|nan'; then
+            problem="a reported value is not a number"
+        elif grep -q 'DEPARTURE' "$tmp/err"; then
+            problem="$(grep -m1 'DEPARTURE' "$tmp/err" | sed 's/^ECHO: "DEPARTURE: //; s/"$//' | cut -c1-72)"
         fi
-    done < <(grep '^ECHO: "ROW|' "$tmp/err" | sed 's/^ECHO: "ROW|//; s/"$//')
+        if [ -n "$problem" ] && [ "$listed" = 0 ]; then
+            echo "FAIL  $n  $problem"; failed=1
+        elif [ -z "$problem" ] && [ "$listed" = 1 ]; then
+            echo "FAIL  $n  builds clean now, but is still listed - remove it from check-sizes"; failed=1
+        else
+            printf 'ok    %-22s %s\n' "$n" "$([ "$listed" = 1 ] && echo "known: $problem" || echo builds)"
+        fi
+    done
     exit $failed
+
+# Fail if the configuration report contains an undefined or non-finite number.
+check-report:
+    #!/usr/bin/env bash
+    # OpenSCAD does not error on an undefined variable or a missing argument - it yields
+    # undef, and undef propagates through arithmetic to the report without a word. Every
+    # derived number here has been undef at least once because a file `use`d something it
+    # needed to `include`. The report is where that surfaces, so the report is checked.
+    set -uo pipefail
+    export OPENSCADPATH="{{LIBRARIES}}"
+    tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
+    {{OPENSCAD}} -o "$tmp/r.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
+    bad=$(grep '^ECHO' "$tmp/err" | grep -inE 'undef|nan|inf' || true)
+    if [ -n "$bad" ]; then
+        echo "FAIL  the report carries values that are not numbers:"
+        echo "$bad" | sed 's/^/        /'
+        exit 1
+    fi
+    echo "ok    every reported value is a number"

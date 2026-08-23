@@ -20,6 +20,19 @@ function plate_size(type)        = type[1];  //! Imperial thickness, the identit
 function plate_description(type) = type[2];  //! What to write on the BOM
 function plate_thickness(type)   = type[3];  //! Thickness, mm
 function plate_colour(type)      = type[4];  //! Preview colour
+function plate_yield(type)       = type[5];  //! Specified minimum yield strength, MPa
+
+//! Distance from a hole's centre to the edge of the plate around it, mm.
+//!
+//! REASONED, NOT CITED: 1.5 x the hole diameter. It is the common shop rule of thumb for
+//! edge distance on a bolt or pin hole, and the Onshape prototype independently landed on
+//! it - its links carry r30 eyes on d20 holes, which is exactly 1.5 d. That is
+//! corroboration, not a source.
+//!
+//! The forming die uses a different and tighter rule for the material between its drive
+//! holes and the groove root, because that is not a free edge in a plate: the section is
+//! six times thicker and there is material above and below the groove.
+function plate_eye_radius(hole_d) = 1.5 * hole_d;
 
 //! Declare the blank a 2D profile is cut from and pass the profile through. `w` and `d`
 //! are the blank the profile has to fit inside, in mm.

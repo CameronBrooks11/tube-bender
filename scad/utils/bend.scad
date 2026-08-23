@@ -132,9 +132,28 @@ function bend_plastic_modulus(tube) =
 function bend_plastic_moment_Nm(tube) =
     tube_material_yield_max(tube_material(tube)) * bend_plastic_modulus(tube) / 1000;
 
-//! Handle length, mm, that puts `moment_Nm` on the die at `force_N` of operator pull.
-function bend_handle_length_mm(moment_Nm, force_N = bend_operator_force_ceiling) =
-    moment_Nm / force_N * 1000;
+//! Grip a handle has to offer beyond wherever it attaches, mm.
+//!
+//! One hand breadth: 10.0 cm at the 99th percentile male, FAA HFDS Exhibit 14.3.2.1
+//! item 45 [HFDS-2009]. A handle shorter than this is not a handle, whatever the
+//! arithmetic says the leverage could be.
+bend_handle_grip_length = 100;
+
+//! Handle length, mm: long enough to put `moment_Nm` on the die at `force_N`, and long
+//! enough to hold.
+//!
+//! THE FORCE CEILING IS A MAXIMUM, NOT A TARGET, and taking it as a target breaks at the
+//! small end. A 1/8 in tube needs 1.4 N.m, which at 490 N is a handle 2.8 mm long -
+//! shorter than the machine it bolts to, so the moment between the socket and the handle's
+//! end came out NEGATIVE and the link width came out `nan`. The sweep found it; nothing
+//! at 1/2 in and up would have.
+//!
+//! Where the grip governs, the operator simply pulls less than the ceiling. Ask for the
+//! real figure with bend_operator_force_N() and report it - it is the more interesting
+//! number anyway, because it says how hard the machine actually is to work.
+function bend_handle_length_mm(moment_Nm, socket_radius_mm,
+                               force_N = bend_operator_force_ceiling) =
+    max(moment_Nm / force_N * 1000, socket_radius_mm + bend_handle_grip_length);
 
 //! Operator pull, N, implied by a handle of `length_mm`. The inverse, for checking a
 //! handle somebody has already decided on against the ceiling.
@@ -144,6 +163,62 @@ function bend_operator_force_N(moment_Nm, length_mm) = moment_Nm / (length_mm / 
 //! The whole drive torque passes through this one pin, so the drive circle wants to be as
 //! large as the die's material allows.
 function bend_drive_pin_force_N(moment_Nm, radius_mm) = moment_Nm / (radius_mm / 1000);
+
+//
+// The followbar, and what it does to the frame.
+//
+
+//! Length of tube the followbar bears on, mm.
+//!
+//! REASONED, NOT CITED: 2 x OD. A sliding pressure die's length is given by Bend Tooling
+//! as `Lp = R x pi x (B/180) + T x Kr` [BENDTOOLING], but that is the distance a die
+//! TRAVELS with the tube, and this machine's followbar is fixed while the tube is drawn
+//! through it - so the formula does not apply and no source read covers the fixed case.
+//! Two diameters matches the clamp's grip factor and the prototype's guide, which bore on
+//! 2.1 x OD.
+function bend_followbar_length(tube) = 2 * tube_od(tube);
+
+//! Gap between the die's tail and the start of the followbar, mm. REASONED, NOT CITED:
+//! a quarter of the tube OD, so the two never touch as the die swings past.
+function bend_followbar_gap(tube) = tube_od(tube) / 4;
+
+//! Distance from the point of bend to the middle of the followbar, mm - the lever the
+//! followbar reacts the bending moment on.
+function bend_followbar_station(tube, clr) =
+    bend_clamp_length(tube, clr) + bend_followbar_gap(tube) + bend_followbar_length(tube) / 2;
+
+//! Force the followbar presses the tube with, N.
+//!
+//! The straight tube between the point of bend and the followbar carries only the
+//! followbar's force, so for the moment at the point of bend to reach `Mp` that force must
+//! be `Mp / station`. Moving the followbar further downstream lightens it and gives up
+//! control of the tube; moving it closer does the opposite. Nothing here optimises that
+//! trade - the station comes from the geometry above and this reports what it costs.
+function bend_followbar_force_N(moment_Nm, station_mm) = moment_Nm / (station_mm / 1000);
+
+//
+// Sizing a plate in bending. Used for both links.
+//
+
+//! Elastic section modulus, mm^3, of a plate `t` thick and `w` wide bent in its own plane,
+//! with a hole of `d` on the neutral axis.
+function plate_section_modulus(t, w, d = 0) = t * (pow(w, 3) - pow(d, 3)) / (6 * w);
+
+//! Width, mm, a plate `t` thick needs to carry `moment_Nmm` in its own plane with a hole
+//! of `d` through it, at the allowable `fb`.
+//!
+//! Solved by iteration because the net section makes it a cubic: `w^3 - ws^2 w - d^3 = 0`,
+//! where `ws` is the width a solid section would need. Five passes of
+//! `w <- cbrt(ws^2 w + d^3)` from `w = ws` is well converged - the map is a contraction
+//! near the root and the residual is under a hundredth of a millimetre by the fourth.
+function plate_width_for_moment(moment_Nmm, t, fb, d = 0) =
+    let (ws = sqrt(6 * moment_Nmm / (fb * t)),
+         w1 = pow(ws * ws * ws + pow(d, 3), 1/3),
+         w2 = pow(ws * ws * w1 + pow(d, 3), 1/3),
+         w3 = pow(ws * ws * w2 + pow(d, 3), 1/3),
+         w4 = pow(ws * ws * w3 + pow(d, 3), 1/3),
+         w5 = pow(ws * ws * w4 + pow(d, 3), 1/3))
+        w5;
 
 //
 // Anchorage. The tube's far end is free, so the base reacts a TORQUE about the vertical
@@ -185,11 +260,12 @@ function bend_departures(tube, clr) = [
 ];
 
 //! Echo everything the configuration implies, before any of it is drawn.
-module bend_report(tube, clr, force_N = bend_operator_force_ceiling) {
+module bend_report(tube, clr, handle_length_mm, force_N = bend_operator_force_ceiling) {
     fd  = bend_d_of_bend(tube, clr);
     fw  = bend_wall_factor(tube);
     mp  = bend_plastic_moment_Nm(tube);
-    l   = bend_handle_length_mm(mp, force_N);
+    l   = handle_length_mm;
+    f   = bend_operator_force_N(mp, l);
     dep = bend_departures(tube, clr);
 
     echo(str("tube:    ", tube_size(tube), ", ",
@@ -203,9 +279,9 @@ module bend_report(tube, clr, force_N = bend_operator_force_ceiling) {
     echo(str("torque:  plastic moment ", mp, " N.m at yield ",
              tube_material_yield_max(tube_material(tube)),
              " MPa - a FLOOR, friction and hardening are not in it"));
-    echo(str("handle:  ", l, " mm at ", force_N, " N of pull",
-             l > 1500 ? "  <-- longer than a person's reach; this wants two hands and a wall"
-                      : ""));
+    echo(str("handle:  ", l, " mm, needing ", round(f), " N of pull - the ceiling a designer",
+             " may require is ", force_N, " N",
+             l > 1500 ? "; this wants two hands and a braced stance" : ""));
 
     if (len(dep) == 0)
         echo("checks:  inside every band checked");

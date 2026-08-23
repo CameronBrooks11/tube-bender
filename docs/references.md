@@ -160,6 +160,32 @@ strain hardening, followbar and U-strap friction, and the travelling hinge, all 
 raise the real figure.
 → `docs/design-basis.md` §6
 
+## Structural allowables and materials
+
+**Goel, S.C. (n.d.).** "Combined Shear and Tension Stresses." *AISC Engineering Journal.*
+<https://ej.aisc.org/index.php/engj/article/download/467/466/466> **[PR]** · **read**
+Cited as **[AISC-GOEL]**. States the AISC allowable stress design fractions directly:
+"tension, Ft = 0.6Fy, and that in shear, Fv = 0.4Fy", against the von Mises shear yield of
+about 0.6Fy. Every pin diameter and both link widths are cut from these two numbers.
+**Read properly, and worth it:** a search summary of the same topic conflated the ASD
+allowable (0.4Fy) with the von Mises shear yield (0.6Fy), which are a factor of 1.5 apart.
+→ `scad/utils/pin_sizing.scad`, `docs/design-basis.md` §13
+
+**Elgin / MW Components (n.d.).** *Carbon Steel Grade 1018 Data Sheet — AISI 1018, cold drawn.*
+<https://www.mwcomponents.com/uploads/Resource-Center/Elgin-Material-Sheets/Carbon-Steel-Grade-1018-Data-Sheet_Elgin.pdf> **[VN]** · **read**
+Cited as **[MW-1018]**. Cold drawn 1018: tensile ultimate 440 MPa, **yield 370 MPa**. The
+pin material anchor. Note what it does NOT settle: the prototype's pin is sold as
+"1004-1045 carbon steel", a range rather than a grade, and 1004 sits below this. A pin has
+to be ordered to a stated grade or the margin re-checked.
+→ `scad/purchased/pins.scad`
+
+**ASTM A36 structural steel.** Specified minimum yield 36 ksi (250 MPa), tensile
+400-550 MPa. <https://www.ssab.com/en-us/brands-and-products/commercial-steel/structural-steel/astm-a36> **[STD]** · **abstract**
+Cited as **[ASTM-A36]**. The yield is definitional — the grade is named for it — and
+several vendor pages agree, but the standard itself was not obtained. It is a MINIMUM: a
+real plate is stronger, and nothing here is sized on the difference.
+→ `scad/purchased/plates.scad`, both links
+
 ## Human factors
 
 **Federal Aviation Administration (2003, amended Oct 2009).** *Human Factors Design

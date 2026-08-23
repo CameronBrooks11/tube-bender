@@ -1,7 +1,13 @@
 main_assembly:
 Vitamins:
   1 Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm
+  1 Pin clevis 7/8 in dia x 71mm, NO ORDER NUMBER - this row is a hole in the BOM
+  1 Pin clevis 1 in dia x 78mm, NO ORDER NUMBER - this row is a hole in the BOM
+  2 Plate mild steel 1/4 in, blank 230mm x 77mm
+  2 Plate mild steel 1/4 in, blank 249mm x 201mm
   1 Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm
 
 Printed:
+  2 drive_link.stl
   1 forming_die.stl
+  2 frame_link.stl
