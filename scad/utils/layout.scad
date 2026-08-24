@@ -94,10 +94,16 @@ function layout_top(layers) = layers[len(layers) - 1][1] + layers[len(layers) - 
 //! Overall height of the stack, mm.
 function layout_height(layers) = layout_top(layers) - layout_bottom(layers);
 
-//! How long a pin has to be to cross from `from_layer`'s underside to the top of the
-//! stack, plus what a cotter needs beyond it.
-function layout_pin_length(layers, from_layer, cotter_allowance = 6) =
-    layout_top(layers) - layout_z(layers, from_layer) + cotter_allowance;
+//! What a pin has to GRIP: the distance from `from_layer`'s underside to the top of the
+//! stack, mm.
+//!
+//! Not the pin's length. A clevis pin is ordered by its USABLE length - head underside to
+//! the cotter hole - and that comes in steps, so the grip is what the stack asks for and
+//! pin() rounds it up to something orderable. Nothing here adds an allowance for the
+//! retainer: it sits beyond the usable length by construction, which is what usable length
+//! means.
+function layout_pin_grip(layers, from_layer) =
+    layout_top(layers) - layout_z(layers, from_layer);
 
 //! Clear distance between the frame links' inner faces, mm. Anything mounted between the
 //! frame links - the followbar, the handle - is this thick.

@@ -34,13 +34,26 @@ function bolt_clearance_hole(type) = bolt_clearance_hole_d(bolt_diameter(type));
 //! The same, from a bare diameter, for callers that only have the number.
 function bolt_clearance_hole_d(d) = d + 1;
 
-//! Draw a bolt, head down, shank running up from z = 0.
+//! The step a hex bolt's length comes in, mm.
+//!
+//! REASONED, NOT CITED: a quarter inch, which is the increment the common lengths fall on
+//! through the range this machine needs. The model computes the stack a bolt has to cross
+//! and that is almost never a length anyone stocks - a 1/2 in bolt 1.556 in long was on the
+//! parts list until this existed.
+bolt_length_step = inch(1/4);
+
+//! The length to order for a bolt that has to cross `mm` of stack.
+function bolt_stock_length(mm) = ceil(mm / bolt_length_step - 1e-9) * bolt_length_step;
+
+//! Draw a bolt, head down, shank running up from z = 0. `length` is the stack it crosses;
+//! what gets billed is the next stock length up.
 module bolt(type, length) {
     // The key before the colon is the BOM's own identity for this part and stays in
     // millimetres in both systems, the way a part number would - it is what groups
     // identical items, not something anybody measures. Only the human half converts.
-    vitamin(str("bolt(", bolt_name(type), ", ", round(length), "): Bolt hex head ",
-                bolt_size(type), " x ", fmt_length(length), ", with nut and washers",
+    vitamin(str("bolt(", bolt_name(type), ", ", round(bolt_stock_length(length)),
+                "): Bolt hex head ", bolt_size(type), " x ",
+                fmt_length(bolt_stock_length(length)), ", with nut and washers",
                 bolt_is_orderable(type) ? str(", ", bolt_part_no(type))
                                         : ", NO ORDER NUMBER - this row is a hole in the BOM"));
 

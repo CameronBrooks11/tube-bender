@@ -171,6 +171,26 @@ about 0.6Fy. Every pin diameter and both link widths are cut from these two numb
 allowable (0.4Fy) with the von Mises shear yield (0.6Fy), which are a factor of 1.5 apart.
 → `scad/utils/pin_sizing.scad`, `docs/design-basis.md` §13
 
+**McMaster-Carr (n.d.).** *Selectable-Length Clevis Pins.*
+<https://www.mcmaster.com/products/clevis-pins/performance~selectable-length/> **[VN]** · **abstract**
+Cited as **[MCMASTER-CLEVIS]**. The one fact taken: a clevis pin's cotter holes are
+**spaced 1/4 in apart**, and which one the cotter goes through is what sets the usable
+length. That is the increment `pin_usable_length()` rounds to. **Abstract:** the statement
+comes from the product listing as surfaced in search, not from a page that was opened, and
+it describes the selectable-length line specifically — a plain clevis pin has one hole and
+the same 1/4 in step is then a statement about which lengths are stocked rather than about
+holes in one pin.
+→ `scad/purchased/pin.scad`
+
+**ASME B18.8.1, Clevis Pins and Cotter Pins (Inch Series).** Cotter pin nominal sizes run
+1/32 in to 3/4 in with a tabulated gage hole for each; 1/8 in pin to a 0.141 in hole.
+<https://amesweb.info/Fasteners/Pins/Cotter-Pin-Sizes-Chart.aspx> **[STD]** · **abstract**
+Cited as **[ASME-B18.8.1]**. Reached through a secondary table, not obtained. Recorded
+because it is the standard that WOULD settle the cotter sizes this model deliberately leaves
+open, and because it also settles that the clevis pin standard stops at 1 in — two of the
+pins here are larger than anything it covers.
+→ `scad/purchased/pins.scad`
+
 **MechSimulator (n.d.).** *Fillet Weld Strength Design — Throat, Allowable Stress & FOS.*
 <https://mechsimulator.com/blog/articles/weld-strength-fillet-weld-design-guide/> **[TP]** · **read**
 Cited as **[AISC-WELD]**. States the allowable directly: the shear allowable on a fillet

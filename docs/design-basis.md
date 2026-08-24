@@ -1003,3 +1003,56 @@ in-plane, and there the same check is the right one and is kept.
 
 The lesson is not "the check was too conservative". It was checking the wrong thing, and
 only looked conservative.
+
+## 20. What you actually order: lengths, and what holds a pin in
+
+Two things stood between the parts list and someone using it, and both were invisible until
+somebody tried to read the list as a list.
+
+### A stack thickness is not a length you can buy
+
+The model computes what a fastener has to cross and, until now, billed that number. So the
+list asked for a `1/2 in × 1.556 in` bolt and a `1-1/8 in × 3.565 in` pin. Nobody stocks
+those.
+
+**Pins are ordered by USABLE length** — head underside to the cotter hole — and that comes in
+**quarter-inch steps**, because a clevis pin's holes are spaced a quarter inch apart and
+which one takes the cotter is what sets the length [MCMASTER-CLEVIS]. So the stack is the
+**grip**, and `pin_usable_length()` rounds it up. `layout_pin_length()` became
+`layout_pin_grip()` and lost the 6 mm allowance it used to add for a cotter: usable length
+already ends at the cotter hole, so the allowance was the same thing counted twice.
+
+**Bolts round the same way**, to a quarter inch. That step is *reasoned* rather than
+catalogued — it is where the common lengths fall through the range this machine needs, and
+no source was obtained for it.
+
+### The rounding leaves slack, and the slack is a part
+
+A stack never lands exactly on a step, so the ordered pin is always a little long — up to a
+quarter inch. That gap is **washers**, and a builder who is not told about it assembles a
+joint that rattles and blames the clearances. At 1-1/2 in the frame pin grips 84.55 mm and
+orders 88.9, so 4.35 mm of washers go under its head. The report says so.
+
+### What holds a pin in is not one answer
+
+The holes were being drilled with nothing to go in them: no cotter, no clip, nothing on the
+parts list. Adding "a cotter pin per pin" would have been wrong, and the model already knew
+why — it distinguishes a **pivot** hole from an **index** hole (§7) precisely because those
+two pins live different lives.
+
+- A **pivot** pin — frame, followbar, U-strap, spacer — is fitted once and forgotten. A
+  cotter is exactly right.
+- An **indexed** pin — drive, and now the die lock — is pulled and re-seated at the end of
+  every stroke, **five times per bend**. A cotter is exactly wrong: nobody opens and closes
+  a split pin five times a bend, and one that has been straightened twice is scrap. Those
+  get a **pin clip**.
+
+Both are BOM lines now. Neither has a size, and that is deliberate: cotter geometry is
+looked up per registry row and is `undef` on every row but the one measured off the
+prototype's CAD, so naming a cotter size for the rest would be exactly the invention the
+registry exists to refuse. The row says which retainer and which pin it belongs to; the
+number is a shopping trip, like the pin's own.
+
+Worth knowing while doing that shopping: **ASME B18.8.1 stops at 1 in** [ASME-B18.8.1], and
+two of the pins here — the 1-1/8 in frame pin at the top of the range, and the 1-3/8 and
+1-1/2 in rows the series was extended to — are larger than the clevis pin standard covers.

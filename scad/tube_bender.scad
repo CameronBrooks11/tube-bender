@@ -400,6 +400,15 @@ echo(str("pins:    frame ", pin_size(frame_pin), " (", fmt_force(frame_force), "
          pin_governing_mode(drive_force, t_centre, t_drive, pin_material_yield), ")"));
 echo(str("         followbar ", pin_size(followbar_pin), " (", fmt_force(followbar_force),
          "), U-strap ", pin_size(ustrap_pin)));
+// A pin is bought by its USABLE length - head underside to the cotter hole - and that comes
+// in quarter-inch steps, so a stack never fills one exactly. The difference is washers, and
+// a builder who is not told assembles a joint that rattles.
+frame_grip = layout_pin_grip(layers, "frame link lower");
+echo(str("         ordered by usable length in 1/4 in steps: the frame pin grips ",
+         fmt_length(frame_grip), " and orders ", fmt_length(pin_usable_length(frame_grip)),
+         ", so ", fmt_length(pin_slack(frame_grip)), " of washers under its head"));
+echo(str("         cotters hold the pivots; the drive and lock pins come out every stroke",
+         " and take clips instead"));
 echo(str("         drive radius ", fmt_bare_length(nominal_r), " nominal -> ",
          fmt_length(drive_radius), " with the chosen pin"));
 echo(str("stack:   ", fmt_length(layout_height(layers)), " overall, ",
@@ -530,7 +539,7 @@ assembly("main") {
         translate(concat(p, [layout_z(layers, "die plate lower")]))
             pin(ustrap_pin, layout_z(layers, "die plate upper")
                             + layout_thickness(layers, "die plate upper")
-                            - layout_z(layers, "die plate lower") + 6);
+                            - layout_z(layers, "die plate lower"));
 
     // The links are drawn with their drive hole on +x, so the pair has to be turned to
     // whichever die drive hole the pin is in. Drawing them at zero while the pin sits at
@@ -546,7 +555,7 @@ assembly("main") {
 
     translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d),
                      [layout_z(layers, "frame link lower")]))
-        pin(followbar_pin, layout_pin_length(layers, "frame link lower"));
+        pin(followbar_pin, layout_pin_grip(layers, "frame link lower"));
 
     for (layer = ["frame link lower", "frame link upper"])
         translate_z(layout_z(layers, layer))
@@ -561,7 +570,7 @@ assembly("main") {
             base_part();
 
     translate_z(layout_z(layers, "frame link lower"))
-        pin(frame_pin, layout_pin_length(layers, "frame link lower"));
+        pin(frame_pin, layout_pin_grip(layers, "frame link lower"));
 
     // Four anchor bolts at the base's corners, heads up, running down through whatever
     // the machine is bolted to.
@@ -580,17 +589,18 @@ assembly("main") {
     // spring back; the die turns into the pin during the first stroke.
     if (!is_undef(lock_pos))
         translate(concat(lock_pos, [layout_z(layers, "frame link lower")]))
-            pin(lock_pin, layout_pin_length(layers, "frame link lower"));
+            // Pulled and re-seated at the end of every stroke, so a clip, not a cotter.
+            pin(lock_pin, layout_pin_grip(layers, "frame link lower"), "clip");
 
     if (!is_undef(drive_hole_r))
         rotate(drive_angle)
             translate([drive_hole_r, 0, layout_z(layers, "drive link lower")])
-                pin(drive_pin, layout_pin_length(layers, "drive link lower"));
+                pin(drive_pin, layout_pin_grip(layers, "drive link lower"), "clip");
 
     for (r = drive_link_spacer_radii(handle, pin_diameter(spacer_bolt)))
         rotate(drive_angle)
             translate([r, 0, layout_z(layers, "drive link lower")]) {
-                pin(spacer_bolt, layout_pin_length(layers, "drive link lower"));
+                pin(spacer_bolt, layout_pin_grip(layers, "drive link lower"));
 
                 translate_z(t_drive)
                     structural_tube(spacer_tube, layout_drive_gap(layers));

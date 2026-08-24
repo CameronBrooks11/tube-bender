@@ -76,6 +76,17 @@ rather than invent a plausible number — see the missing chromoly row.
 NopSCADlib's own registries stop short of this machine in two places, so large imperial
 fasteners and structural plate are registered project-side against the same row shapes.
 
+**A computed dimension is not an orderable one.** The pin and bolt registries are DIAMETER
+series; length is whatever the stack turns out to be, and a stack thickness is never a
+length anyone stocks. So a fastener is passed the GRIP it has to hold and rounds up to a
+stock step itself — `pin_usable_length()`, `bolt_stock_length()`, both a quarter inch. Do
+not bill a raw computed length; it puts `1/2 in x 1.556 in` on the parts list.
+
+**A hole with nothing in it is a missing BOM line.** Every pin bills its retainer, and which
+retainer depends on how often the pin comes out: a cotter for a pivot that is fitted once, a
+clip for an INDEXED pin that is pulled at every stroke. Neither carries a size, because
+cotter geometry is `undef` on every registry row but the measured one.
+
 ## `include` for anything with constants, `use` for behaviour only
 
 `use` brings a file's **modules and functions but not its variables**, and a default

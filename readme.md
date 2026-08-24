@@ -56,13 +56,18 @@ started from actually measured, and which of its features survived, is in
 | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span> |  |
 |---:|---:|:---|
 |  | | **Vitamins** |
-| &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 39.53 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 90.55 mm, 98306A868 |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 63.15 mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 1-1/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 3/4 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 5/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 88.9 mm usable, 98306A868 |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clip to suit a 7/8 in dia clevis pin that is pulled every stroke, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 228.6 x 190.5 mm, faced to 44.45 mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm |
@@ -74,7 +79,7 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm |
 | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm |
-| &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;35&nbsp; | &nbsp;&nbsp;35&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
@@ -97,13 +102,18 @@ started from actually measured, and which of its features survived, is in
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|4| Bolt hex head 1/2 in x 39.53 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 1-1/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 3/4 in dia x 90.55 mm, 98306A868|
-|2| Pin clevis 5/16 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|2| Pin clevis 5/8 in dia x 63.15 mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 7/8 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 7/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM|
+|4| Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Cotter pin to suit a 1-1/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Cotter pin to suit a 3/4 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Cotter pin to suit a 5/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 1-1/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 3/4 in dia x 88.9 mm usable, 98306A868|
+|2| Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 7/8 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 7/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Pin clip to suit a 7/8 in dia clevis pin that is pulled every stroke, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 228.6 x 190.5 mm, faced to 44.45 mm|
 |1| Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm|
 |1| Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm|
