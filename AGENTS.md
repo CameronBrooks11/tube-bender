@@ -149,6 +149,28 @@ Whichever category a part is in, the stock it comes from is declared separately 
 **DXF arcs are polylines at the current `$fn`.** A cutter gets whatever `facets` was set to
 when the file was written.
 
+## The assembly IS the build manual
+
+`main_assembly()` is not a way of grouping the drawing. Each sub-assembly is a step somebody
+performs — a weldment that has to cool, a bolted group that never comes apart, a pair of
+links joined before the die will fit between them — and NopSCADlib turns the `//!` comment
+above each one into a section of `readme.md`. Write those comments as **instructions to a
+builder**, not as notes to whoever edits the file next.
+
+Two mechanical facts about the generator:
+
+- **Sub-assemblies are listed in REVERSE order of first appearance** (`bom.py` inserts each
+  at the front as it opens). So the calls in `main_assembly()` run backwards for the manual's
+  contents to read forwards. Reordering them changes the document, not the machine.
+- **Do not write a derived number into an instruction.** It is a function of the
+  configuration and the comment is static, so it would be wrong for every configuration but
+  one. Say where the number comes from — `just report` — and let the reader run it.
+
+Placing a part in an assembly is also what BILLS it. Every fastener the model drills a hole
+for must actually be placed, or it silently leaves the parts list: eleven bolts and seven
+retainers were missing for exactly that reason, and building the sub-assemblies is what
+surfaced them.
+
 ## Units: imperial identity, millimetre arithmetic, and one place that converts
 
 A row's name and `size` field are its imperial size, because that is what you order and

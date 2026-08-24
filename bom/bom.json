@@ -1,6 +1,43 @@
 [
     {
-        "name": "main_assembly",
+        "name": "base_assembly",
+        "big": null,
+        "ngb": false,
+        "zoomed": 0,
+        "count": 1,
+        "assemblies": {},
+        "vitamins": {
+            "plate_2D(plate_0p375in, 283, 174): Plate mild steel 3/8 in, blank 283.44 x 173.85 mm": {
+                "count": 1
+            },
+            "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm": {
+                "count": 1
+            },
+            "plate_2D(plate_0p375in, 171, 171): Plate mild steel 3/8 in, blank 171.45 x 171.45 mm": {
+                "count": 1
+            },
+            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309.09 x 232.97 mm": {
+                "count": 1
+            }
+        },
+        "printed": {},
+        "routed": {
+            "base.dxf": {
+                "count": 1,
+                "colour": "darkorange"
+            },
+            "pedestal_foot.dxf": {
+                "count": 1,
+                "colour": "SteelBlue"
+            },
+            "frame_link.dxf": {
+                "count": 1,
+                "colour": "SteelBlue"
+            }
+        }
+    },
+    {
+        "name": "die_assembly",
         "big": null,
         "ngb": false,
         "zoomed": 0,
@@ -13,6 +50,65 @@
             "plate_2D(plate_0p250in, 229, 191): Plate mild steel 1/4 in, blank 228.6 x 190.5 mm": {
                 "count": 2
             },
+            "bolt(bolt_0p375in, 57): Bolt hex head 3/8 in x 57.15 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 6
+            }
+        },
+        "printed": {
+            "forming_die.stl": {
+                "count": 1,
+                "colour": "[0, 0.572549, 0]",
+                "camera": "0,0,0,70,0,315,500"
+            }
+        },
+        "routed": {
+            "die_plate.dxf": {
+                "count": 2,
+                "colour": "darkorange"
+            }
+        }
+    },
+    {
+        "name": "handle_assembly",
+        "big": null,
+        "ngb": false,
+        "zoomed": 0,
+        "count": 1,
+        "assemblies": {},
+        "vitamins": {
+            "plate_2D(plate_0p250in, 2034, 87): Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm": {
+                "count": 2
+            },
+            "pin(pin_0p3125in, 83): Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 2
+            },
+            "pin_retainer(pin_0p3125in, cotter): Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 2
+            },
+            "structural_tube(structural_0p500x0p065, 58): Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm": {
+                "count": 2
+            }
+        },
+        "printed": {},
+        "routed": {
+            "drive_link.dxf": {
+                "count": 2,
+                "colour": "[0.862745, 0.0784314, 0.235294]"
+            }
+        }
+    },
+    {
+        "name": "main_assembly",
+        "big": null,
+        "ngb": false,
+        "zoomed": 0,
+        "count": 1,
+        "assemblies": {
+            "handle_assembly": 1,
+            "die_assembly": 1,
+            "base_assembly": 1
+        },
+        "vitamins": {
             "clamp_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm": {
                 "count": 1
             },
@@ -22,8 +118,8 @@
             "pin_retainer(pin_0p625in, cotter): Cotter pin to suit a 5/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 2
             },
-            "plate_2D(plate_0p250in, 2034, 87): Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm": {
-                "count": 2
+            "bolt(bolt_0p375in, 38): Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 1
             },
             "followbar_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm": {
                 "count": 1
@@ -35,15 +131,6 @@
                 "count": 1
             },
             "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309.09 x 232.97 mm": {
-                "count": 2
-            },
-            "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm": {
-                "count": 1
-            },
-            "plate_2D(plate_0p375in, 171, 171): Plate mild steel 3/8 in, blank 171.45 x 171.45 mm": {
-                "count": 1
-            },
-            "plate_2D(plate_0p375in, 283, 174): Plate mild steel 3/8 in, blank 283.44 x 173.85 mm": {
                 "count": 1
             },
             "pin(pin_1p125in, 89): Pin clevis 1-1/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM": {
@@ -53,7 +140,7 @@
                 "count": 1
             },
             "bolt(bolt_0p500in, 44): Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
-                "count": 4
+                "count": 8
             },
             "pin(pin_0p875in, 89): Pin clevis 7/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
@@ -64,25 +151,11 @@
             "pin(pin_0p875in, 83): Pin clevis 7/8 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
             },
-            "pin(pin_0p3125in, 83): Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM": {
-                "count": 2
-            },
-            "pin_retainer(pin_0p3125in, cotter): Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM": {
-                "count": 2
-            },
-            "structural_tube(structural_0p500x0p065, 58): Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm": {
-                "count": 2
-            },
             "tube(tube_1p500x0p095, 600): Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm": {
                 "count": 1
             }
         },
         "printed": {
-            "forming_die.stl": {
-                "count": 1,
-                "colour": "[0, 0.572549, 0]",
-                "camera": "0,0,0,70,0,315,500"
-            },
             "clamp.stl": {
                 "count": 1,
                 "colour": "[0.862745, 0.0784314, 0.235294]",
@@ -95,25 +168,9 @@
             }
         },
         "routed": {
-            "die_plate.dxf": {
-                "count": 2,
-                "colour": "darkorange"
-            },
-            "drive_link.dxf": {
-                "count": 2,
-                "colour": "[0.862745, 0.0784314, 0.235294]"
-            },
             "frame_link.dxf": {
-                "count": 2,
-                "colour": "SteelBlue"
-            },
-            "pedestal_foot.dxf": {
                 "count": 1,
                 "colour": "SteelBlue"
-            },
-            "base.dxf": {
-                "count": 1,
-                "colour": "darkorange"
             }
         }
     }

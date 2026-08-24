@@ -1056,3 +1056,48 @@ number is a shopping trip, like the pin's own.
 Worth knowing while doing that shopping: **ASME B18.8.1 stops at 1 in** [ASME-B18.8.1], and
 two of the pins here — the 1-1/8 in frame pin at the top of the range, and the 1-3/8 and
 1-1/2 in rows the series was extended to — are larger than the clevis pin standard covers.
+
+## 21. The build, in four stages
+
+The manual had one picture of a finished machine and a flat list of parts. That is a
+drawing, not instructions. It is now four stages, and each one is a thing somebody actually
+does at a bench rather than a way of grouping the model:
+
+1. **The base weldment** — the lower frame link welded flat to the base plate, plus the post
+   and its foot on a pedestal build. §19 sizes those welds; the instructions say to tack both
+   ends and check flatness before running, because distortion is the risk here rather than
+   strength.
+2. **The die** — the two die plates bolted to the faces of the forming die, never to come off
+   again. Bolt one on, spot the other from it, and check the tails are parallel before
+   tightening: those tails are the only thing the clamp pins to, so a twist here is a clamp
+   that will not go on.
+3. **The handle** — the two drive links joined by the spacer bolts and their tubes. Joined at
+   the grip end only, because the pivot end has to stay open for stage 4.
+4. **The machine** — the die assembly slides into the handle fork from the pivot end, the
+   frame pin drops through, and the anchor bolts go in last.
+
+Stage 3 into stage 4 is the one worth stating outright: the handle is a **fork**, joined only
+at its far end, so the die goes in sideways rather than being lowered in. Build it the other
+way round and it does not go together.
+
+### Building the stages is what found eighteen missing parts
+
+This was the real return on the work, and it was not the intended one.
+
+A fastener is billed by being **placed**. Drilling a hole for one bills nothing. So the
+model had, for a long time, holes with nothing in them and a parts list that did not mention
+it: **six** bolts holding the die plates to the die, the clamp's own bolt, **four** pedestal
+foot bolts, and **seven** pin retainers (§20). Eighteen items, every one of them load-bearing
+or the machine does not work, and none of them on the list.
+
+Nothing catches this except assembling the thing. A gate can check that every reported value
+is a number; it cannot know that a hole is lonely. Laying the build out as stages is what
+made each fastener's absence visible, because a stage with no fasteners in it reads as
+obviously wrong in a way a flat list does not.
+
+### Two headings that are the library's words
+
+`readme.md` files the forming die, the clamp and the followbar under **"3D printed parts"**.
+They are machined. That is NopSCADlib's word for a part you make rather than buy, and it is
+not worth forking a library over — the flat parts now sit under **"CNC routed"**, which is
+right, and the file header says plainly what the other heading means.

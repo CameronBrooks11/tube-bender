@@ -1,0 +1,9 @@
+handle_assembly:
+Vitamins:
+  2 Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM
+  2 Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM
+  2 Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm
+  2 Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm
+
+CNC cut:
+  2 drive_link.dxf

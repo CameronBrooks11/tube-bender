@@ -32,6 +32,14 @@
 //! and the handle together - and the arithmetic behind that is echoed rather than hidden.
 //! `just report` prints it, or read the console after any render.
 //!
+//! ## Two words in the parts list that are NopSCADlib's, not ours
+//!
+//! Nothing here is printed. The list has a **"3D printed parts"** heading because that is
+//! what NopSCADlib calls a part you make rather than buy, and under it are the three parts
+//! with real depth to cut - the forming die, the clamp and the followbar - which are
+//! **machined**. Everything flat is under **"CNC routed"**, which is right: those go to a
+//! laser, waterjet or plasma table as the DXF files linked beside them.
+//!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
 //! started from actually measured, and which of its features survived, is in
@@ -522,15 +530,132 @@ module pedestal_weldment() {
         pedestal_foot_part();
 }
 
-//! The stack, with the tube where it goes in. The handle, the followbar, the U-strap and
-//! the base are not built yet.
-module main_assembly()
-assembly("main") {
+//
+// THE BUILD, IN FOUR STAGES.
+//
+// Three things are made up on the bench before anything goes together, and each is a real
+// step rather than a way of grouping the drawing: a weldment that has to cool, a bolted
+// group that never comes apart again, and a pair of links that has to be joined before the
+// die will fit between them.
+//
+// NopSCADlib turns the comment above each of these into a section of readme.md, so what is
+// written here is the build instructions - not a note to whoever edits the file next.
+//
+
+//! **Stage 1 - the base weldment.** The lower frame link is welded flat to the base plate,
+//! and this is the joint the whole drive torque leaves through, so it is worth getting
+//! right before anything else exists to be in the way.
+//!
+//! Fillet **both edges** of the link where it lands on the plate, over the full run from
+//! the pivot to the followbar eye. The leg is not written here on purpose - it is a
+//! function of the plate you chose, so `just report` is where it lives and a number in this
+//! sentence would be a lie for every configuration but one. It comes out at the code
+//! minimum for every size in the range, with a factor of about six in hand on the load, so
+//! what to be careful about is fusion and distortion rather than size. Tack both ends,
+//! check the link is still flat and still square to the plate, then run it.
+//!
+//! On a pedestal build the post is welded to the underside of the plate at the same
+//! setting, and to its foot at the other end. Both are a ring of fillet round the post's
+//! outside diameter; the bore in the foot is there so a second pass can be run inside it.
+//! Those two ARE load-sized rather than minimum-sized - the report says which - so they
+//! want a real bead, not a tack.
+module base_assembly()
+assembly("base") {
+    translate_z(layout_z(layers, "base"))
+        rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1],
+                     frame_link_axis(tube, clr, fb_pin_d)[0]))
+            base_part();
+
+    // Not exploded. The post is obviously a separate piece, and moving it would leave the
+    // foot bolts - which are placed in the main assembly, like the anchor bolts, because
+    // they go into the floor rather than into this weldment - hanging in mid air.
+    if (mount == "pedestal")
+        translate_z(layout_z(layers, "base"))
+            pedestal_weldment();
+
+    explode(30)
+        translate_z(layout_z(layers, "frame link lower"))
+            frame_link_part();
+}
+
+//! **Stage 2 - the die.** The two die plates bolt to the faces of the forming die and never
+//! come off again. They are what the clamp pins to, so their tails have to line up with
+//! each other: bolt one on, use it to spot the other, and check the two tails are parallel
+//! before anything is tightened.
+//!
+//! The bolts sit on a circle between the hub and the drive holes. The report gives the
+//! shear in each against its allowable; they carry the clamp's whole drag on the tube plus
+//! the moment that drag makes about the pivot, so they are not incidental fixings.
+module die_assembly()
+assembly("die") {
     stl_colour(pp1_colour) stl("forming_die") forming_die_stl();
 
     for (layer = ["die plate lower", "die plate upper"])
-        translate_z(layout_z(layers, layer))
-            die_plate_part();
+        explode(layer == "die plate upper" ? 30 : -30)
+            translate_z(layout_z(layers, layer))
+                die_plate_part();
+
+    // Six bolts through both plates and the die. They were drilled for and never billed.
+    for (p = plate_bolt_pos)
+        explode(60)
+            translate(concat(p, [layout_z(layers, "die plate upper")
+                                     + layout_thickness(layers, "die plate upper")]))
+                rotate([180, 0, 0])
+                    bolt(plate_bolt, layout_central_thickness(layers));
+}
+
+//! **Stage 3 - the handle.** The two drive links are joined by the two spacer bolts at the
+//! grip, each running through a length of tube that sets the gap and stops the pair being
+//! pulled together when the bolts are done up. Without those tubes the bolts close the fork
+//! and the die will not go in.
+//!
+//! Join them at the grip end only. The pivot end has to stay open, because that is where
+//! the die assembly slides in at the next stage.
+module handle_assembly()
+assembly("handle") {
+    for (layer = ["drive link lower", "drive link upper"])
+        explode(layer == "drive link upper" ? 45 : -45)
+            translate_z(layout_z(layers, layer))
+                rotate(drive_angle)
+                    drive_link_part();
+
+    for (r = drive_link_spacer_radii(handle, pin_diameter(spacer_bolt)))
+        rotate(drive_angle)
+            translate([r, 0, layout_z(layers, "drive link lower")]) {
+                pin(spacer_bolt, layout_pin_grip(layers, "drive link lower"));
+
+                translate_z(t_drive)
+                    structural_tube(spacer_tube, layout_drive_gap(layers));
+            }
+}
+
+//! **Stage 4 - the machine.** Everything stacks bottom up on the base weldment, in the
+//! order the stack itself is in: lower drive link, die assembly, upper drive link, upper
+//! frame link.
+//!
+//! The handle pair is a fork joined only at its far end, so the die assembly slides into it
+//! from the pivot end rather than being lowered in. Line the two up, drop the frame pin
+//! through the lot, and fit its retainer at the top.
+//!
+//! Then the followbar, on its own pin between the frame links; the clamp, pinned to the die
+//! plates' tails with its bolt left slack until a tube is in; and the die lock pin, which
+//! goes in from the top through whichever drive hole has come round under it.
+//!
+//! Last, the four anchor bolts at the base's corners, heads up, down through the mounting
+//! surface to nuts underneath. **Do not use the machine before those are in.** They are the
+//! only thing reacting the drive torque, and everything above them is sized on the
+//! assumption that the base does not move.
+module main_assembly()
+assembly("main") {
+    // BACKWARDS ON PURPOSE. NopSCADlib lists sub-assemblies in REVERSE order of first
+    // appearance - bom.py inserts each one at the front of the list as it opens - so the
+    // calls have to run backwards for the manual's contents to read forwards, stage 1
+    // first. Reordering these changes the document, not the machine.
+    handle_assembly();
+
+    die_assembly();
+
+    base_assembly();
 
     translate([clr, 0, 0])
         stl_colour(pp2_colour) stl("clamp") clamp_stl();
@@ -541,13 +666,13 @@ assembly("main") {
                             + layout_thickness(layers, "die plate upper")
                             - layout_z(layers, "die plate lower"));
 
-    // The links are drawn with their drive hole on +x, so the pair has to be turned to
-    // whichever die drive hole the pin is in. Drawing them at zero while the pin sits at
-    // the hole angle puts the pin through solid plate.
-    for (layer = ["drive link lower", "drive link upper"])
-        translate_z(layout_z(layers, layer))
-            rotate(drive_angle)
-                drive_link_part();
+    // The bolt that stops the tube sliding through the clamp, in from outboard.
+    translate([clr + clamp_depth(tube, pin_diameter(ustrap_pin))
+                   + bolt_head_height(clamp_bolt),
+               -forming_die_tail_length(tube, clr) / 2, 0])
+        rotate([0, -90, 0])
+            bolt(clamp_bolt, clamp_depth(tube, pin_diameter(ustrap_pin))
+                                 - forming_die_groove_radius(tube));
 
     translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d)
                          - [followbar_pin_offset(tube, fb_pin_d), 0], [0]))
@@ -557,17 +682,9 @@ assembly("main") {
                      [layout_z(layers, "frame link lower")]))
         pin(followbar_pin, layout_pin_grip(layers, "frame link lower"));
 
-    for (layer = ["frame link lower", "frame link upper"])
-        translate_z(layout_z(layers, layer))
+    explode(60)
+        translate_z(layout_z(layers, "frame link upper"))
             frame_link_part();
-
-    if (mount == "pedestal")
-        translate_z(layout_z(layers, "base"))
-            pedestal_weldment();
-
-    translate_z(layout_z(layers, "base"))
-        rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1], frame_link_axis(tube, clr, fb_pin_d)[0]))
-            base_part();
 
     translate_z(layout_z(layers, "frame link lower"))
         pin(frame_pin, layout_pin_grip(layers, "frame link lower"));
@@ -583,6 +700,13 @@ assembly("main") {
             rotate([180, 0, 0])
                 bolt(anchor_bolt, layout_thickness(layers, "base") + 30);
 
+    // Four more through the pedestal's foot, the same way.
+    if (mount == "pedestal")
+        for (p = pedestal_foot_bolts(post, bolt_diameter(foot_bolt)))
+            translate(concat(p, [layout_z(layers, "base") - post_length]))
+                rotate([180, 0, 0])
+                    bolt(foot_bolt, plate_thickness(base_plate) + 30);
+
     // The die lock, through the whole stack into whichever drive hole is under it. The
     // assembly is drawn with the die at zero, and at zero the lock is just past the die's
     // trailing edge with nothing under it - which is right. A straight tube has nothing to
@@ -596,15 +720,6 @@ assembly("main") {
         rotate(drive_angle)
             translate([drive_hole_r, 0, layout_z(layers, "drive link lower")])
                 pin(drive_pin, layout_pin_grip(layers, "drive link lower"), "clip");
-
-    for (r = drive_link_spacer_radii(handle, pin_diameter(spacer_bolt)))
-        rotate(drive_angle)
-            translate([r, 0, layout_z(layers, "drive link lower")]) {
-                pin(spacer_bolt, layout_pin_grip(layers, "drive link lower"));
-
-                translate_z(t_drive)
-                    structural_tube(spacer_tube, layout_drive_gap(layers));
-            }
 
     translate([clr, -tube_length_mm / 2 + forming_die_tail_length(tube, clr) / 2, 0])
         rotate([90, 0, 0])
