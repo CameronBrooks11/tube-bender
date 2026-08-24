@@ -72,3 +72,20 @@ function pin_smallest_at_least(d, from = pins) =
                         : [for (p = from) if (pin_diameter(p) == min(above)) p][0];
 
 use <pin.scad>; // pin() draws the pin these rows describe
+
+//! The row called `name`, for a caller that has a string rather than a row.
+//!
+//! This is how the OpenSCAD Customizer reaches the registry. Customizer parameters may only
+//! be LITERALS - a string, a number, a boolean - so a configuration cannot hold a row; it
+//! holds the row's name and looks it up here. Lives beside the list for the usual reason: a
+//! default argument is evaluated in the scope of the file that defines the function.
+//!
+//! Asserts rather than returning undef. A name that is not in the registry is a typo or a
+//! stale dropdown, and undef would travel a long way from here before it surfaced.
+function pin_by_name(name, from = pins) =
+    let (hit = [for (r = from) if (pin_name(r) == name) r])
+        assert(len(hit) == 1, str("no such pin in the registry: ", name))
+        hit[0];
+
+//! Every registered name, in registry order - what a Customizer dropdown has to offer.
+function pin_names(from = pins) = [for (r = from) pin_name(r)];

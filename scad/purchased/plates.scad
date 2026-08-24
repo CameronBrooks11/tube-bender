@@ -54,3 +54,20 @@ function plate_smallest_at_least(t, from = plates) =
                         : [for (p = from) if (plate_thickness(p) == min(above)) p][0];
 
 use <plate.scad>; // plate_2D() declares the blank, render_2D_plate() extrudes the profile
+
+//! The row called `name`, for a caller that has a string rather than a row.
+//!
+//! This is how the OpenSCAD Customizer reaches the registry. Customizer parameters may only
+//! be LITERALS - a string, a number, a boolean - so a configuration cannot hold a row; it
+//! holds the row's name and looks it up here. Lives beside the list for the usual reason: a
+//! default argument is evaluated in the scope of the file that defines the function.
+//!
+//! Asserts rather than returning undef. A name that is not in the registry is a typo or a
+//! stale dropdown, and undef would travel a long way from here before it surfaced.
+function plate_by_name(name, from = plates) =
+    let (hit = [for (r = from) if (plate_name(r) == name) r])
+        assert(len(hit) == 1, str("no such plate in the registry: ", name))
+        hit[0];
+
+//! Every registered name, in registry order - what a Customizer dropdown has to offer.
+function plate_names(from = plates) = [for (r = from) plate_name(r)];

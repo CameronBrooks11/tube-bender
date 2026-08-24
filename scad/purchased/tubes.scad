@@ -46,3 +46,20 @@ tubes = [tube_0p125x0p028, tube_0p250x0p035, tube_0p375x0p049, tube_0p500x0p049,
          tube_1p625x0p095, tube_1p750x0p095, tube_2p000x0p120];
 
 use <tube.scad>; // tube() draws the stock these rows describe
+
+//! The row called `name`, for a caller that has a string rather than a row.
+//!
+//! This is how the OpenSCAD Customizer reaches the registry. Customizer parameters may only
+//! be LITERALS - a string, a number, a boolean - so a configuration cannot hold a row; it
+//! holds the row's name and looks it up here. Lives beside the list for the usual reason: a
+//! default argument is evaluated in the scope of the file that defines the function.
+//!
+//! Asserts rather than returning undef. A name that is not in the registry is a typo or a
+//! stale dropdown, and undef would travel a long way from here before it surfaced.
+function tube_by_name(name, from = tubes) =
+    let (hit = [for (r = from) if (tube_name(r) == name) r])
+        assert(len(hit) == 1, str("no such tube in the registry: ", name))
+        hit[0];
+
+//! Every registered name, in registry order - what a Customizer dropdown has to offer.
+function tube_names(from = tubes) = [for (r = from) tube_name(r)];

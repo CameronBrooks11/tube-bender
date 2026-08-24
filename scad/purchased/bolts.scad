@@ -51,3 +51,20 @@ function bolt_smallest_at_least(d, from = bolts) =
                         : [for (b = from) if (bolt_diameter(b) == min(above)) b][0];
 
 use <bolt.scad>; // bolt() draws the fastener these rows describe
+
+//! The row called `name`, for a caller that has a string rather than a row.
+//!
+//! This is how the OpenSCAD Customizer reaches the registry. Customizer parameters may only
+//! be LITERALS - a string, a number, a boolean - so a configuration cannot hold a row; it
+//! holds the row's name and looks it up here. Lives beside the list for the usual reason: a
+//! default argument is evaluated in the scope of the file that defines the function.
+//!
+//! Asserts rather than returning undef. A name that is not in the registry is a typo or a
+//! stale dropdown, and undef would travel a long way from here before it surfaced.
+function bolt_by_name(name, from = bolts) =
+    let (hit = [for (r = from) if (bolt_name(r) == name) r])
+        assert(len(hit) == 1, str("no such bolt in the registry: ", name))
+        hit[0];
+
+//! Every registered name, in registry order - what a Customizer dropdown has to offer.
+function bolt_names(from = bolts) = [for (r = from) bolt_name(r)];
