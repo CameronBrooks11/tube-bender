@@ -2,9 +2,7 @@
     "parameterSets": {
         "1-1/2 in pedestal (the prototype)": {
             "tube_name": "tube_1p500x0p095",
-            "tube_length": "600",
             "bend_angle": "180",
-            "clr_override_mm": "0",
             "die_style": "machined",
             "slice_plate_name": "plate_0p125in",
             "die_plate_name": "plate_0p250in",
@@ -13,15 +11,16 @@
             "frame_plate_name": "plate_0p250in",
             "base_plate_name": "plate_0p375in",
             "mount": "pedestal",
-            "pedestal_height": "950",
             "show": "assembly",
-            "facets": "90"
+            "facets": "90",
+            "tube_length_mm": "600",
+            "pedestal_height_mm": "950",
+            "clr_override_in": "0",
+            "units": "metric"
         },
         "1 in bench": {
             "tube_name": "tube_1p000x0p065",
-            "tube_length": "600",
             "bend_angle": "180",
-            "clr_override_mm": "0",
             "die_style": "machined",
             "slice_plate_name": "plate_0p125in",
             "die_plate_name": "plate_0p250in",
@@ -30,15 +29,16 @@
             "frame_plate_name": "plate_0p250in",
             "base_plate_name": "plate_0p375in",
             "mount": "bench",
-            "pedestal_height": "950",
             "show": "assembly",
-            "facets": "90"
+            "facets": "90",
+            "tube_length_mm": "600",
+            "pedestal_height_mm": "950",
+            "clr_override_in": "0",
+            "units": "metric"
         },
         "1/2 in bench": {
             "tube_name": "tube_0p500x0p049",
-            "tube_length": "400",
             "bend_angle": "180",
-            "clr_override_mm": "0",
             "die_style": "machined",
             "slice_plate_name": "plate_0p125in",
             "die_plate_name": "plate_0p250in",
@@ -47,15 +47,16 @@
             "frame_plate_name": "plate_0p250in",
             "base_plate_name": "plate_0p375in",
             "mount": "bench",
-            "pedestal_height": "950",
             "show": "assembly",
-            "facets": "90"
+            "facets": "90",
+            "tube_length_mm": "400",
+            "pedestal_height_mm": "950",
+            "clr_override_in": "0",
+            "units": "metric"
         },
         "1-1/2 in, sliced die (no mill)": {
             "tube_name": "tube_1p500x0p095",
-            "tube_length": "600",
             "bend_angle": "180",
-            "clr_override_mm": "0",
             "die_style": "sliced",
             "slice_plate_name": "plate_0p125in",
             "die_plate_name": "plate_0p250in",
@@ -64,15 +65,16 @@
             "frame_plate_name": "plate_0p250in",
             "base_plate_name": "plate_0p375in",
             "mount": "pedestal",
-            "pedestal_height": "950",
             "show": "forming_die",
-            "facets": "60"
+            "facets": "60",
+            "tube_length_mm": "600",
+            "pedestal_height_mm": "950",
+            "clr_override_in": "0",
+            "units": "metric"
         },
         "2 in pedestal (the wall, not a build)": {
             "tube_name": "tube_2p000x0p120",
-            "tube_length": "800",
             "bend_angle": "180",
-            "clr_override_mm": "0",
             "die_style": "machined",
             "slice_plate_name": "plate_0p125in",
             "die_plate_name": "plate_0p250in",
@@ -81,9 +83,12 @@
             "frame_plate_name": "plate_0p250in",
             "base_plate_name": "plate_0p500in",
             "mount": "pedestal",
-            "pedestal_height": "950",
             "show": "assembly",
-            "facets": "90"
+            "facets": "90",
+            "tube_length_mm": "800",
+            "pedestal_height_mm": "950",
+            "clr_override_in": "0",
+            "units": "metric"
         }
     },
     "fileFormatVersion": "1"

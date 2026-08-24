@@ -17,6 +17,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 function pin_name(type)            = type[0];  //! Registry name
 function pin_size(type)            = type[1];  //! Imperial size, the identity you order by
 function pin_diameter(type)        = type[2];  //! Shank diameter, mm
@@ -60,8 +62,11 @@ module pin(type, length) {
     headed  = !is_undef(pin_head_diameter(type));
     cottered = !is_undef(pin_cotter_hole(type));
 
+    // The key before the colon is the BOM's own identity for this part and stays in
+    // millimetres in both systems, the way a part number would - it is what groups
+    // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("pin(", pin_name(type), ", ", round(length), "): Pin clevis ",
-                pin_size(type), " x ", round(length), "mm",
+                pin_size(type), " x ", fmt_length(length),
                 pin_is_orderable(type) ? str(", ", pin_part_no(type))
                                        : ", NO ORDER NUMBER - this row is a hole in the BOM"));
 

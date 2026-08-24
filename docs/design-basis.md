@@ -226,6 +226,69 @@ native sizes.
 libraries and mixing units inside the derivation is how the two halves of a dimension
 drift apart. Inch values are converted once, at the registry row.
 
+### Reading is a third thing, and it is a whole system
+
+The derivation stays in millimetres, newtons and megapascals whatever the reader wants.
+`units` converts at the last step before a number reaches a human — the report and the BOM
+— and nothing upstream of that knows it exists. `scad/utils/units.scad` is the only file in
+the model where a unit is ever written down.
+
+**It moves everything together, not just lengths.** Inches with newtons is harder to check
+than either system on its own: you cannot carry a sanity calculation across mixed units in
+your head. So length, force, moment, stress and mass convert as a set.
+
+There is a second reason, and it turned out to be the more useful one. Most of the sources
+this model rests on are imperial-native, so reporting in imperial puts their numbers back
+into the form they were published in — and **shows where a registry row is itself a rounded
+conversion**, which is invisible from the metric side:
+
+| quantity | registry holds | reported imperial | the source's own number |
+|---|---|---|---|
+| A513 T1 yield, top of band | 310 MPa | 44.96 ksi | **45 ksi** [TOTTEN-A513] |
+| A36 plate, `0.6 Fy` | 0.6 × 250 MPa = 150 MPa | 21.76 ksi | 0.6 × **36 ksi** = 21.6 ksi |
+| operator pull ceiling | 490 N | 110.2 lbf | **490 N** [HFDS-2009] |
+
+The first row is the good case: Totten states 30–45 ksi, the registry carries the
+conversion, and imperial reporting recovers 44.96 — the whole chain agreeing to the
+rounding.
+
+The second is the interesting one. `[ASTM-A36]` is recorded as **abstract**, from a vendor
+page that pairs "36 ksi" with "250 MPa" — and those two are not equal. 36 ksi is 248.2 MPa,
+so the registered figure is 0.7 % over the number the grade is named for, and every plate
+allowance carries that. It is inside the "a real plate is stronger" margin the row already
+records, and it is left alone; the point is that switching units is what made it visible.
+
+The third is a reminder that the arrow does not always point the same way: HFDS is metric at
+source, so 110.2 lbf is *ours*, not theirs. Do not read a converted number back as a
+citation.
+
+**ksi for strength, psi for bearing.** Both are stress and the trade writes them
+differently because they differ by orders of magnitude: structural allowables are quoted in
+ksi, what a machine bears onto a bench is quoted in psi. The base's 0.01 MPa in ksi is
+0.0000015 and tells nobody anything.
+
+### A name is not a measurement, and neither is an input
+
+`tube_size()`, `plate_size()` and `pin_size()` return `1-1/2 in OD x 0.095 in wall`,
+`1/4 in`, `7/8 in dia` — in **both** systems, because those are identities. A metric builder
+still orders 1/4 in plate. Only measurements convert.
+
+The same rule runs the other way, through the configuration. **A number you type in never
+changes meaning when you change the unit system**; its unit is in its name and stays what it
+says. Inputs that followed the toggle would silently reinterpret every saved configuration
+the moment somebody switched, turning a 950 mm pedestal into a 24 m one. Which unit a given
+input takes follows §8's rule: chosen off a catalogue means the catalogue's unit — CLR is
+`clr_override_in` because every die catalogue lists 4-1/2, 5, 6, 7 — and a free dimension
+takes the model's own, `pedestal_height_mm`.
+
+### Precision is matched on resolution, not on digits
+
+A decimal place is worth a different amount in each system: one newton is 0.22 lbf, so
+integer newtons and integer pounds-force are a factor of four apart in what they resolve.
+Each quantity is given whatever number of decimals puts the two within about a factor of
+two, and OpenSCAD drops trailing zeros, so one rule prints `13066 N` and `2.7 N` and shows
+thousandths of an inch only when a length genuinely has them.
+
 ## 9. Fabrication: one forming die now, sliced dies later
 
 The forming die is the one part that needs real machining — a grooved disc, thickness

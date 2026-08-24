@@ -11,6 +11,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 function bolt_name(type)     = type[0];  //! Registry name
 function bolt_size(type)     = type[1];  //! Imperial size, the identity you order by
 function bolt_diameter(type) = type[2];  //! Nominal diameter, mm
@@ -34,8 +36,11 @@ function bolt_clearance_hole_d(d) = d + 1;
 
 //! Draw a bolt, head down, shank running up from z = 0.
 module bolt(type, length) {
+    // The key before the colon is the BOM's own identity for this part and stays in
+    // millimetres in both systems, the way a part number would - it is what groups
+    // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("bolt(", bolt_name(type), ", ", round(length), "): Bolt hex head ",
-                bolt_size(type), " x ", round(length), "mm, with nut and washers",
+                bolt_size(type), " x ", fmt_length(length), ", with nut and washers",
                 bolt_is_orderable(type) ? str(", ", bolt_part_no(type))
                                         : ", NO ORDER NUMBER - this row is a hole in the BOM"));
 

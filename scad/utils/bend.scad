@@ -18,6 +18,7 @@
 include <NopSCADlib/core.scad>;
 include <pin_sizing.scad>;   // the allowable fractions are variables
 
+use <units.scad>
 use <../purchased/tube.scad>
 use <../purchased/tube_material.scad>
 use <clr_catalogue.scad>
@@ -418,19 +419,26 @@ module bend_report(tube, clr, handle_length_mm, force_N = bend_operator_force_ce
     f   = bend_operator_force_N(mp, l);
     dep = bend_departures(tube, clr);
 
+    // tube_size() is an IDENTITY, not a measurement - it stays imperial in both systems,
+    // because that is what is stamped on the die and typed into an order form.
     echo(str("tube:    ", tube_size(tube), ", ",
              tube_material_description(tube_material(tube))));
-    echo(str("         OD ", tube_od(tube), " mm, wall ", tube_wall(tube),
-             " mm, wall factor ", fw, " (thin wall is a high number)"));
-    echo(str("bend:    CLR ", clr, " mm = ", fd, " D of bend; minimum without a mandrel is ",
-             bend_min_clr(tube), " mm"));
+    echo(str("         OD ", fmt_length(tube_od(tube)), ", wall ", fmt_length(tube_wall(tube)),
+             ", wall factor ", fw, " (a ratio, so it reads the same either way)"));
+    echo(str("bend:    CLR ", fmt_length(clr), " = ", fd,
+             " D of bend; minimum without a mandrel is ", fmt_length(bend_min_clr(tube))));
+    // A list, so the unit goes on the outside rather than onto every entry.
     echo(str("         radii sold for this OD: ",
-             len(clr_catalogued(tube)) ? clr_catalogued(tube) : "none in either catalogue"));
-    echo(str("torque:  plastic moment ", mp, " N.m at yield ",
-             tube_material_yield_max(tube_material(tube)),
-             " MPa - a FLOOR, friction and hardening are not in it"));
-    echo(str("handle:  ", l, " mm, needing ", round(f), " N of pull - the ceiling a designer",
-             " may require is ", force_N, " N",
+             len(clr_catalogued(tube))
+                 ? str([for (r = clr_catalogued(tube)) fmt_bare_length(r)], " ",
+                       fmt_length_unit())
+                 : "none in either catalogue"));
+    echo(str("torque:  plastic moment ", fmt_moment(mp), " at yield ",
+             fmt_stress(tube_material_yield_max(tube_material(tube))),
+             " - a FLOOR, friction and hardening are not in it"));
+    // The 1500 mm test is a threshold in the model's own units, not a reported number.
+    echo(str("handle:  ", fmt_length(l), ", needing ", fmt_force(f), " of pull - the ceiling",
+             " a designer may require is ", fmt_force(force_N),
              l > 1500 ? "; this wants two hands and a braced stance" : ""));
 
     if (len(dep) == 0)

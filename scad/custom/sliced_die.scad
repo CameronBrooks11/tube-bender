@@ -38,6 +38,7 @@ use <NopSCADlib/utils/maths.scad>
 use <../purchased/bolt.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
+use <../utils/units.scad>
 use <forming_die.scad>
 
 include <../utils/bend.scad>;
@@ -150,11 +151,11 @@ module sliced_die_report(tube, clr, slice_plate) {
     wrap = sliced_die_wrap(tube, clr, slice_plate);
 
     echo(str("sliced die: ", n, " x ", plate_size(slice_plate), " slices, ",
-             round(sliced_die_slice_thickness(tube, slice_plate) * 100) / 100,
-             " mm each after facing"));
+             fmt_length(sliced_die_slice_thickness(tube, slice_plate)),
+             " each after facing"));
     echo(str("            supports ", round(wrap), " deg of the tube's section against 180",
-             " machined, and falls up to ", round(gap * 100) / 100,
-             " mm away from the groove between rims"));
+             " machined, and falls up to ", fmt_length(gap),
+             " away from the groove between rims"));
     echo(str("            wall factor here is ",
              round(bend_wall_factor(tube) * 10) / 10,
              " - a stepped groove suits thick wall and marks thin"));

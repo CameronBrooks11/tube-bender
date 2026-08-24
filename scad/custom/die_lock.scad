@@ -90,6 +90,7 @@ include <NopSCADlib/core.scad>;
 
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
+use <../utils/units.scad>
 use <forming_die.scad>
 
 include <../utils/bend.scad>;
@@ -168,11 +169,12 @@ module die_lock_report(tube, clr, drive_pin_d, lock_pin, drive_link_w, web, pitc
         echo("die lock: none - this die has no drive holes to lock into");
     } else {
         echo(str("die lock: ", pin_size(lock_pin), " pin through the whole stack on r ",
-                 round(r), " mm at ", round(a), " deg - one pitch past the last drive hole,",
+                 fmt_length(r), " at ", round(a),
+                 " deg - one pitch past the last drive hole,",
                  " so a hole reaches it at the end of all ", n_holes, " strokes"));
-        echo(str("          on its own arm off the frame link, ", round(arm),
-                 " mm wide for ", round(die_lock_arm_moment_Nmm(moment_Nm) / 1000),
-                 " N.m per link, drawn at the link's ", round(link_w)));
+        echo(str("          on its own arm off the frame link, ", fmt_length(arm),
+                 " wide for ", fmt_moment(die_lock_arm_moment_Nmm(moment_Nm) / 1000),
+                 " per link, drawn at the link's ", fmt_length(link_w)));
         echo(str("          the drive band must clear it by ", round(clear),
                  " deg and stands ", sep, " deg = ", n_holes, " pitches off"));
     }

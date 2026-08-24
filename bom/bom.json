@@ -7,58 +7,58 @@
         "count": 1,
         "assemblies": {},
         "vitamins": {
-            "forming_die_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 229mm x 191mm, faced to 44.45mm": {
+            "forming_die_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 228.6 x 190.5 mm, faced to 44.45 mm": {
                 "count": 1
             },
-            "plate_2D(plate_0p250in, 229, 191): Plate mild steel 1/4 in, blank 229mm x 191mm": {
+            "plate_2D(plate_0p250in, 229, 191): Plate mild steel 1/4 in, blank 228.6 x 190.5 mm": {
                 "count": 2
             },
-            "clamp_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 54mm x 76mm, faced to 44.45mm": {
+            "clamp_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm": {
                 "count": 1
             },
-            "pin(pin_0p625in, 63): Pin clevis 5/8 in dia x 63mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "pin(pin_0p625in, 63): Pin clevis 5/8 in dia x 63.15 mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 2
             },
-            "plate_2D(plate_0p250in, 2034, 87): Plate mild steel 1/4 in, blank 2034mm x 87mm": {
+            "plate_2D(plate_0p250in, 2034, 87): Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm": {
                 "count": 2
             },
-            "followbar_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 58mm x 76mm, faced to 44.45mm": {
+            "followbar_blank(plate_1p750in): Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm": {
                 "count": 1
             },
-            "pin(pin_0p750in, 91): Pin clevis 3/4 in dia x 91mm, 98306A868": {
+            "pin(pin_0p750in, 91): Pin clevis 3/4 in dia x 90.55 mm, 98306A868": {
                 "count": 1
             },
-            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309mm x 233mm": {
+            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309.09 x 232.97 mm": {
                 "count": 2
             },
-            "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898mm": {
+            "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm": {
                 "count": 1
             },
-            "plate_2D(plate_0p375in, 171, 171): Plate mild steel 3/8 in, blank 171mm x 171mm": {
+            "plate_2D(plate_0p375in, 171, 171): Plate mild steel 3/8 in, blank 171.45 x 171.45 mm": {
                 "count": 1
             },
-            "plate_2D(plate_0p375in, 283, 174): Plate mild steel 3/8 in, blank 283mm x 174mm": {
+            "plate_2D(plate_0p375in, 283, 174): Plate mild steel 3/8 in, blank 283.44 x 173.85 mm": {
                 "count": 1
             },
-            "pin(pin_1p125in, 91): Pin clevis 1-1/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "pin(pin_1p125in, 91): Pin clevis 1-1/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
             },
-            "bolt(bolt_0p500in, 40): Bolt hex head 1/2 in x 40mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "bolt(bolt_0p500in, 40): Bolt hex head 1/2 in x 39.53 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 4
             },
-            "pin(pin_0p875in, 91): Pin clevis 7/8 in dia x 91mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "pin(pin_0p875in, 91): Pin clevis 7/8 in dia x 90.55 mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
             },
-            "pin(pin_0p875in, 84): Pin clevis 7/8 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "pin(pin_0p875in, 84): Pin clevis 7/8 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
             },
-            "pin(pin_0p3125in, 84): Pin clevis 5/16 in dia x 84mm, NO ORDER NUMBER - this row is a hole in the BOM": {
+            "pin(pin_0p3125in, 84): Pin clevis 5/16 in dia x 83.7 mm, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 2
             },
-            "structural_tube(structural_0p500x0p065, 58): Tube 1/2 in OD x 0.065 in wall, mild steel, length 58mm": {
+            "structural_tube(structural_0p500x0p065, 58): Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm": {
                 "count": 2
             },
-            "tube(tube_1p500x0p095, 600): Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600mm": {
+            "tube(tube_1p500x0p095, 600): Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm": {
                 "count": 1
             }
         },

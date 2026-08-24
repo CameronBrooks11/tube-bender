@@ -28,6 +28,7 @@
 include <NopSCADlib/core.scad>;
 
 use <NopSCADlib/utils/maths.scad>
+use <../utils/units.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
 
@@ -198,16 +199,16 @@ module drive_link_report(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radiu
                           is_undef(drive_radius_mm) ? 0 : drive_radius_mm,
                           frame_pin_d, drive_pin_d, spacer_bolt_d);
 
-    echo(str("drive link: ", plate_size(plate), " plate, ", w, " mm wide, ",
-             round(handle_length_mm), " mm long - it IS the handle, grip beyond r ",
-             round(hi[0]), " mm"));
-    echo(str("            ", round(drive_link_mass(plate, tp, w) * 100) / 100,
-             " kg each, so ", round(2 * drive_link_mass(plate, tp, w) * 10) / 10,
-             " kg of handle for the pair, tapered from ", round(w), " mm to ",
-             round(tp[len(tp) - 1][1]), " mm"));
-    echo(str("            peak moment ", round(m / 1000), " N.m per link ",
+    echo(str("drive link: ", plate_size(plate), " plate, ", fmt_length(w), " wide, ",
+             fmt_length(handle_length_mm), " long - it IS the handle, grip beyond r ",
+             fmt_length(hi[0])));
+    echo(str("            ", fmt_mass(drive_link_mass(plate, tp, w)), " each, so ",
+             fmt_mass(2 * drive_link_mass(plate, tp, w)),
+             " of handle for the pair, tapered from ", fmt_bare_length(w), " to ",
+             fmt_length(tp[len(tp) - 1][1])));
+    echo(str("            peak moment ", fmt_moment(m / 1000), " per link ",
              is_undef(drive_radius_mm) ? "at the pivot - NO DRIVE HOLE, this die is too small; the link must bear on the U-strap pin"
                                        : "at the drive hole",
-             ", allowable ", pin_allowable_bending_fraction * plate_yield(plate), " MPa"));
+             ", allowable ", fmt_stress(pin_allowable_bending_fraction * plate_yield(plate))));
 
 }

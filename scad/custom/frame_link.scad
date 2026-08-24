@@ -62,6 +62,7 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
 use <../purchased/bolt.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
@@ -148,11 +149,14 @@ module frame_link_report(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin
     fb = frame_link_followbar_pos(tube, clr, followbar_pin_d);
     p  = bend_followbar_force_N(moment_Nm, bend_followbar_station(tube, clr));
 
-    echo(str("frame link: ", plate_size(plate), " plate, ", w, " mm wide, reach ",
-             frame_link_reach(tube, clr, followbar_pin_d), " mm"));
-    echo(str("            followbar pin at [", fb[0], ", ", fb[1], "] mm, ",
-             round(p), " N on it, station ", bend_followbar_station(tube, clr),
-             " mm downstream"));
-    echo(str("            peak moment ", round(frame_link_moment_Nmm(tube, clr, moment_Nm, followbar_pin_d) / 1000),
-             " N.m per link at the pivot, as a cantilever"));
+    echo(str("frame link: ", plate_size(plate), " plate, ", fmt_length(w), " wide, reach ",
+             fmt_length(frame_link_reach(tube, clr, followbar_pin_d))));
+    // A coordinate pair, so the unit goes once on the outside.
+    echo(str("            followbar pin at [", fmt_bare_length(fb[0]), ", ",
+             fmt_bare_length(fb[1]), "] ", fmt_length_unit(), ", ", fmt_force(p),
+             " on it, station ", fmt_length(bend_followbar_station(tube, clr)),
+             " downstream"));
+    echo(str("            peak moment ",
+             fmt_moment(frame_link_moment_Nmm(tube, clr, moment_Nm, followbar_pin_d) / 1000),
+             " per link at the pivot, as a cantilever"));
 }

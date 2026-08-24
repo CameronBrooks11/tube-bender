@@ -21,6 +21,12 @@
 //! this file carries a few worked configurations to start from, including the 1-1/2 in
 //! prototype and a sliced-die build for a shop with no mill.
 //!
+//! The **Units** tab switches the report and the BOM between metric and imperial as a
+//! whole system - length, force, moment, stress and mass together, because inches with
+//! newtons is harder to check than either on its own. It changes nothing that is
+//! calculated, and it changes no name: a tube is "1-1/2 in OD x 0.095 in wall" and plate is
+//! ordered as "1/4 in" in both.
+//!
 //! Nothing in the Customizer is a dimension of a part. Every part is derived from the tube
 //! and the loads, so choosing a 1 in tube resizes the die, the pins, the links, the base
 //! and the handle together - and the arithmetic behind that is echoed rather than hidden.
@@ -42,6 +48,7 @@ include <purchased/bolts.scad>
 include <utils/bend.scad>;    // bend_operator_force_ceiling is a variable, so include
 use <utils/layout.scad>
 use <utils/pin_sizing.scad>
+use <utils/units.scad>
 use <custom/forming_die.scad>
 use <custom/drive_link.scad>
 use <custom/frame_link.scad>
@@ -72,15 +79,35 @@ use <custom/die_lock.scad>
 // if the file and the registries have drifted apart. Do not edit them by hand.
 //
 
+/* [Units] */
+
+// Which system every REPORTED and every BOM number is written in. It changes nothing that
+// is calculated - the model works in millimetres, newtons and megapascals throughout - and
+// it changes no NAME: a tube is "1-1/2 in OD x 0.095 in wall" and plate is ordered as
+// "1/4 in" in both, because those are identities rather than measurements.
+//
+// It moves the whole system rather than only lengths. Inches with newtons is harder to
+// check than either on its own.
+units = "metric"; // [metric:metric - mm, N, N.m, MPa, kg, imperial:imperial - in, lbf, lbf.ft, ksi, lb]
+
+// A NUMBER YOU TYPE IN NEVER CHANGES MEANING when you change the system above. Its unit is
+// in its name, and it stays what it says: `_mm` is millimetres, `_in` is inches, in both.
+// The alternative - inputs that follow the toggle - would silently reinterpret every saved
+// configuration the moment somebody switched, turning a 950 mm pedestal into a 24 m one.
+//
+// Which unit a given input takes follows the rule the whole model uses: something chosen
+// off a catalogue takes the catalogue's unit, which for tube and die stock is inches;
+// a free dimension takes the model's own, which is millimetres.
+
 /* [Tube] */
 
 // The tube this machine is built for. Tube is specified OD x wall; pipe is not, so look a
 // pipe's real OD up in a pipe table and pick the tube row that matches it.
 tube_name = "tube_1p500x0p095"; // [tube_0p125x0p028:1/8 in OD x 0.028 in wall, tube_0p250x0p035:1/4 in OD x 0.035 in wall, tube_0p375x0p049:3/8 in OD x 0.049 in wall, tube_0p500x0p049:1/2 in OD x 0.049 in wall, tube_0p625x0p049:5/8 in OD x 0.049 in wall, tube_0p750x0p065:3/4 in OD x 0.065 in wall, tube_0p875x0p065:7/8 in OD x 0.065 in wall, tube_1p000x0p065:1 in OD x 0.065 in wall, tube_1p125x0p065:1-1/8 in OD x 0.065 in wall, tube_1p250x0p065:1-1/4 in OD x 0.065 in wall, tube_1p375x0p083:1-3/8 in OD x 0.083 in wall, tube_1p500x0p095:1-1/2 in OD x 0.095 in wall, tube_1p625x0p095:1-5/8 in OD x 0.095 in wall, tube_1p750x0p095:1-3/4 in OD x 0.095 in wall, tube_2p000x0p120:2 in OD x 0.120 in wall]
 
-// How much straight tube to draw either side of the bend, mm. Drawing only - nothing is
-// sized from it.
-tube_length = 600; // [100:50:2000]
+// How much straight tube to draw either side of the bend, millimetres. Drawing only -
+// nothing is sized from it.
+tube_length_mm = 600; // [100:50:2000]
 
 /* [Bend] */
 
@@ -88,10 +115,14 @@ tube_length = 600; // [100:50:2000]
 // springs back through.
 bend_angle = 180; // [15:5:180]
 
-// Centreline radius, mm. Leave at 0 for the tightest radius the trade actually sells at or
-// above the 3 x OD mandrel-less floor, which is what you want unless you have a reason.
+// Centreline radius, INCHES. Leave at 0 for the tightest radius the trade actually sells at
+// or above the 3 x OD mandrel-less floor, which is what you want unless you have a reason.
 // Anything else is reported as a departure rather than refused.
-clr_override_mm = 0; // 0.1
+//
+// Inches whichever system you are reporting in, because a CLR is chosen off a catalogue and
+// every catalogue lists it in inches - 4-1/2, 5, 6, 7 - the same way the tube size is an
+// imperial identity in both. See the note on input units above.
+clr_override_in = 0; // 0.001
 
 /* [Die] */
 
@@ -128,10 +159,10 @@ base_plate_name = "plate_0p375in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16
 // post, which is what the bigger sizes need to be usable.
 mount = "pedestal"; // [bench, pedestal]
 
-// Height of the working plane above the floor, mm. The 490 N pull this whole machine is
+// Height of the working plane above the floor, millimetres. The pull this machine is
 // sized on is only available to a BRACED operator, and the standard puts that at 510 to
 // 1780 mm - the report says which side of the band this lands on.
-pedestal_height = 950; // [400:10:1800]
+pedestal_height_mm = 950; // [400:10:1800]
 
 /* [View] */
 
@@ -145,6 +176,11 @@ facets = 90; // [12:6:180]
 /* [Hidden] */
 
 $fn = facets;
+
+// A special variable, so it is dynamically scoped and reaches every report module and every
+// function they call without being threaded through signatures that have nothing else to do
+// with it. See utils/units.scad.
+$units = units;
 
 //
 // The registry rows the names above stand for. A Customizer parameter can only be a
@@ -160,7 +196,7 @@ slice_plate = plate_by_name(slice_plate_name);
 // 0 means "the radius the catalogue would pick", which is the answer almost every time.
 // An override is taken at face value; bend_departures() says if it is off the catalogue or
 // under the mandrel-less floor.
-clr = clr_override_mm > 0 ? clr_override_mm : bend_default_clr(tube);
+clr = clr_override_in > 0 ? inch(clr_override_in) : bend_default_clr(tube);
 
 //
 // Everything below is derived. Read `just report` before believing any of it.
@@ -291,15 +327,15 @@ base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bo
 
 // The pedestal post carries the operator's pull as bending and the drive torque as
 // torsion, at the same time.
-post          = structural_smallest_for_combined(op_force * pedestal_height, moment * 1000,
+post          = structural_smallest_for_combined(op_force * pedestal_height_mm, moment * 1000,
                                                  pin_allowable_shear_fraction * 250);
-post_length   = pedestal_height - layout_working_height(layers);
-foot_bolt     = pedestal_foot_bolt(post, op_force, pedestal_height, moment,
+post_length   = pedestal_height_mm - layout_working_height(layers);
+foot_bolt     = pedestal_foot_bolt(post, op_force, pedestal_height_mm, moment,
                                    bolt_material_yield, bolts);
 
 if (mount == "pedestal")
     pedestal_report(post, base_plate, post_length, foot_bolt, bolt_material_yield,
-                    op_force, pedestal_height, moment);
+                    op_force, pedestal_height_mm, moment);
 
 // The drive links turn with the die; the followbar and its pin do not move. What has to
 // fit between the followbar's keep-outs is ONE STROKE, not the whole bend - the link is
@@ -356,34 +392,36 @@ for (d = die_lock_departures(forming_die_drive_pitch(), n_drive_holes,
                              lock_clearance, lock_arm_w, link_w))
     echo(str("DEPARTURE: ", d));
 
-echo(str("pins:    frame ", pin_size(frame_pin), " (", round(frame_force), " N, ",
+// pin_size() is the pin's NAME - "7/8 in dia" in both systems, because that is what you
+// order. The load beside it is a measurement and converts.
+echo(str("pins:    frame ", pin_size(frame_pin), " (", fmt_force(frame_force), ", ",
          pin_governing_mode(frame_force, t_centre, t_drive + t_frame, pin_material_yield),
-         "), drive ", pin_size(drive_pin), " (", round(drive_force), " N, ",
+         "), drive ", pin_size(drive_pin), " (", fmt_force(drive_force), ", ",
          pin_governing_mode(drive_force, t_centre, t_drive, pin_material_yield), ")"));
-echo(str("         followbar ", pin_size(followbar_pin), " (", round(followbar_force),
-         " N), U-strap ", pin_size(ustrap_pin)));
-echo(str("         drive radius ", nominal_r, " mm nominal -> ", drive_radius,
-         " mm with the chosen pin"));
-echo(str("stack:   ", layout_height(layers), " mm overall, ", layout_frame_gap(layers),
-         " mm between the frame links"));
+echo(str("         followbar ", pin_size(followbar_pin), " (", fmt_force(followbar_force),
+         "), U-strap ", pin_size(ustrap_pin)));
+echo(str("         drive radius ", fmt_bare_length(nominal_r), " nominal -> ",
+         fmt_length(drive_radius), " with the chosen pin"));
+echo(str("stack:   ", fmt_length(layout_height(layers)), " overall, ",
+         fmt_length(layout_frame_gap(layers)), " between the frame links"));
 if (n_drive_holes) {
     echo(str("cycle:   ", bend_strokes(bend_angle, forming_die_drive_pitch(), n_drive_holes),
              " strokes of ",
-             round(bend_stroke_travel_mm(forming_die_drive_pitch(), handle) / 10) / 100,
-             " m at the handle's end, re-pinning the drive pin between each"));
+             fmt_length(bend_stroke_travel_mm(forming_die_drive_pitch(), handle)),
+             " at the handle's end, re-pinning the drive pin between each"));
     echo(str("         ", n_drive_holes, " drive holes index ",
              bend_indexed_rotation(n_drive_holes, forming_die_drive_pitch()), " deg of the ",
              forming_die_arc(bend_angle), " deg groove",
              stroke_overrun > 0
                  ? str(", so the last is over-pulled to ",
                        round(forming_die_drive_pitch() + stroke_overrun), " deg and ",
-                       round(bend_stroke_travel_mm(forming_die_drive_pitch() + stroke_overrun,
-                                                   handle) / 10) / 100, " m")
+                       fmt_length(bend_stroke_travel_mm(
+                           forming_die_drive_pitch() + stroke_overrun, handle)))
                  : " and nothing is left to over-pull"));
 } else {
     echo(str("cycle:   1 stroke of ",
-             round(bend_stroke_travel_mm(forming_die_arc(bend_angle), handle) / 10) / 100,
-             " m at the handle's end - this die has no drive holes, so the link takes it",
+             fmt_length(bend_stroke_travel_mm(forming_die_arc(bend_angle), handle)),
+             " at the handle's end - this die has no drive holes, so the link takes it",
              " round in one go on the U-strap pin"));
 }
 
@@ -513,9 +551,9 @@ assembly("main") {
                     structural_tube(spacer_tube, layout_drive_gap(layers));
             }
 
-    translate([clr, -tube_length / 2 + forming_die_tail_length(tube, clr) / 2, 0])
+    translate([clr, -tube_length_mm / 2 + forming_die_tail_length(tube, clr) / 2, 0])
         rotate([90, 0, 0])
-            tube(tube, tube_length);
+            tube(tube, tube_length_mm);
 }
 
 //! Draw whatever `show` asks for. NopSCADlib's make_all does not come through here - it

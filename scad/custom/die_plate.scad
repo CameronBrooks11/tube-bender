@@ -29,6 +29,7 @@
 include <NopSCADlib/core.scad>;
 
 use <../purchased/bolt.scad>
+use <../utils/units.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
 use <forming_die.scad>
@@ -124,8 +125,9 @@ module die_plate_report(tube, clr, plate, bend_angle, frame_pin_d, drive_pin_d, 
     allow = pin_allowable_shear_fraction * bolt_yield * PI * pow(bolt_diameter(bolt), 2) / 4;
 
     echo(str("die plate: ", plate_size(plate), " plate, tail overhangs to r ",
-             round(die_plate_tail_edge(tube, clr, clamp_pin_d)),
-             " mm so the clamp has something to pin to"));
-    echo(str("           ", n_bolts, " x ", bolt_size(bolt), " to the die on r ", round(r),
-             " mm, ", round(shear), " N each against ", round(allow), " N at yield"));
+             fmt_length(die_plate_tail_edge(tube, clr, clamp_pin_d)),
+             " so the clamp has something to pin to"));
+    echo(str("           ", n_bolts, " x ", bolt_size(bolt), " to the die on r ",
+             fmt_length(r), ", ", fmt_force(shear), " each against ", fmt_force(allow),
+             " at yield"));
 }

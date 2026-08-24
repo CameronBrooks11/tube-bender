@@ -15,6 +15,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 function plate_name(type)        = type[0];  //! Registry name
 function plate_size(type)        = type[1];  //! Imperial thickness, the identity you order by
 function plate_description(type) = type[2];  //! What to write on the BOM
@@ -37,9 +39,12 @@ function plate_eye_radius(hole_d) = 1.5 * hole_d;
 //! Declare the blank a 2D profile is cut from and pass the profile through. `w` and `d`
 //! are the blank the profile has to fit inside, in mm.
 module plate_2D(type, w, d) {
+    // The key before the colon is the BOM's own identity for this part and stays in
+    // millimetres in both systems, the way a part number would - it is what groups
+    // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("plate_2D(", plate_name(type), ", ", round(w), ", ", round(d), "): ",
                 plate_description(type), " ", plate_size(type), ", blank ",
-                round(w), "mm x ", round(d), "mm"));
+                fmt_bare_length(w), " x ", fmt_length(d)));
     children();
 }
 

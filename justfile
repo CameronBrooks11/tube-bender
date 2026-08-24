@@ -82,11 +82,11 @@ bom:
     cat bom/bom.txt
 
 # Report what the current configuration implies, without drawing anything.
-report:
+report units="metric":
     #!/usr/bin/env bash
     set -uo pipefail
     export OPENSCADPATH="{{LIBRARIES}}"
-    {{OPENSCAD}} -o "$(mktemp -d)/report.csg" scad/tube_bender.scad 2>&1 | grep '^ECHO' | sed 's/^ECHO: "//; s/"$//'
+    {{OPENSCAD}} -o "$(mktemp -d)/report.csg" -D 'units="{{units}}"' scad/tube_bender.scad 2>&1 | grep '^ECHO' | sed 's/^ECHO: "//; s/"$//'
 
 # Remove everything make_all generates.
 clean:
@@ -104,6 +104,11 @@ check-sizes:
     # It FAILS both ways: an unexpected result is a regression, and an expected failure
     # that stopped happening means the list has gone stale and a fix went unnoticed.
     # Shrinking `expected` is the work.
+    #
+    # Metric only, deliberately. undef reaches the report whatever units are in force, so
+    # this catches a size-specific fault either way, and a units-specific one does not
+    # depend on the size - check-report drives both systems instead, for two renders
+    # rather than thirty.
     set -uo pipefail
     export OPENSCADPATH="{{LIBRARIES}}"
     expected=(
@@ -147,14 +152,25 @@ check-report:
     # undef, and undef propagates through arithmetic to the report without a word. Every
     # derived number here has been undef at least once because a file `use`d something it
     # needed to `include`. The report is where that surfaces, so the report is checked.
+    #
+    # Run in BOTH unit systems, because every reported number now passes through a
+    # formatter that has a branch per system, and a fault in one branch is invisible from
+    # the other. This is the right place for that and check-sizes is not: undef propagates
+    # to the report whatever the units, so the size sweep catches a size-specific undef in
+    # metric alone, while a units-specific fault does not depend on the size at all.
     set -uo pipefail
     export OPENSCADPATH="{{LIBRARIES}}"
     tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
-    {{OPENSCAD}} -o "$tmp/r.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
-    bad=$(grep '^ECHO' "$tmp/err" | grep -inE 'undef|nan|inf' || true)
-    if [ -n "$bad" ]; then
-        echo "FAIL  the report carries values that are not numbers:"
-        echo "$bad" | sed 's/^/        /'
-        exit 1
-    fi
-    echo "ok    every reported value is a number"
+    failed=0
+    for u in metric imperial; do
+        {{OPENSCAD}} -D "units=\"$u\"" -o "$tmp/r.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
+        bad=$(grep '^ECHO' "$tmp/err" | grep -inE 'undef|nan|inf' || true)
+        if [ -n "$bad" ]; then
+            echo "FAIL  the $u report carries values that are not numbers:"
+            echo "$bad" | sed 's/^/        /'
+            failed=1
+        else
+            echo "ok    every reported value is a number, in $u"
+        fi
+    done
+    exit $failed

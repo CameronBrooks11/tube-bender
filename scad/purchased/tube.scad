@@ -13,6 +13,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 use <tube_material.scad>
 
 function tube_name(type)     = type[0];  //! Registry name
@@ -25,8 +27,12 @@ function tube_id(type) = tube_od(type) - 2 * tube_wall(type); //! Inside diamete
 
 //! Draw a straight length of tube, centred on the origin and running along z.
 module tube(type, length) {
+    // The key before the colon is the BOM's own identity for this part and stays in
+    // millimetres in both systems, the way a part number would - it is what groups
+    // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("tube(", tube_name(type), ", ", length, "): Tube ", tube_size(type), ", ",
-                tube_material_description(tube_material(type)), ", length ", round(length), "mm"));
+                tube_material_description(tube_material(type)), ", length ",
+                fmt_length(length)));
 
     colour = tube_material_colour(tube_material(type));
 

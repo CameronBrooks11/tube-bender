@@ -35,6 +35,7 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
 use <../purchased/tube.scad>
 use <../purchased/pin.scad>
 
@@ -236,9 +237,11 @@ module forming_die(tube, clr, bend_angle = 180,
     // is machined, and the line below is the stock it is machined from.
     blank = forming_die_blank(tube);
     plan  = forming_die_blank_plan(tube, clr);
+    // The BOM is a cut list, so it follows the units too - a shop working in inches cannot
+    // use a blank size in millimetres. The stock SIZE stays imperial: that is its name.
     vitamin(str("forming_die_blank(", plate_name(blank), "): ", plate_description(blank),
-                " ", plate_size(blank), ", blank ", round(plan[0]), "mm x ", round(plan[1]),
-                "mm, faced to ", t, "mm"));
+                " ", plate_size(blank), ", blank ", fmt_bare_length(plan[0]), " x ",
+                fmt_length(plan[1]), ", faced to ", fmt_length(t)));
 
     difference() {
         linear_extrude(t, center = true)
@@ -278,23 +281,25 @@ module forming_die_report(tube, clr, bend_angle, frame_pin_d, drive_pin_d) {
     plan   = forming_die_blank_plan(tube, clr);
     force  = bend_drive_pin_force_N(bend_plastic_moment_Nm(tube), r_drv);
 
-    echo(str("die:     radius ", clr, " mm x ", forming_die_thickness(tube),
-             " thick, ", forming_die_arc(bend_angle), " deg of groove"));
-    echo(str("         groove r ", forming_die_groove_radius(tube), " mm, root at ",
-             forming_die_root_radius(tube, clr), " mm, tail ",
-             forming_die_tail_length(tube, clr), " mm long"));
-    echo(str("         clamp grips ", bend_clamp_length(tube, clr), " mm = ",
+    echo(str("die:     radius ", fmt_length(clr), " x ",
+             fmt_length(forming_die_thickness(tube)), " thick, ",
+             forming_die_arc(bend_angle), " deg of groove"));
+    echo(str("         groove r ", fmt_length(forming_die_groove_radius(tube)), ", root at ",
+             fmt_length(forming_die_root_radius(tube, clr)), ", tail ",
+             fmt_length(forming_die_tail_length(tube, clr)), " long"));
+    echo(str("         clamp grips ", fmt_length(bend_clamp_length(tube, clr)), " = ",
              bend_clamp_length(tube, clr) / tube_od(tube), " x OD, smooth cavity"));
     echo(str("blank:   ", is_undef(blank) ? "NONE THICK ENOUGH IN THE REGISTRY"
                                           : str(plate_size(blank), " plate, ",
-                                                round(plan[0]), " x ", round(plan[1]), " mm")));
+                                                fmt_bare_length(plan[0]), " x ",
+                                                fmt_length(plan[1]))));
 
     if (len(drives))
-        echo(str("drive:   ", len(drives), " holes on r ", r_drv, " mm at ",
-                 die_drive_hole_pitch, " deg pitch, ", round(force), " N on the pin"));
+        echo(str("drive:   ", len(drives), " holes on r ", fmt_length(r_drv), " at ",
+                 die_drive_hole_pitch, " deg pitch, ", fmt_force(force), " on the pin"));
     else
         echo(str("drive:   no room for drive holes - needs r ",
-                 forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d),
-                 " mm, the groove root only allows ", r_drv,
-                 " mm. Drive on the U-strap pin, as JD2 does for small dies."));
+                 fmt_length(forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d)),
+                 ", the groove root only allows ", fmt_length(r_drv),
+                 ". Drive on the U-strap pin, as JD2 does for small dies."));
 }

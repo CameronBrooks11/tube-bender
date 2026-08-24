@@ -28,6 +28,7 @@
 include <NopSCADlib/core.scad>;
 
 use <../purchased/bolt.scad>
+use <../utils/units.scad>
 use <../purchased/plate.scad>
 use <frame_link.scad>
 
@@ -137,16 +138,17 @@ module base_report(tube, clr, plate, link_width, followbar_pin_d, moment_Nm, for
     shear  = base_anchor_shear_N(moment_Nm, r, force_N);
     allow  = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
 
-    echo(str("base:    ", plate_size(plate), " plate, ", round(size[0]), " x ",
-             round(size[1]), " mm, lower frame link welded to it"));
+    echo(str("base:    ", plate_size(plate), " plate, ", fmt_bare_length(size[0]), " x ",
+             fmt_length(size[1]), ", lower frame link welded to it"));
     assert(shear <= allow,
            "base: the anchor bolts are over their allowable at the radius they end up with - size up");
 
-    echo(str("         4 x ", bolt_size(bolt), " anchor bolts on r ", round(r), " mm, ",
-             round(shear), " N each against ", round(allow),
-             " N allowable at a safety factor of ", bend_anchor_safety_factor));
-    echo(str("         the work happens ", round(working_height),
-             " mm above the mounting surface, and it bears on it at ",
-             round(base_bearing_MPa(force_N, size) * 100) / 100,
-             " MPa - fine on steel, check it against a bench top"));
+    echo(str("         4 x ", bolt_size(bolt), " anchor bolts on r ", fmt_length(r), ", ",
+             fmt_force(shear), " each against ", fmt_force(allow),
+             " allowable at a safety factor of ", bend_anchor_safety_factor));
+    // What it bears ONTO is a bench or a floor, so this is a contact pressure - psi.
+    echo(str("         the work happens ", fmt_length(working_height),
+             " above the mounting surface, and it bears on it at ",
+             fmt_pressure(base_bearing_MPa(force_N, size)),
+             " - fine on steel, check it against a bench top"));
 }

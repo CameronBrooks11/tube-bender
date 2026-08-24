@@ -34,6 +34,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
 use <forming_die.scad>
@@ -82,8 +84,8 @@ module followbar(tube, pin_d) {
     assert(!is_undef(blank), "followbar: no registered plate is thick enough for this blank");
 
     vitamin(str("followbar_blank(", plate_name(blank), "): ", plate_description(blank),
-                " ", plate_size(blank), ", blank ", round(d), "mm x ", round(lf),
-                "mm, faced to ", h, "mm"));
+                " ", plate_size(blank), ", blank ", fmt_bare_length(d), " x ",
+                fmt_length(lf), ", faced to ", fmt_length(h)));
 
     color(plate_colour(blank))
         render()
@@ -101,12 +103,14 @@ module followbar(tube, pin_d) {
 
 //! Echo what the followbar comes out as.
 module followbar_report(tube, clr, pin_d, force_N) {
-    echo(str("followbar: ", round(followbar_depth(tube, pin_d)), " x ",
-             round(bend_followbar_length(tube)), " x ", followbar_height(tube),
-             " mm, pin ", round(followbar_pin_offset(tube, pin_d)),
-             " mm outboard of the tube's axis, from ",
+    echo(str("followbar: ", fmt_bare_length(followbar_depth(tube, pin_d)), " x ",
+             fmt_bare_length(bend_followbar_length(tube)), " x ",
+             fmt_length(followbar_height(tube)), ", pin ",
+             fmt_length(followbar_pin_offset(tube, pin_d)),
+             " outboard of the tube's axis, from ",
              plate_size(followbar_blank(tube)), " plate"));
-    echo(str("           ", round(force_N), " N onto the tube at ",
-             round(followbar_bearing_MPa(force_N, tube) * 10) / 10,
-             " MPa over its projected area"));
+    // A contact pressure, so psi rather than ksi - see utils/units.scad.
+    echo(str("           ", fmt_force(force_N), " onto the tube at ",
+             fmt_pressure(followbar_bearing_MPa(force_N, tube)),
+             " over its projected area"));
 }

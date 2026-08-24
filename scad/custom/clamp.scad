@@ -31,6 +31,7 @@
 include <NopSCADlib/core.scad>;
 
 use <../purchased/bolt.scad>
+use <../utils/units.scad>
 use <../purchased/pin.scad>
 use <../purchased/plate.scad>
 use <forming_die.scad>
@@ -63,8 +64,8 @@ module clamp(tube, clr, pin_d, bolt_d) {
     assert(!is_undef(blank), "clamp: no registered plate is thick enough for this blank");
 
     vitamin(str("clamp_blank(", plate_name(blank), "): ", plate_description(blank), " ",
-                plate_size(blank), ", blank ", round(d), "mm x ", round(lc),
-                "mm, faced to ", h, "mm"));
+                plate_size(blank), ", blank ", fmt_bare_length(d), " x ", fmt_length(lc),
+                ", faced to ", fmt_length(h)));
 
     color(plate_colour(blank))
         render()
@@ -89,10 +90,10 @@ module clamp(tube, clr, pin_d, bolt_d) {
 
 //! Echo what the clamp comes out as.
 module clamp_report(tube, clr, pin_d, bolt, force_N) {
-    echo(str("clamp:   ", round(clamp_depth(tube, pin_d)), " x ",
-             round(forming_die_tail_length(tube, clr)), " x ", clamp_height(tube),
-             " mm from ", plate_size(clamp_blank(tube)), " plate, 2 pins and a ",
-             bolt_size(bolt), " bolt"));
-    echo(str("         holding ", round(force_N),
-             " N of tangential drag - the moment over the bend radius"));
+    echo(str("clamp:   ", fmt_bare_length(clamp_depth(tube, pin_d)), " x ",
+             fmt_bare_length(forming_die_tail_length(tube, clr)), " x ",
+             fmt_length(clamp_height(tube)), " from ", plate_size(clamp_blank(tube)),
+             " plate, 2 pins and a ", bolt_size(bolt), " bolt"));
+    echo(str("         holding ", fmt_force(force_N),
+             " of tangential drag - the moment over the bend radius"));
 }

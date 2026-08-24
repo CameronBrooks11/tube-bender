@@ -122,10 +122,37 @@ machined, so it goes under `stl()` and the BOM files it under "Printed". The sto
 cut from is declared separately as a `vitamin()`, because a parts list has to say what to
 *buy*.
 
-## Units: imperial identity, millimetre arithmetic
+## Units: imperial identity, millimetre arithmetic, and one place that converts
 
 A row's name and `size` field are its imperial size, because that is what you order and
 what is stamped on the die. **All arithmetic is millimetres.** Convert once, at the row.
+
+Reading is separate again. `scad/utils/units.scad` is **the only file that may write a unit
+down**, and it converts at the last step before a number reaches a human - the report and
+the BOM. Nothing upstream knows the setting exists, so no calculation can be affected by it.
+
+- Use `fmt_length`, `fmt_force`, `fmt_moment`, `fmt_stress`, `fmt_pressure`, `fmt_mass`. The
+  unit travels with the number, because a number and its unit travelling separately is how
+  they end up mismatched. `fmt_bare_length` plus `fmt_length_unit` covers a list or a
+  coordinate pair, where repeating the unit on every entry is noise.
+- **`fmt_stress` is ksi and `fmt_pressure` is psi.** Structural allowables are quoted in
+  ksi; what a part bears onto a bench is quoted in psi, and putting 0.01 MPa into ksi says
+  nothing.
+- **Do not convert** angles, counts, ratios, or a threshold used in a comparison.
+- **Identities do not convert.** `plate_size()` says `1/4 in` in both systems. So does the
+  key before the colon in a `vitamin()` string: that is what groups identical parts, not
+  something anybody measures.
+- **An input's unit lives in its name and never changes meaning.** `clr_override_in`,
+  `pedestal_height_mm`. Making inputs follow the toggle would silently reinterpret every
+  saved preset the moment somebody switched.
+
+The setting travels as `$units`, a special variable, so it is dynamically scoped and reaches
+every report module and every function they call across `use` boundaries without being
+threaded through signatures that have nothing else to do with it. Unset means metric.
+
+`check-report` drives both systems, because each formatter has a branch per system and a
+fault in one is invisible from the other. `check-sizes` stays metric on purpose: undef
+reaches the report whatever the units, and a units fault does not depend on the size.
 
 ## The three gates, and what each one cannot see
 

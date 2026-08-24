@@ -11,6 +11,8 @@
 
 include <NopSCADlib/core.scad>;
 
+use <../utils/units.scad>
+
 function structural_name(type)  = type[0];  //! Registry name
 function structural_size(type)  = type[1];  //! Imperial size, the identity you order by
 function structural_od(type)    = type[2];  //! Outside diameter, mm
@@ -32,8 +34,11 @@ function structural_mass_per_m(type) =
 
 //! Draw a length of the member, running up +z from the origin.
 module structural_tube(type, length) {
+    // The key before the colon is the BOM's own identity for this part and stays in
+    // millimetres in both systems, the way a part number would - it is what groups
+    // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("structural_tube(", structural_name(type), ", ", round(length), "): Tube ",
-                structural_size(type), " in wall, mild steel, length ", round(length), "mm"));
+                structural_size(type), " in wall, mild steel, length ", fmt_length(length)));
 
     color(structural_colour(type))
         render()

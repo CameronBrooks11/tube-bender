@@ -30,6 +30,7 @@
 include <NopSCADlib/core.scad>;
 
 use <../purchased/bolt.scad>
+use <../utils/units.scad>
 use <../purchased/plate.scad>
 use <../purchased/structural_tube.scad>
 
@@ -117,17 +118,23 @@ module pedestal_report(post, plate, length, bolt, bolt_yield, force_N, height_mm
     tens  = pedestal_foot_tension_N(force_N, height_mm, r);
     allow = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
 
-    echo(str("pedestal: ", structural_size(post), " post ", round(length), " mm long, ",
-             round(structural_mass_per_m(post) * length / 1000 * 10) / 10, " kg, on a ",
-             plate_size(plate), " foot ", round(pedestal_foot_size(post)[0]), " mm square"));
-    echo(str("          bending ", round(force_N * height_mm / 1000), " N.m and torsion ",
-             round(moment_Nm), " N.m give ", round(tau), " MPa shear against ",
-             round(pin_allowable_shear_fraction * structural_yield(post)), " MPa allowable"));
-    echo(str("          4 x ", bolt_size(bolt), " foot bolts on r ", round(r), " mm: ",
-             round(shear), " N shear, ", round(tens), " N tension, allowable ",
-             round(allow), " N at a safety factor of ", bend_anchor_safety_factor));
-    echo(str("          working plane at ", round(height_mm), " mm",
+    echo(str("pedestal: ", structural_size(post), " post ", fmt_length(length), " long, ",
+             fmt_mass(structural_mass_per_m(post) * length / 1000), ", on a ",
+             plate_size(plate), " foot ", fmt_length(pedestal_foot_size(post)[0]),
+             " square"));
+    echo(str("          bending ", fmt_moment(force_N * height_mm / 1000), " and torsion ",
+             fmt_moment(moment_Nm), " give ", fmt_stress(tau), " shear against ",
+             fmt_stress(pin_allowable_shear_fraction * structural_yield(post)),
+             " allowable"));
+    echo(str("          4 x ", bolt_size(bolt), " foot bolts on r ", fmt_length(r), ": ",
+             fmt_force(shear), " shear, ", fmt_force(tens), " tension, allowable ",
+             fmt_force(allow), " at a safety factor of ", bend_anchor_safety_factor));
+    // The ceiling is quoted rather than written out, so it converts with everything else.
+    echo(str("          working plane at ", fmt_length(height_mm),
              height_mm >= pedestal_braced_band[0] && height_mm <= pedestal_braced_band[1]
-                 ? " - inside the braced band the 490 N ceiling assumes"
-                 : " - OUTSIDE the braced band; the 490 N ceiling does not apply here"));
+                 ? str(" - inside the braced band the ",
+                       fmt_force(bend_operator_force_ceiling), " ceiling assumes")
+                 : str(" - OUTSIDE the braced band; the ",
+                       fmt_force(bend_operator_force_ceiling),
+                       " ceiling does not apply here")));
 }
