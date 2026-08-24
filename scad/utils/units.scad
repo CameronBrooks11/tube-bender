@@ -115,6 +115,16 @@ function fmt_force(N) =
     units_imperial() ? str(units_round(N / units_N_per_lbf, 1), " lbf")
                      : str(units_round(N, 0), " N");
 
+//! Force per unit length, from N/mm - what one millimetre of a weld carries.
+//!
+//! One newton per millimetre is 5.71 pounds per inch, so imperial takes a whole number
+//! where metric takes a tenth; that puts the two within a factor of 1.75 of each other,
+//! which is the rule the rest of these follow.
+function fmt_force_per_length(N_per_mm) =
+    units_imperial()
+        ? str(units_round(N_per_mm * units_mm_per_inch / units_N_per_lbf, 0), " lbf/in")
+        : str(units_round(N_per_mm, 1), " N/mm");
+
 //! A moment or a torque, from N.m.
 function fmt_moment(Nm) =
     units_imperial() ? str(units_round(Nm / units_Nm_per_lbfft, 1), " lbf.ft")

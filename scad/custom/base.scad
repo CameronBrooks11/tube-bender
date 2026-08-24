@@ -30,6 +30,7 @@ include <NopSCADlib/core.scad>;
 use <../purchased/bolt.scad>
 use <../utils/units.scad>
 use <../purchased/plate.scad>
+use <../utils/weld.scad>
 use <frame_link.scad>
 
 include <../utils/bend.scad>;
@@ -101,6 +102,25 @@ function base_anchor_bolt(tube, clr, link_width, followbar_pin_d, moment_Nm, for
         len(fits) == 0 ? undef
                        : [for (b = candidates) if (bolt_diameter(b) == min(fits)) b][0];
 
+//! The weld group that holds the machine down: two runs of fillet along the two long edges
+//! of the lower frame link's followbar arm, where that arm lies on this plate.
+//!
+//! Only the followbar arm is counted. The link's lock arm is welded down as well and helps,
+//! and leaving it out is free conservatism on a joint the code minimum governs anyway.
+function base_weld_group(tube, clr, link_width, followbar_pin_d) =
+    weld_group_parallel(frame_link_reach(tube, clr, followbar_pin_d), link_width);
+
+//! Load on the worst millimetre of that weld, N/mm.
+//!
+//! The weld and the anchor bolts are IN SERIES on one path: everything the machine sheds
+//! into the world crosses this joint, then the plate, then the bolts. So the weld carries
+//! what the bolts carry - the drive torque about the pivot, and the operator's pull - and
+//! the overturning that pull makes about the working plane on top of it.
+function base_weld_load_N_per_mm(tube, clr, link_width, followbar_pin_d, moment_Nm, force_N,
+                                 working_height) =
+    weld_group_load(base_weld_group(tube, clr, link_width, followbar_pin_d),
+                    moment_Nm * 1000, force_N * working_height, force_N);
+
 //! Bearing pressure the plate puts on whatever it is bolted to, MPa, if the operator's
 //! whole pull were taken as a compression over the plate's area. A crude figure, and
 //! reported rather than checked, because what it bears ON is not the model's to know -
@@ -130,16 +150,33 @@ module base_2D(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
 }
 
 //! Echo what the anchorage comes out as.
-module base_report(tube, clr, plate, link_width, followbar_pin_d, moment_Nm, force_N,
-                   bolt, bolt_yield, working_height) {
+module base_report(tube, clr, plate, link_plate, link_width, followbar_pin_d, moment_Nm,
+                   force_N, bolt, bolt_yield, working_height) {
     size   = base_size(tube, clr, link_width, followbar_pin_d);
     inset  = plate_eye_radius(bolt_clearance_hole_d(bolt_diameter(bolt))) + 1;
     r      = base_anchor_radius(tube, clr, link_width, followbar_pin_d, inset);
     shear  = base_anchor_shear_N(moment_Nm, r, force_N);
     allow  = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
+    // The weld runs along the frame link's EDGE, on top of this plate: a lap joint, so the
+    // link's own thickness caps the fillet as well as setting the minimum.
+    t_thin = min(plate_thickness(plate), plate_thickness(link_plate));
+    wf     = base_weld_load_N_per_mm(tube, clr, link_width, followbar_pin_d, moment_Nm,
+                                     force_N, working_height);
+    leg    = weld_leg(wf, t_thin);
+    run    = frame_link_reach(tube, clr, followbar_pin_d);
 
     echo(str("base:    ", plate_size(plate), " plate, ", fmt_bare_length(size[0]), " x ",
              fmt_length(size[1]), ", lower frame link welded to it"));
+    assert(leg <= weld_max_edge_size(plate_thickness(link_plate)),
+           "base: the weld the load wants is bigger than the frame link's edge can take - thicker link plate");
+    assert(wf <= weld_base_metal_N_per_mm(t_thin, pin_allowable_shear_fraction * plate_yield(link_plate)),
+           "base: the weld is over what the plate it lands on can carry - thicker plate, not a bigger weld");
+
+    echo(str("         weld ", fmt_length(leg), " fillet both sides of the link, ",
+             fmt_length(run), " each side, set by ", weld_governing_mode(wf, t_thin),
+             " - E70XX, ", fmt_stress(weld_allowable_MPa()), " on the throat"));
+    echo(str("         carrying ", fmt_force_per_length(wf), " against ",
+             fmt_force_per_length(weld_capacity_N_per_mm(leg)), " at that leg"));
     assert(shear <= allow,
            "base: the anchor bolts are over their allowable at the radius they end up with - size up");
 

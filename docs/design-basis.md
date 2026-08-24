@@ -914,3 +914,92 @@ cuts it fine, and it is worth knowing before someone opens the file and wonders.
 that is a function of the configuration does not fit that, so the sliced die remains a
 report and a preview only. It is the last part of the machine with no cut file, and it is
 the one that needs the most of them.
+
+## 19. The three welds
+
+Three joints on this machine are welded, and until now they were a sentence. Every other
+load path here is sized from a stress and an allowable; these carried **everything the
+machine sheds into the world** on the strength of the word "welded".
+
+| joint | what it carries |
+|---|---|
+| lower frame link → base plate | the drive torque about the pivot, the operator's pull, and the overturning that pull makes at the working plane |
+| post → base plate (top) | the drive torque, and the pull as direct shear. No bending: the load is applied at this end, so its lever arm has not started |
+| post → foot plate (bottom) | the drive torque, and the pull over the **whole** working height |
+
+### Weld as a line
+
+A fillet's strength goes with its **length**, so a weld group is treated as a line of unit
+width rather than as an area. Its "area" is a length in mm and its second moments come out
+in mm³ — one power down from their solid-section namesakes. Divide a moment by one of those
+and you get **newtons per millimetre of weld**, with no leg size anywhere in the arithmetic.
+
+That is the whole reason for doing it this way. The required leg falls out at the end, by
+dividing by what one millimetre of fillet can carry, instead of being guessed, checked, and
+guessed again.
+
+The base joint is two parallel runs along the frame link's followbar arm; both post joints
+are a ring round the post's OD. In-plane torsion and direct shear are added as scalars —
+they are collinear at one point of the group and smaller everywhere else, which is the
+standard hand check. Bending is combined as a vector, because it pulls the throat open
+rather than shearing it.
+
+### The allowable, and how good it is
+
+**0.30 × the electrode's nominal tensile strength, on the effective throat** — 21 ksi /
+144.8 MPa for E70XX [AISC-WELD]. The throat is `leg / √2`, the shortest path across the
+corner, which is where a fillet loaded any way at all actually fails.
+
+**This is the weakest-sourced number in the project, and it should be said plainly.** Every
+other allowable here comes from a peer-reviewed journal or a mill data sheet; this one comes
+from two secondary pages that restate AISC and AWS rather than being them. The figure itself
+is not in doubt — it is the most-quoted number in weld design and the two sources agree to
+three digits — but the provenance is one step further out than anything else in the load
+path.
+
+### The code minimum is not about strength, and it governs
+
+AISC also sets a **minimum** leg from the thickness of the parts joined [AISC-360 Table
+J2.4], and it has nothing to do with the load. It is a heat-input rule: too small a bead
+against heavy plate chills too fast and cracks.
+
+**The base weld is minimum-governed at every size in the range** — a 1/8 in fillet, both
+sides of the link, where the load asks for well under a tenth of that. At 1-1/2 in it
+carries 52 N/mm against 325 N/mm of capacity. The joint that looked like the biggest open
+question turns out to have a factor of six in hand, and that is worth knowing rather than
+assuming either way.
+
+The post welds are the opposite: **load-governed at every size but the smallest**, and one
+of them runs at 97 % of a 1/8 in fillet before stepping to 3/16. The report prints both
+figures side by side and says which decided it, because a minimum-governed joint has margin
+and a load-governed one does not.
+
+### Which part the table is read against — a live disagreement
+
+Table J2.4 is read against the **thinner** part joined. That is current AISC and current
+AWS. Older editions read it against the **thicker** part, and secondary sources still repeat
+that, so both readings are in circulation and **they do not agree here**: 1/4 in link on
+3/8 in plate gives 1/8 in one way and 3/16 in the other.
+
+Thinner is taken, and not because it is smaller. The rule exists so that a bead is not
+chilled by the mass around it. On the pedestal's 0.120 in post wall the **larger** figure is
+the dangerous one — it burns through the very part the rule is there to protect. The code
+carries that logic itself: where the table minimum exceeds the thinner part's thickness, the
+minimum is limited to that thickness, which is why two of the post welds come out at 3.05 mm
+— the wall — rather than at a round 1/16 in step.
+
+### A check I got wrong, and what it taught
+
+A weld cannot be stronger than the metal it is welded to, so the first version asserted the
+resultant against `0.4 Fy × t` of the part underneath. **It fired on seven perfectly good
+sizes.**
+
+The reason is worth keeping. At the post's foot, 300 of the 315 N/mm is **bending** — a
+normal force pulling on the fusion face, not a shear across it — and comparing it to a
+*shear* allowable conflates two limit states. The real check on that force is the post's own
+section, which `pedestal_report()` already makes and which passes with room (71 MPa
+equivalent against 100 allowable). The base weld is the opposite case, all but 4 % of it
+in-plane, and there the same check is the right one and is kept.
+
+The lesson is not "the check was too conservative". It was checking the wrong thing, and
+only looked conservative.

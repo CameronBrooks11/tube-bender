@@ -33,6 +33,7 @@ use <../purchased/bolt.scad>
 use <../utils/units.scad>
 use <../purchased/plate.scad>
 use <../purchased/structural_tube.scad>
+use <../utils/weld.scad>
 
 include <../utils/bend.scad>;
 
@@ -48,6 +49,32 @@ function pedestal_equivalent_torque(force_N, height_mm, moment_Nm) =
 //! pull at the working height, resisted as a couple by the bolts on the far side.
 function pedestal_foot_tension_N(force_N, height_mm, radius_mm) =
     force_N * height_mm / (2 * radius_mm);
+
+//! The weld that holds the post on, at either end: a ring of fillet round its outside
+//! diameter.
+//!
+//! The bore in the foot lets a second ring be run inside as well, and this does not count
+//! it. One ring is what the arithmetic is done on and the inside pass is margin.
+function pedestal_weld_group(post) = weld_group_ring(structural_od(post) / 2);
+
+//! Load on the worst millimetre of the FOOT weld, N/mm - the bottom of the post, where the
+//! operator's pull has the whole working height to act over.
+function pedestal_foot_weld_load(post, force_N, height_mm, moment_Nm) =
+    weld_group_load(pedestal_weld_group(post), moment_Nm * 1000, force_N * height_mm,
+                    force_N);
+
+//! And of the TOP weld, where the post meets the base plate.
+//!
+//! Same torque, and effectively no bending: the pull is applied at this end, so its lever
+//! arm has not started. That is why the post is a bending problem at the bottom and a pure
+//! torsion problem at the top, and why the two welds are not the same size.
+function pedestal_top_weld_load(post, force_N, moment_Nm) =
+    weld_group_load(pedestal_weld_group(post), moment_Nm * 1000, 0, force_N);
+
+//! The thinner of the two parts at either post weld, mm - which is the post's wall on every
+//! size in the registry, and is what sets the code minimum.
+function pedestal_weld_thinner(post, plate) =
+    min(structural_wall(post), plate_thickness(plate));
 
 //! Size of the foot plate, [x, y] mm.
 //!
@@ -113,12 +140,16 @@ module pedestal_foot_2D(post, plate, bolt_d) {
 //! Echo what the pedestal comes out as.
 module pedestal_report(post, plate, length, bolt, bolt_yield, force_N, height_mm,
                        moment_Nm) {
-    te    = pedestal_equivalent_torque(force_N, height_mm, moment_Nm);
-    tau   = te / (2 * structural_section_modulus(post));
-    r     = pedestal_foot_radius(post, bolt_diameter(bolt));
-    shear = moment_Nm * 1000 / (4 * r) + force_N / 4;
-    tens  = pedestal_foot_tension_N(force_N, height_mm, r);
-    allow = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
+    te       = pedestal_equivalent_torque(force_N, height_mm, moment_Nm);
+    tau      = te / (2 * structural_section_modulus(post));
+    r        = pedestal_foot_radius(post, bolt_diameter(bolt));
+    shear    = moment_Nm * 1000 / (4 * r) + force_N / 4;
+    tens     = pedestal_foot_tension_N(force_N, height_mm, r);
+    allow    = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
+    t_thin   = pedestal_weld_thinner(post, plate);
+    fw       = pedestal_foot_weld_load(post, force_N, height_mm, moment_Nm);
+    foot_leg = weld_leg(fw, t_thin);
+    top_leg  = weld_leg(pedestal_top_weld_load(post, force_N, moment_Nm), t_thin);
 
     echo(str("pedestal: ", structural_size(post), " post ", fmt_length(length), " long, ",
              fmt_mass(structural_mass_per_m(post) * length / 1000), ", on a ",
@@ -128,6 +159,14 @@ module pedestal_report(post, plate, length, bolt, bolt_yield, force_N, height_mm
              fmt_moment(moment_Nm), " give ", fmt_stress(tau), " shear against ",
              fmt_stress(pin_allowable_shear_fraction * structural_yield(post)),
              " allowable"));
+    echo(str("          welded to the foot with a ", fmt_length(foot_leg),
+             " fillet all round, set by ", weld_governing_mode(fw, t_thin), " - ",
+             fmt_force_per_length(fw), " against ",
+             fmt_force_per_length(weld_capacity_N_per_mm(foot_leg)),
+             " - almost all of it BENDING, which the post's own section above is the",
+             " real check on"));
+    echo(str("          and to the base plate above with a ", fmt_length(top_leg),
+             " fillet: no bending up there, the pull is applied at that end"));
     echo(str("          4 x ", bolt_size(bolt), " foot bolts on r ", fmt_length(r), ": ",
              fmt_force(shear), " shear, ", fmt_force(tens), " tension, allowable ",
              fmt_force(allow), " at a safety factor of ", bend_anchor_safety_factor));

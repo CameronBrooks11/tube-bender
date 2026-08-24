@@ -171,6 +171,35 @@ about 0.6Fy. Every pin diameter and both link widths are cut from these two numb
 allowable (0.4Fy) with the von Mises shear yield (0.6Fy), which are a factor of 1.5 apart.
 → `scad/utils/pin_sizing.scad`, `docs/design-basis.md` §13
 
+**MechSimulator (n.d.).** *Fillet Weld Strength Design — Throat, Allowable Stress & FOS.*
+<https://mechsimulator.com/blog/articles/weld-strength-fillet-weld-design-guide/> **[TP]** · **read**
+Cited as **[AISC-WELD]**. States the allowable directly: the shear allowable on a fillet
+weld's effective throat is **0.30 x the electrode's nominal tensile strength**, which for
+E70XX is 21 ksi / 144.9 MPa, and the throat is `0.707 x leg`. Corroborated independently by
+a second calculator page reached from a different search. **Secondary, and marked as such:**
+both restate AISC/AWS rather than being it, and the specification itself was not obtained.
+The number is not in doubt — it is the most-quoted figure in weld design — but the
+provenance is one step removed from every other allowable in this project.
+→ `scad/utils/weld.scad`, `docs/design-basis.md` §19
+
+**IDEA StatiCa (n.d.).** *Detailing of bolts and welds according to AISC.*
+<https://www.ideastatica.com/support-center/detailing-of-bolts-and-welds-according-to-aisc> **[VN]** · **read**
+Cited as **[AISC-360]** for the two detailing rules the weld sizing uses. Minimum fillet
+size, Table J2.4, read against **the thickness of the thinner plate**: 1/8 in to 1/4 in,
+3/16 in to 1/2 in, 1/4 in to 3/4 in, 5/16 in above. Maximum size along an edge, J2.2b,
+quoted verbatim: "For plate thickness smaller than 1/4 in, the weld size should be no bigger
+than plate thickness. For plate thickness equal to or higher than 1/4 in, the weld size
+should be no bigger than the plate thickness -1/16 in."
+
+**A disagreement worth recording.** A second secondary source states the minimum is read
+against the **thicker** part, and on this machine the two readings differ — 1/4 in link on
+3/8 in plate gives 1/8 in one way and 3/16 in the other. Thinner is current AISC and current
+AWS, and the commentary rationale quoted for the change ("the prevalence of the use of
+filler metal considered to be low hydrogen") is consistent with that direction. Older
+editions read it against the thicker part, which is why the wrong figure is still in
+circulation.
+→ `scad/utils/weld.scad`, `docs/design-basis.md` §19
+
 **Elgin / MW Components (n.d.).** *Carbon Steel Grade 1018 Data Sheet — AISI 1018, cold drawn.*
 <https://www.mwcomponents.com/uploads/Resource-Center/Elgin-Material-Sheets/Carbon-Steel-Grade-1018-Data-Sheet_Elgin.pdf> **[VN]** · **read**
 Cited as **[MW-1018]**. Cold drawn 1018: tensile ultimate 440 MPa, **yield 370 MPa**. The

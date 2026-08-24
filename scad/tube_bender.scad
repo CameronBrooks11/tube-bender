@@ -322,8 +322,8 @@ die_plate_report(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin)
                  bolt_material_yield, die_plate_bolts, moment);
 clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
 sliced_die_report(tube, clr, slice_plate);
-base_report(tube, clr, base_plate, link_w, fb_pin_d, moment, op_force, anchor_bolt,
-            bolt_material_yield, layout_working_height(layers));
+base_report(tube, clr, base_plate, frame_plate, link_w, fb_pin_d, moment, op_force,
+            anchor_bolt, bolt_material_yield, layout_working_height(layers));
 
 // The pedestal post carries the operator's pull as bending and the drive torque as
 // torsion, at the same time.
