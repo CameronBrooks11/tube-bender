@@ -82,10 +82,14 @@ length anyone stocks. So a fastener is passed the GRIP it has to hold and rounds
 stock step itself — `pin_usable_length()`, `bolt_stock_length()`, both a quarter inch. Do
 not bill a raw computed length; it puts `1/2 in x 1.556 in` on the parts list.
 
-**A hole with nothing in it is a missing BOM line.** Every pin bills its retainer, and which
-retainer depends on how often the pin comes out: a cotter for a pivot that is fitted once, a
-clip for an INDEXED pin that is pulled at every stroke. Neither carries a size, because
-cotter geometry is `undef` on every registry row but the measured one.
+**A hole with nothing in it is a missing BOM line** — but check the sources before deciding
+what goes in it. Retainers were added to every pin on a reasonable-looking argument and then
+removed, because the reference machine has none: every hole here is vertical and every pin
+comes out, so a cotter is a thing that stops you using the machine. See design-basis §22.
+
+**Read the reference manuals for the question in front of you, not just the one you had.**
+`[JD2-M32]` had been mined for tooling practice and was sitting there with the answer to a
+mechanical question the model had got wrong for months.
 
 ## `include` for anything with constants, `use` for behaviour only
 

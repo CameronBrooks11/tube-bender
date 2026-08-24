@@ -70,17 +70,12 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;8&nbsp; |  &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 57.15 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 1-1/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 3/4 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Cotter pin to suit a 5/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 88.9 mm usable, 98306A868 |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868 |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clip to suit a 7/8 in dia clevis pin that is pulled every stroke, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 7/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 228.6 x 190.5 mm, faced to 44.45 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm |
@@ -92,7 +87,7 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm |
 | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm |
-| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;25&nbsp; | &nbsp;&nbsp;46&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;19&nbsp; | &nbsp;&nbsp;38&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  |  |  |  | | **3D printed parts** |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
@@ -205,7 +200,6 @@ the moment that drag makes about the pivot, so they are not incidental fixings.
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|2| Cotter pin to suit a 5/16 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
 |2| Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
 |2| Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm|
 |2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm|
@@ -243,15 +237,11 @@ the die assembly slides in at the next stage.
 |---:|:----------|
 |8| Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Cotter pin to suit a 1-1/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Cotter pin to suit a 3/4 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
-|2| Cotter pin to suit a 5/8 in dia clevis pin, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 1-1/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 3/4 in dia x 88.9 mm usable, 98306A868|
+|1| Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868|
 |2| Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 7/8 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
-|1| Pin clevis 7/8 in dia x 88.9 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
-|2| Pin clip to suit a 7/8 in dia clevis pin that is pulled every stroke, NO ORDER NUMBER - this row is a hole in the BOM|
+|1| Pin clevis 7/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm|
 |1| Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm|
 |1| Plate mild steel 1/4 in, blank 309.09 x 232.97 mm|
@@ -297,10 +287,30 @@ Then the followbar, on its own pin between the frame links; the clamp, pinned to
 plates' tails with its bolt left slack until a tube is in; and the die lock pin, which
 goes in from the top through whichever drive hole has come round under it.
 
+**Every pin drops in head up and nothing retains it** - no cotters, no clips. That is the
+reference machine's answer, not a shortcut: searched end to end, its manual has no
+retainer of any kind on any pin [JD2-M32]. It works because every hole here is vertical
+and the die turns about a vertical axis, so a pin that is upright at the start of a bend
+is upright at the end. And it has to work that way, because all of them come out - the
+frame pin to change a die, the drive pin at every stroke, the lock pin by hand.
+
+The frame, followbar and lock pins land on the base plate. The drive, U-strap and spacer
+pins hang in the stack, where the head is the only thing holding them up.
+
 Last, the four anchor bolts at the base's corners, heads up, down through the mounting
 surface to nuts underneath. **Do not use the machine before those are in.** They are the
 only thing reacting the drive torque, and everything above them is sized on the
 assumption that the base does not move.
+
+Take the pins as the alignment gauge while you tighten them, which is JD2's own
+procedure and worth copying exactly: bolts hand tight, pins in, then "tighten the nuts
+as tightly as possible, while insuring the two pins are perfectly vertical and slide
+easily through their respective holes" [JD2-M32 p.1]. A pin that binds after the bolts
+are pulled down means the plate is not flat, and that is much easier to fix now.
+
+And before every bend, from the same manual: **make sure all pins are completely seated
+in their holes.** Their words for why - "failure to do this may cause damage to the
+bender links or worse yet the operator may slip and fall".
 
 ![main_assembled](assemblies/main_assembled.png)
 

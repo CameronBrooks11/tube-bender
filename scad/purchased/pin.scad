@@ -16,21 +16,38 @@
  * rather than hidden: it is up to a quarter inch of washers, and a builder who does not
  * know that assembles a joint that rattles.
  *
- * ## What holds it in depends on how often it comes out
+ * ## Every pin here drops in, head up, and nothing holds it
  *
- * A pivot pin is fitted once and forgotten, and a cotter is exactly right for it. An
- * INDEXED pin is pulled and replaced at every stroke of every bend - five times per bend
- * here - and a cotter is exactly wrong: nobody bends and unbends a split pin five times a
- * bend, and one that has been straightened twice is scrap. Those get a pin clip instead,
- * which comes off with a thumb.
+ * That is not a simplification, it is what the reference machine does. Searched end to end,
+ * the Model 32 manual contains no cotter, no clip, no snap ring and no retainer of any kind
+ * on any pin [JD2-M32]. They are plain pins, dropped into vertical holes, held by gravity,
+ * with one operating instruction covering the lot: "make sure all pins are completely
+ * seated in their holes... failure to do this may cause damage to the bender links or worse
+ * yet the operator may slip and fall" [JD2-M32 p.7].
  *
- * Either way the retainer is a BOM line. The holes were being drawn with nothing to go in
- * them.
+ * The reason it works is that every hole on this machine is VERTICAL. Nothing here ever
+ * turns a pin upside down: the die rotates about a vertical axis, so a pin that is upright
+ * at the start of a bend is upright at the end of it.
  *
- * The two clearances a pin gets are NOT the same number and must not be written as one.
- * A pivot pin turns in its hole for the life of the machine; an index pin is pulled and
- * repositioned by hand every few degrees of a bend, and JD2 drills its drive holes 1/8 in
- * oversize precisely so that is quick. See docs/design-basis.md section 7.
+ * The reason it MATTERS is that all of them come out. The frame pin is pulled to load a
+ * die and to get the drive links in; the drive pin is pulled at every stroke; the lock pin
+ * is lifted to release the die. A pin with a cotter on it is a pin you cannot pull, and the
+ * manual's own assembly step depends on being able to: bolts hand tight, pins in, then
+ * "tighten the nuts as tightly as possible, while insuring the two pins are perfectly
+ * vertical and slide easily through their respective holes" [JD2-M32 p.1]. The pins are the
+ * alignment gauge.
+ *
+ * ## The head goes on TOP, and on some pins it is the only thing holding them up
+ *
+ * `seat` records what is UNDER a pin, because the two cases are not equally forgiving:
+ *
+ * - **"base"** - the frame, followbar and lock pins sit over the base plate, and it is what
+ *   they land on. The head is then a handle and a stop for the plate above, not a structural
+ *   necessity.
+ * - **"stack"** - the drive, U-strap and spacer pins hang in the stack with nothing beneath
+ *   them, so the head IS what holds them up. A row with no head dimensions looked up draws
+ *   as a bare shank, and that is honest: nothing is holding that pin, in the drawing or on
+ *   the bench, until somebody looks the part up.
  *
  * Sets no $fn, so the resolution of the calling file carries through.
  */
@@ -96,60 +113,44 @@ function pin_slack(mm) = pin_usable_length(mm) - mm;
 //! what this stands in for.
 pin_end_allowance = 3;
 
-//! What holds a pin in, and it is not the same answer for every pin. See the file header:
-//! "cotter" for one that is fitted and forgotten, "clip" for one that is pulled and
-//! replaced every stroke.
-//!
-//! The SIZE of either is left open on purpose. Cotter geometry is looked up per row and is
-//! undef on every row but the measured one, so naming a cotter size for the rest would be
-//! exactly the invention the registry refuses. The row says which retainer and which pin it
-//! belongs to, and the number is a shopping trip like the pin's own.
-module pin_retainer(type, kind) {
-    vitamin(str("pin_retainer(", pin_name(type), ", ", kind, "): ",
-                kind == "clip" ? "Pin clip" : "Cotter pin",
-                " to suit a ", pin_size(type), " clevis pin",
-                kind == "clip" ? " that is pulled every stroke" : "",
-                ", NO ORDER NUMBER - this row is a hole in the BOM"));
-}
+//! Whether a head-seated pin's row knows what its head is - which is the only thing keeping
+//! that pin from dropping through, so it is worth being able to ask.
+function pin_head_is_known(type) = !is_undef(pin_head_diameter(type));
 
-//! Draw a clevis pin gripping `grip` mm of stack, head down, shank running up from z = 0,
-//! and bill it at the usable length you would order plus whatever holds it in.
+//! Draw a pin gripping `grip` mm of stack, shank running up from z = 0, and bill it at the
+//! usable length you would order plus whatever holds it in.
 //!
-//! A row with no head geometry looked up yet draws as a bare shank, which is what it is: an
-//! unspecified pin of a known diameter.
-module pin(type, grip, retainer = "cotter") {
-    d        = pin_diameter(type);
-    headed   = !is_undef(pin_head_diameter(type));
-    cottered = !is_undef(pin_cotter_hole(type));
-    length   = pin_usable_length(grip);
+//! `seat` is what stops it dropping: "base" for a pin that lands on the base plate and is
+//! therefore plain and headless, "head" for one that hangs in the stack on its own head,
+//! which is then drawn on TOP. `retainer` is what stops it lifting - "cotter", "clip", or
+//! "none" for a pin that is meant to come out. See the file header.
+//!
+//! A head-seated row with no head geometry looked up yet draws as a bare shank. That is
+//! honest rather than convenient: nothing is holding that pin up, in the drawing or on the
+//! bench, until somebody looks the part up.
+module pin(type, grip, seat = "stack") {
+    d      = pin_diameter(type);
+    headed = pin_head_is_known(type);
+    length = pin_usable_length(grip);
 
     // The key before the colon is the BOM's own identity for this part and stays in
     // millimetres in both systems, the way a part number would - it is what groups
     // identical items, not something anybody measures. Only the human half converts.
     vitamin(str("pin(", pin_name(type), ", ", round(length), "): Pin clevis ",
                 pin_size(type), " x ", fmt_length(length), " usable",
-                pin_is_orderable(type) ? str(", ", pin_part_no(type))
-                                       : ", NO ORDER NUMBER - this row is a hole in the BOM"));
-
-    pin_retainer(type, retainer);
-
-    end_run = cottered ? pin_cotter_from_end(type) : pin_end_allowance;
+                seat == "base" ? ", seats on the base plate" : "",
+                pin_is_orderable(type)
+                    ? str(", ", pin_part_no(type))
+                    : ", NO ORDER NUMBER - this row is a hole in the BOM"));
 
     color("silver") {
+        // On TOP. Every pin here goes in head up: on a stack-seated pin the head is the
+        // only thing holding it, and on a base-seated one it is the handle you pull it out
+        // by and the stop that keeps the plate above from lifting.
         if (headed)
-            translate_z(-pin_head_thickness(type))
+            translate_z(length)
                 cylinder(d = pin_head_diameter(type), h = pin_head_thickness(type));
 
-        render()
-            difference() {
-                cylinder(d = d, h = length + end_run);
-
-                // The hole IS the usable length: that is where the retainer goes and where
-                // the stack stops.
-                if (cottered)
-                    translate([0, 0, length])
-                        rotate([90, 0, 0])
-                            cylinder(d = pin_cotter_hole(type), h = d + 2 * eps, center = true);
-            }
+        cylinder(d = d, h = length + (headed ? 0 : pin_end_allowance));
     }
 }

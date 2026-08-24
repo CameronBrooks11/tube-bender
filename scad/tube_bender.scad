@@ -408,15 +408,27 @@ echo(str("pins:    frame ", pin_size(frame_pin), " (", fmt_force(frame_force), "
          pin_governing_mode(drive_force, t_centre, t_drive, pin_material_yield), ")"));
 echo(str("         followbar ", pin_size(followbar_pin), " (", fmt_force(followbar_force),
          "), U-strap ", pin_size(ustrap_pin)));
-// A pin is bought by its USABLE length - head underside to the cotter hole - and that comes
-// in quarter-inch steps, so a stack never fills one exactly. The difference is washers, and
-// a builder who is not told assembles a joint that rattles.
+// A pin is bought in quarter-inch steps of length, so a stack never fills one exactly. The
+// difference is washers, and a builder who is not told assembles a joint that rattles.
 frame_grip = layout_pin_grip(layers, "frame link lower");
-echo(str("         ordered by usable length in 1/4 in steps: the frame pin grips ",
+echo(str("         ordered in 1/4 in steps of length: the frame pin grips ",
          fmt_length(frame_grip), " and orders ", fmt_length(pin_usable_length(frame_grip)),
          ", so ", fmt_length(pin_slack(frame_grip)), " of washers under its head"));
-echo(str("         cotters hold the pivots; the drive and lock pins come out every stroke",
-         " and take clips instead"));
+// Every hole on this machine is vertical and every pin comes out, so nothing retains any of
+// them - which is the reference machine's answer too. See pin.scad's header.
+echo(str("         all of them drop in HEAD UP with no retainer, and every one comes out:",
+         " the frame pin to change a die, the drive pin at every stroke, the lock by hand"));
+echo(str("         frame, followbar and lock seat on the base plate; drive, U-strap and",
+         " spacer hang in the stack, where the head is what holds them"));
+// A head-seated pin is held up by its head and nothing else, so a row with no head looked
+// up is a real gap rather than a drawing detail. Not a DEPARTURE - it is the same missing
+// catalogue data the BOM already marks, and it closes when the rows are filled in.
+head_seated = [["drive", drive_pin], ["U-strap", ustrap_pin], ["spacer", spacer_bolt]];
+unknown_heads = [for (h = head_seated) if (!pin_head_is_known(h[1])) h[0]];
+for (h = unknown_heads)
+    echo(str("         TO ORDER: the ", h, " pin hangs in the stack on a head this registry",
+             " has no dimensions for - that row has to be looked up, it is the only thing",
+             " holding the pin up"));
 echo(str("         drive radius ", fmt_bare_length(nominal_r), " nominal -> ",
          fmt_length(drive_radius), " with the chosen pin"));
 echo(str("stack:   ", fmt_length(layout_height(layers)), " overall, ",
@@ -622,7 +634,7 @@ assembly("handle") {
     for (r = drive_link_spacer_radii(handle, pin_diameter(spacer_bolt)))
         rotate(drive_angle)
             translate([r, 0, layout_z(layers, "drive link lower")]) {
-                pin(spacer_bolt, layout_pin_grip(layers, "drive link lower"));
+                pin(spacer_bolt, layout_pin_grip(layers, "drive link lower"), "stack");
 
                 translate_z(t_drive)
                     structural_tube(spacer_tube, layout_drive_gap(layers));
@@ -641,10 +653,30 @@ assembly("handle") {
 //! plates' tails with its bolt left slack until a tube is in; and the die lock pin, which
 //! goes in from the top through whichever drive hole has come round under it.
 //!
+//! **Every pin drops in head up and nothing retains it** - no cotters, no clips. That is the
+//! reference machine's answer, not a shortcut: searched end to end, its manual has no
+//! retainer of any kind on any pin [JD2-M32]. It works because every hole here is vertical
+//! and the die turns about a vertical axis, so a pin that is upright at the start of a bend
+//! is upright at the end. And it has to work that way, because all of them come out - the
+//! frame pin to change a die, the drive pin at every stroke, the lock pin by hand.
+//!
+//! The frame, followbar and lock pins land on the base plate. The drive, U-strap and spacer
+//! pins hang in the stack, where the head is the only thing holding them up.
+//!
 //! Last, the four anchor bolts at the base's corners, heads up, down through the mounting
 //! surface to nuts underneath. **Do not use the machine before those are in.** They are the
 //! only thing reacting the drive torque, and everything above them is sized on the
 //! assumption that the base does not move.
+//!
+//! Take the pins as the alignment gauge while you tighten them, which is JD2's own
+//! procedure and worth copying exactly: bolts hand tight, pins in, then "tighten the nuts
+//! as tightly as possible, while insuring the two pins are perfectly vertical and slide
+//! easily through their respective holes" [JD2-M32 p.1]. A pin that binds after the bolts
+//! are pulled down means the plate is not flat, and that is much easier to fix now.
+//!
+//! And before every bend, from the same manual: **make sure all pins are completely seated
+//! in their holes.** Their words for why - "failure to do this may cause damage to the
+//! bender links or worse yet the operator may slip and fall".
 module main_assembly()
 assembly("main") {
     // BACKWARDS ON PURPOSE. NopSCADlib lists sub-assemblies in REVERSE order of first
@@ -664,7 +696,8 @@ assembly("main") {
         translate(concat(p, [layout_z(layers, "die plate lower")]))
             pin(ustrap_pin, layout_z(layers, "die plate upper")
                             + layout_thickness(layers, "die plate upper")
-                            - layout_z(layers, "die plate lower"));
+                            - layout_z(layers, "die plate lower"),
+                "stack");
 
     // The bolt that stops the tube sliding through the clamp, in from outboard.
     translate([clr + clamp_depth(tube, pin_diameter(ustrap_pin))
@@ -680,14 +713,16 @@ assembly("main") {
 
     translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d),
                      [layout_z(layers, "frame link lower")]))
-        pin(followbar_pin, layout_pin_grip(layers, "frame link lower"));
+        // Seats on the base plate, so no head; the cotter above the upper frame link is
+        // what holds that link down, because this machine has no frame bolts.
+        pin(followbar_pin, layout_pin_grip(layers, "frame link lower"), "base");
 
     explode(60)
         translate_z(layout_z(layers, "frame link upper"))
             frame_link_part();
 
     translate_z(layout_z(layers, "frame link lower"))
-        pin(frame_pin, layout_pin_grip(layers, "frame link lower"));
+        pin(frame_pin, layout_pin_grip(layers, "frame link lower"), "base");
 
     // Four anchor bolts at the base's corners, heads up, running down through whatever
     // the machine is bolted to.
@@ -713,13 +748,17 @@ assembly("main") {
     // spring back; the die turns into the pin during the first stroke.
     if (!is_undef(lock_pos))
         translate(concat(lock_pos, [layout_z(layers, "frame link lower")]))
-            // Pulled and re-seated at the end of every stroke, so a clip, not a cotter.
-            pin(lock_pin, layout_pin_grip(layers, "frame link lower"), "clip");
+            // Nothing on either end. It seats on the base plate and it is LIFTED to
+            // release the die, which is what JD2 does - theirs is parked by lifting and
+            // rotating it so a cross roll pin rests on the frame [JD2-M32 p.8].
+            pin(lock_pin, layout_pin_grip(layers, "frame link lower"), "base");
 
     if (!is_undef(drive_hole_r))
         rotate(drive_angle)
             translate([drive_hole_r, 0, layout_z(layers, "drive link lower")])
-                pin(drive_pin, layout_pin_grip(layers, "drive link lower"), "clip");
+                // Hangs in the stack, so its own head is the stop - and that head is all
+                // a pin pulled at every stroke should have on it.
+                pin(drive_pin, layout_pin_grip(layers, "drive link lower"), "stack");
 
     translate([clr, -tube_length_mm / 2 + forming_die_tail_length(tube, clr) / 2, 0])
         rotate([90, 0, 0])

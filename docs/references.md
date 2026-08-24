@@ -33,7 +33,19 @@ the 36 in handle and the 1-3/4 x .095 mild steel claim (p.2); hydraulic pressure
 10-ton cylinder on three test materials (p.3); springback of 3–4 degrees on 1-1/2 x .120
 mild steel and roughly double for chromoly (p.9, p.11); never lubricate a round-tube
 forming die groove (p.7).
-→ `docs/design-basis.md` §1, §2, §5, §7
+**Re-read for the frame assembly (p.1, p.7), and it settled a design question.** The frame
+pins are plain, loose, drop-in pins - two of them, the same part serving the die pivot and
+the followbar - and the assembly procedure makes them the ALIGNMENT GAUGE: frame bolts hand
+tight, pins in, then "tighten the 3/4 nuts as tightly as possible, while insuring the two
+pins are perfectly vertical and slide easily through their respective holes". Searched end
+to end the manual has **no cotter, clip, snap ring or retainer of any kind on any pin**; the
+word does not appear. One instruction covers all of them: "make sure all pins are completely
+seated in their holes... failure to do this may cause damage to the bender links or worse yet
+the operator may slip and fall". Also: the frame pair is clamped by 3/4 in bolts through 1 in
+OD spacer tubes, which continue through the base and the mounting surface to nuts underneath,
+so one set of bolts clamps the pair AND anchors the machine; and the die locking pin carries
+a 3/16 x 1-1/4 roll pin so it can be parked by lifting and rotating it (p.8).
+→ `docs/design-basis.md` §1, §2, §5, §7, §22; `scad/purchased/pin.scad`
 
 **Pro-Tools (n.d.).** *Tube and Pipe Bender, 105 Series Heavy Duty — specifications.*
 <https://pro-tools.com/products/manual-tube-and-pipe-bender-105-series-heavy-duty> **[VN]** · **read**

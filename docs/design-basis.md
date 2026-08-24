@@ -1004,7 +1004,7 @@ in-plane, and there the same check is the right one and is kept.
 The lesson is not "the check was too conservative". It was checking the wrong thing, and
 only looked conservative.
 
-## 20. What you actually order: lengths, and what holds a pin in
+## 20. What you actually order: stock lengths
 
 Two things stood between the parts list and someone using it, and both were invisible until
 somebody tried to read the list as a list.
@@ -1033,27 +1033,13 @@ quarter inch. That gap is **washers**, and a builder who is not told about it as
 joint that rattles and blames the clearances. At 1-1/2 in the frame pin grips 84.55 mm and
 orders 88.9, so 4.35 mm of washers go under its head. The report says so.
 
-### What holds a pin in is not one answer
+### What holds a pin in — see §22
 
-The holes were being drilled with nothing to go in them: no cotter, no clip, nothing on the
-parts list. Adding "a cotter pin per pin" would have been wrong, and the model already knew
-why — it distinguishes a **pivot** hole from an **index** hole (§7) precisely because those
-two pins live different lives.
+The holes were being drilled with nothing to go in them, so retainers were added: a cotter
+for pins fitted once, a clip for pins pulled every stroke. **That was wrong, and §22 records
+why and what replaced it.** The reference machine has no retainer of any kind on any pin.
 
-- A **pivot** pin — frame, followbar, U-strap, spacer — is fitted once and forgotten. A
-  cotter is exactly right.
-- An **indexed** pin — drive, and now the die lock — is pulled and re-seated at the end of
-  every stroke, **five times per bend**. A cotter is exactly wrong: nobody opens and closes
-  a split pin five times a bend, and one that has been straightened twice is scrap. Those
-  get a **pin clip**.
-
-Both are BOM lines now. Neither has a size, and that is deliberate: cotter geometry is
-looked up per registry row and is `undef` on every row but the one measured off the
-prototype's CAD, so naming a cotter size for the rest would be exactly the invention the
-registry exists to refuse. The row says which retainer and which pin it belongs to; the
-number is a shopping trip, like the pin's own.
-
-Worth knowing while doing that shopping: **ASME B18.8.1 stops at 1 in** [ASME-B18.8.1], and
+Worth knowing while doing the shopping: **ASME B18.8.1 stops at 1 in** [ASME-B18.8.1], and
 two of the pins here — the 1-1/8 in frame pin at the top of the range, and the 1-3/8 and
 1-1/2 in rows the series was extended to — are larger than the clevis pin standard covers.
 
@@ -1101,3 +1087,88 @@ obviously wrong in a way a flat list does not.
 They are machined. That is NopSCADlib's word for a part you make rather than buy, and it is
 not worth forking a library over — the flat parts now sit under **"CNC routed"**, which is
 right, and the file header says plainly what the other heading means.
+
+## 22. Where the pin heads go, and what the manual settled
+
+Building the assembly views surfaced a defect that had been in the model since the base
+existed: **the frame pin and the followbar pin had their heads inside the base plate.** Both
+were placed at the lower frame link's underside, head down. That link is welded flat to the
+base plate, so the head occupied −48.9 to −42.3 mm and the plate occupied −51.8 to −42.3.
+The head was entirely buried in it, and the plate has no holes but the four anchor bolts.
+
+It was invisible because the 1-1/8 in pin row has no head geometry looked up, so nothing was
+drawn. The one row that *has* been measured — the 3/4 in followbar pin, off the prototype's
+CAD — draws its head, and its head was inside the plate.
+
+### Three candidate answers, and none of them was right
+
+The options looked like: a headless pin bottoming on the plate; a through-bolt with a nut
+underneath; or clearance holes so the heads recess. The argument for the second is a good
+one and it is the right instinct — **proven design over bespoke** — because a bolt-and-nut
+pivot is a thing the world has built a million of, and a headless turned pin is a thing you
+would have to make.
+
+So the question was settled the only way it should have been: by reading what the machine
+this one is modelled on actually does. The Model 32 manual is a source this project already
+cites and had, until now, only mined for tooling practice.
+
+### What JD2 does
+
+Its frame pins are **plain, loose, drop-in pins**, and there are **two** of them — the same
+part serves the die pivot and the followbar. They are not bolted, not headed in the
+instructions, and not retained:
+
+> **D)** Insert the 1 1/4" Frame Pins in the holes shown above. Now, tighten the 3/4" nuts as
+> tightly as possible, while insuring the two pins are perfectly vertical and slide easily
+> through their respective holes. — [JD2-M32 p.1]
+
+That single step kills the bolt option outright, and for a reason neither candidate argument
+had reached: **the pins are the alignment gauge.** The frame bolts go in hand tight, the pins
+go in, and the nuts are torqued while you check the pins still slide. A pivot with a nut on
+the bottom cannot do that — and cannot be pulled at all once the machine is bolted to a
+bench, which you have to do to change a die ("Place the forming die into the bender using the
+1 1/4" frame pin", p.7) and to install the drive links (p.1).
+
+### And there are no retainers anywhere
+
+Searched end to end, the manual contains **no cotter, no clip, no snap ring, no retainer of
+any kind, on any pin**. The word does not appear. There is one instruction covering all of
+them:
+
+> Make sure all pins are completely seated in their holes. Failure to do this may cause
+> damage to the bender links or worse yet the operator may slip and fall. — [JD2-M32 p.7]
+
+That overrules §20's retainers, which were **an invention** — reasonable-looking, internally
+consistent, and not what anybody builds. Two facts make plain pins correct here and both are
+properties of this machine rather than of that one:
+
+- **Every hole is vertical.** The die turns about a vertical axis, so a pin that is upright
+  at the start of a bend is upright at the end. Nothing is ever inverted.
+- **Every pin comes out.** The frame pin to change a die, the drive pin at every stroke, the
+  lock pin by hand to release the die. A cotter is a thing that stops you doing that.
+
+### What was built
+
+**Every pin goes in head up.** That is the smallest change that fixes the defect, and it is
+better than the headless option on its own terms: the head is on top where there is room, it
+holds down the plate above it, it is the handle you pull the pin out by — and it keeps the
+part a catalogue clevis pin, so the project's one real order number survives. The headless
+idea would have thrown `98306A868` away and replaced it with a turned part.
+
+What is under a pin is recorded, because the two cases are not equally forgiving. The frame,
+followbar and lock pins sit over the base plate and land on it. The drive, U-strap and
+spacer pins hang in the stack, and there the **head is the only thing holding the pin up** —
+so a registry row with no head dimensions is a live gap, and the report names it as one:
+`TO ORDER: the drive pin hangs in the stack on a head this registry has no dimensions for`.
+
+### One thing this opens, and does not close
+
+§14 deleted the frame bolts, on the argument that the frame pair "is already joined at both
+ends — by the frame pin at the pivot, the followbar pin at the far end". With plain drop-in
+pins that is **located, not joined**: the upper frame link is now held down by two pin heads
+resting on it and nothing else.
+
+JD2 has both — loose pins *and* 3/4 in bolts through 1 in OD spacer tubes clamping the frame
+pair. Their frame bolts do not react the drive torque; they clamp the pair and set its
+spacing, and §14 sized them for the wrong job before deleting them. Whether to put them back
+is a separate decision and is not made here.
