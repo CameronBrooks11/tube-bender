@@ -13,6 +13,19 @@
 //! the clamp, the followbar, the tapered frame and drive links, the die lock that holds the
 //! die against springback between strokes, and a bench base or a pedestal.
 //!
+//! ## Driving it
+//!
+//! Open this file in OpenSCAD and use the **Customizer** (Window > Customizer). Everything
+//! that decides what the machine is has a control there: the tube, the bend, the plate
+//! stock, the die style, the mounting, and which part to look at. `tube_bender.json` beside
+//! this file carries a few worked configurations to start from, including the 1-1/2 in
+//! prototype and a sliced-die build for a shop with no mill.
+//!
+//! Nothing in the Customizer is a dimension of a part. Every part is derived from the tube
+//! and the loads, so choosing a 1 in tube resizes the die, the pins, the links, the base
+//! and the handle together - and the arithmetic behind that is echoed rather than hidden.
+//! `just report` prints it, or read the console after any render.
+//!
 //! Why the numbers are what they are, and what each one rests on, is in
 //! [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
 //! started from actually measured, and which of its features survived, is in
@@ -40,34 +53,113 @@ use <custom/pedestal.scad>
 use <custom/sliced_die.scad>
 use <custom/die_lock.scad>
 
-$fn = 90;
+//
+// CONFIGURATION - this block is the Customizer's tab set, and it is the interface to the
+// whole model.
+//
+// Every parameter here is a LITERAL: a string, a number or a boolean. That is not a style
+// preference, it is the only thing the Customizer can see. A variable assigned an
+// identifier or an expression is invisible to it - which is why the registries are reached
+// BY NAME here and turned into rows below. See AGENTS.md.
+//
+// Two more rules the Customizer imposes, both easy to break by accident:
+//   - parameters must be in THIS file. Anything in an include or a use is ignored.
+//   - parameters must appear before the first `{` in the file.
+//
+// The dropdown options are the registries' own names. An annotation cannot be computed, so
+// they are written out - by `just customizer`, from the registries, and `just check` fails
+// if the file and the registries have drifted apart. Do not edit them by hand.
+//
+
+/* [Tube] */
+
+// The tube this machine is built for. Tube is specified OD x wall; pipe is not, so look a
+// pipe's real OD up in a pipe table and pick the tube row that matches it.
+tube_name = "tube_1p500x0p095"; // [tube_0p125x0p028:1/8 in OD x 0.028 in wall, tube_0p250x0p035:1/4 in OD x 0.035 in wall, tube_0p375x0p049:3/8 in OD x 0.049 in wall, tube_0p500x0p049:1/2 in OD x 0.049 in wall, tube_0p625x0p049:5/8 in OD x 0.049 in wall, tube_0p750x0p065:3/4 in OD x 0.065 in wall, tube_0p875x0p065:7/8 in OD x 0.065 in wall, tube_1p000x0p065:1 in OD x 0.065 in wall, tube_1p125x0p065:1-1/8 in OD x 0.065 in wall, tube_1p250x0p065:1-1/4 in OD x 0.065 in wall, tube_1p375x0p083:1-3/8 in OD x 0.083 in wall, tube_1p500x0p095:1-1/2 in OD x 0.095 in wall, tube_1p625x0p095:1-5/8 in OD x 0.095 in wall, tube_1p750x0p095:1-3/4 in OD x 0.095 in wall, tube_2p000x0p120:2 in OD x 0.120 in wall]
+
+// How much straight tube to draw either side of the bend, mm. Drawing only - nothing is
+// sized from it.
+tube_length = 600; // [100:50:2000]
+
+/* [Bend] */
+
+// Angle to bend, degrees. The die carries this plus the few degrees of overbend the tube
+// springs back through.
+bend_angle = 180; // [15:5:180]
+
+// Centreline radius, mm. Leave at 0 for the tightest radius the trade actually sells at or
+// above the 3 x OD mandrel-less floor, which is what you want unless you have a reason.
+// Anything else is reported as a departure rather than refused.
+clr_override_mm = 0; // 0.1
+
+/* [Die] */
+
+// "machined" cuts the die from one thick plate and needs a mill. "sliced" stacks flat
+// plates a laser or waterjet can cut, and gives up groove wrap for it - how much is in the
+// report, and it is never the full 180 degrees.
+die_style = "machined"; // [machined, sliced]
+
+// Stock the sliced die's slices are cut from. Thinner follows the groove better and costs
+// more cuts. Ignored when the die is machined.
+slice_plate_name = "plate_0p125in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16 in, plate_0p250in:1/4 in, plate_0p3125in:5/16 in, plate_0p375in:3/8 in, plate_0p500in:1/2 in, plate_0p625in:5/8 in, plate_0p750in:3/4 in, plate_1p000in:1 in, plate_1p250in:1-1/4 in, plate_1p500in:1-1/2 in, plate_1p750in:1-3/4 in, plate_2p000in:2 in, plate_2p250in:2-1/4 in, plate_2p500in:2-1/2 in]
+
+// Stock for the plates that bolt to the die's faces. Their tails overhang the tube and are
+// the only thing the clamp can pin to.
+die_plate_name = "plate_0p250in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16 in, plate_0p250in:1/4 in, plate_0p3125in:5/16 in, plate_0p375in:3/8 in, plate_0p500in:1/2 in, plate_0p625in:5/8 in, plate_0p750in:3/4 in, plate_1p000in:1 in, plate_1p250in:1-1/4 in, plate_1p500in:1-1/2 in, plate_1p750in:1-3/4 in, plate_2p000in:2 in, plate_2p250in:2-1/4 in, plate_2p500in:2-1/2 in]
+
+// How many bolts hold each die plate to the die.
+die_plate_bolts = 6; // [3:12]
+
+/* [Plate stock] */
+
+// The drive links. These ARE the handle - there is no separate one.
+drive_plate_name = "plate_0p250in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16 in, plate_0p250in:1/4 in, plate_0p3125in:5/16 in, plate_0p375in:3/8 in, plate_0p500in:1/2 in, plate_0p625in:5/8 in, plate_0p750in:3/4 in, plate_1p000in:1 in, plate_1p250in:1-1/4 in, plate_1p500in:1-1/2 in, plate_1p750in:1-3/4 in, plate_2p000in:2 in, plate_2p250in:2-1/4 in, plate_2p500in:2-1/2 in]
+
+// The frame links: the parts that do not turn. They carry the followbar and the die lock.
+frame_plate_name = "plate_0p250in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16 in, plate_0p250in:1/4 in, plate_0p3125in:5/16 in, plate_0p375in:3/8 in, plate_0p500in:1/2 in, plate_0p625in:5/8 in, plate_0p750in:3/4 in, plate_1p000in:1 in, plate_1p250in:1-1/4 in, plate_1p500in:1-1/2 in, plate_1p750in:1-3/4 in, plate_2p000in:2 in, plate_2p250in:2-1/4 in, plate_2p500in:2-1/2 in]
+
+// The base plate the lower frame link is welded to.
+base_plate_name = "plate_0p375in"; // [plate_0p125in:1/8 in, plate_0p1875in:3/16 in, plate_0p250in:1/4 in, plate_0p3125in:5/16 in, plate_0p375in:3/8 in, plate_0p500in:1/2 in, plate_0p625in:5/8 in, plate_0p750in:3/4 in, plate_1p000in:1 in, plate_1p250in:1-1/4 in, plate_1p500in:1-1/2 in, plate_1p750in:1-3/4 in, plate_2p000in:2 in, plate_2p250in:2-1/4 in, plate_2p500in:2-1/2 in]
+
+/* [Mounting] */
+
+// "bench" bolts the base straight down onto whatever you have. "pedestal" stands it on a
+// post, which is what the bigger sizes need to be usable.
+mount = "pedestal"; // [bench, pedestal]
+
+// Height of the working plane above the floor, mm. The 490 N pull this whole machine is
+// sized on is only available to a BRACED operator, and the standard puts that at 510 to
+// 1780 mm - the report says which side of the band this lands on.
+pedestal_height = 950; // [400:10:1800]
+
+/* [View] */
+
+// What to draw: the whole machine, or one part on its own to look at.
+show = "assembly"; // [assembly, forming_die, die_plate, clamp, followbar, drive_link, frame_link, base, pedestal]
+
+// Facets per circle. 90 is the built default; drop it to 30 while dragging sliders and put
+// it back before exporting anything.
+facets = 90; // [12:6:180]
+
+/* [Hidden] */
+
+$fn = facets;
 
 //
-// Configuration. This becomes a set of config_<target>.scad files once there is more than
-// one thing to vary; for now the prototype size is the one being checked against.
+// The registry rows the names above stand for. A Customizer parameter can only be a
+// literal, so the configuration holds names and this is where they become rows.
 //
-tube        = tube_1p500x0p095;
-clr         = bend_default_clr(tube);
-bend_angle  = 180;
+tube        = tube_by_name(tube_name);
+drive_plate = plate_by_name(drive_plate_name);
+frame_plate = plate_by_name(frame_plate_name);
+base_plate  = plate_by_name(base_plate_name);
+die_plate_stock = plate_by_name(die_plate_name);
+slice_plate = plate_by_name(slice_plate_name);
 
-drive_plate = plate_0p250in;
-frame_plate = plate_0p250in;
-base_plate  = plate_0p375in;
-die_plate_stock = plate_0p250in;
-die_plate_bolts = 6;
-
-// "bench" bolts the base straight down; "pedestal" stands it on a post. The pedestal's
-// height is the working plane above the floor, and the braced band the 490 N ceiling
-// assumes is 510 to 1780 mm - the report says whether this lands in it.
-// "machined" cuts the die from one thick plate and needs a mill; "sliced" stacks flat
-// plates a laser or waterjet can cut, and gives up wrap for it - see the report.
-die_style       = "machined";
-slice_plate     = plate_0p125in;
-
-mount           = "pedestal";
-pedestal_height = 950;
-
-tube_length = 600;
+// 0 means "the radius the catalogue would pick", which is the answer almost every time.
+// An override is taken at face value; bend_departures() says if it is off the catalogue or
+// under the mandrel-less floor.
+clr = clr_override_mm > 0 ? clr_override_mm : bend_default_clr(tube);
 
 //
 // Everything below is derived. Read `just report` before believing any of it.
@@ -425,4 +517,20 @@ assembly("main") {
             tube(tube, tube_length);
 }
 
-main_assembly();
+//! Draw whatever `show` asks for. NopSCADlib's make_all does not come through here - it
+//! generates its own wrapper and calls the assembly and the `*_stl()` modules directly -
+//! so this is purely the interactive view, and a part selector costs the build nothing.
+module show_part(name) {
+    if      (name == "assembly")    main_assembly();
+    else if (name == "forming_die") forming_die_stl();
+    else if (name == "die_plate")   die_plate_stl();
+    else if (name == "clamp")       clamp_stl();
+    else if (name == "followbar")   followbar_stl();
+    else if (name == "drive_link")  drive_link_stl();
+    else if (name == "frame_link")  frame_link_stl();
+    else if (name == "base")        base_stl();
+    else if (name == "pedestal")    pedestal_stl();
+    else assert(false, str("show: no such part - ", name));
+}
+
+show_part(show);

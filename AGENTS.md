@@ -32,6 +32,35 @@ of what renders.
 A failing assert still exits 0 in OpenSCAD and writes a ~1 byte file, so nothing may be
 gated on `$?`. The recipe greps stderr for `ERROR` and uses file size as the backstop.
 
+## The configuration block is the interface, and the Customizer sets its rules
+
+The block at the top of `scad/tube_bender.scad` is what a user drives the model with, and
+OpenSCAD's Customizer decides what may be in it. Three rules, all easy to break by accident
+and all silent when broken - the parameter simply does not appear:
+
+- **Literals only.** A string, a number, a boolean, or a list of at most four numeric
+  literals. `tube = tube_1p500x0p095;` assigns an identifier, so the Customizer cannot see
+  it; that is why the block holds `tube_name = "tube_1p500x0p095";` and turns it into a row
+  with `tube_by_name()` below. Every registry carries a `*_by_name()` for this, and it
+  asserts rather than returning undef.
+- **This file only.** Anything assigned in an `include` or a `use` is ignored.
+- **Before the first `{`.** Everything after the first brace in the file is out of scope,
+  so the configuration goes at the top and `/* [Hidden] */` covers the derived block.
+
+Descriptions are a `//` comment on the line **above** the variable; the widget comes from a
+`//` annotation **after** it - `// [15:5:180]` for a slider, `// [a:Label, b:Label]` for a
+dropdown, a bare `// 0.1` for a spinbox step. Prose floating above a group of variables is
+documentation, not annotation, and produces bare unlabelled boxes.
+
+**The dropdown option lists are generated.** An annotation is a literal comment and cannot
+be computed, so the registry names appear in the configuration block as well as in the
+registry. `scripts/customizer.py` writes them from the registries - via OpenSCAD, so it is
+not a second parser of those files - and `just check-customizer` fails if the two have
+drifted. Run `just customizer` after adding a registry row; do not edit those lists by hand.
+
+Which registry a parameter draws on is a naming convention, not a table: `tube_name` takes
+the tube registry, anything ending `_plate_name` takes the plate registry.
+
 ## Registries are the source of every bought number
 
 Anything purchased is a row in `scad/purchased/`, following NopSCADlib's convention: a

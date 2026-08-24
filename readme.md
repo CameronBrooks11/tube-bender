@@ -14,6 +14,19 @@ from one plate or stacked from flat-cut slices, behind the same interface - its 
 the clamp, the followbar, the tapered frame and drive links, the die lock that holds the
 die against springback between strokes, and a bench base or a pedestal.
 
+## Driving it
+
+Open this file in OpenSCAD and use the **Customizer** (Window > Customizer). Everything
+that decides what the machine is has a control there: the tube, the bend, the plate
+stock, the die style, the mounting, and which part to look at. `tube_bender.json` beside
+this file carries a few worked configurations to start from, including the 1-1/2 in
+prototype and a sliced-die build for a shop with no mill.
+
+Nothing in the Customizer is a dimension of a part. Every part is derived from the tube
+and the loads, so choosing a 1 in tube resizes the die, the pins, the links, the base
+and the handle together - and the arithmetic behind that is echoed rather than hidden.
+`just report` prints it, or read the console after any render.
+
 Why the numbers are what they are, and what each one rests on, is in
 [docs/design-basis.md](docs/design-basis.md). What the Onshape prototype this was
 started from actually measured, and which of its features survived, is in

@@ -7,7 +7,7 @@ default:
     @just --list
 
 # Everything CI runs.
-check: check-scad check-sizes check-report
+check: check-scad check-customizer check-sizes check-report
 
 # Evaluate every SCAD file and report anything that does not build.
 check-scad:
@@ -48,6 +48,23 @@ check-scad:
         fi
     done < <(find scad -name '*.scad' -not -path '*/_archive/*' | sort)
     exit $failed
+
+# Rewrite the Customizer dropdowns in tube_bender.scad from the registries.
+customizer:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export OPENSCADPATH="{{LIBRARIES}}"
+    python3 scripts/customizer.py
+
+# Fail if those dropdowns no longer match the registries.
+check-customizer:
+    #!/usr/bin/env bash
+    # A Customizer annotation is a literal comment - it cannot be computed - so the list of
+    # sizes appears in the configuration block as well as in the registry it came from.
+    # That is one fact in two places, and this is what stops the copy going stale.
+    set -uo pipefail
+    export OPENSCADPATH="{{LIBRARIES}}"
+    python3 scripts/customizer.py --check
 
 # Build the BOM, DXFs, STLs, assembly views and the manual (NopSCADlib make_all).
 build:
@@ -102,7 +119,9 @@ check-sizes:
     for n in $names; do
         listed=0
         for e in "${expected[@]}"; do [ "$e" = "$n" ] && listed=1; done
-        {{OPENSCAD}} -D "tube=$n" -o "$tmp/s.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
+        # Driven through tube_name, the way the Customizer drives it, so the sweep also
+        # exercises the by-name lookup rather than reaching past it to the row.
+        {{OPENSCAD}} -D "tube_name=\"$n\"" -o "$tmp/s.csg" scad/tube_bender.scad 2>"$tmp/err" >/dev/null
         problem=""
         if grep -q '^ERROR' "$tmp/err"; then
             problem="$(grep -m1 '^ERROR' "$tmp/err" | sed 's/.*failed: //; s/ in file.*//' | cut -c1-72)"
