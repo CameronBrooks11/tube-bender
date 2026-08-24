@@ -64,7 +64,8 @@ use <custom/die_lock.scad>
 //
 // Two more rules the Customizer imposes, both easy to break by accident:
 //   - parameters must be in THIS file. Anything in an include or a use is ignored.
-//   - parameters must appear before the first `{` in the file.
+//   - parameters must appear before the first opening brace in the file, which is a long
+//     way below but not infinitely far.
 //
 // The dropdown options are the registries' own names. An annotation cannot be computed, so
 // they are written out - by `just customizer`, from the registries, and `just check` fails

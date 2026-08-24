@@ -44,8 +44,10 @@ and all silent when broken - the parameter simply does not appear:
   with `tube_by_name()` below. Every registry carries a `*_by_name()` for this, and it
   asserts rather than returning undef.
 - **This file only.** Anything assigned in an `include` or a `use` is ignored.
-- **Before the first `{`.** Everything after the first brace in the file is out of scope,
-  so the configuration goes at the top and `/* [Hidden] */` covers the derived block.
+- **Before the first brace.** Everything after the first opening brace in the file is out
+  of scope, so the configuration goes at the top and `/* [Hidden] */` covers the derived
+  block. Comments do not count - the lexer removes them - but do not write one that looks
+  like it does.
 
 Descriptions are a `//` comment on the line **above** the variable; the widget comes from a
 `//` annotation **after** it - `// [15:5:180]` for a slider, `// [a:Label, b:Label]` for a
