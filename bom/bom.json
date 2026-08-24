@@ -68,18 +68,8 @@
                 "colour": "[0, 0.572549, 0]",
                 "camera": "0,0,0,70,0,315,500"
             },
-            "die_plate.stl": {
-                "count": 2,
-                "colour": "darkorange",
-                "camera": "0,0,0,70,0,315,500"
-            },
             "clamp.stl": {
                 "count": 1,
-                "colour": "[0.862745, 0.0784314, 0.235294]",
-                "camera": "0,0,0,70,0,315,500"
-            },
-            "drive_link.stl": {
-                "count": 2,
                 "colour": "[0.862745, 0.0784314, 0.235294]",
                 "camera": "0,0,0,70,0,315,500"
             },
@@ -87,23 +77,29 @@
                 "count": 1,
                 "colour": "[0, 0.572549, 0]",
                 "camera": "0,0,0,70,0,315,500"
-            },
-            "frame_link.stl": {
-                "count": 2,
-                "colour": "SteelBlue",
-                "camera": "0,0,0,70,0,315,500"
-            },
-            "pedestal.stl": {
-                "count": 1,
-                "colour": "SteelBlue",
-                "camera": "0,0,0,70,0,315,500"
-            },
-            "base.stl": {
-                "count": 1,
-                "colour": "darkorange",
-                "camera": "0,0,0,70,0,315,500"
             }
         },
-        "routed": {}
+        "routed": {
+            "die_plate.dxf": {
+                "count": 2,
+                "colour": "darkorange"
+            },
+            "drive_link.dxf": {
+                "count": 2,
+                "colour": "[0.862745, 0.0784314, 0.235294]"
+            },
+            "frame_link.dxf": {
+                "count": 2,
+                "colour": "SteelBlue"
+            },
+            "pedestal_foot.dxf": {
+                "count": 1,
+                "colour": "SteelBlue"
+            },
+            "base.dxf": {
+                "count": 1,
+                "colour": "darkorange"
+            }
+        }
     }
 ]

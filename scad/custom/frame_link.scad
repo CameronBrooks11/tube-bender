@@ -104,20 +104,19 @@ function frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pi
 function frame_link_axis(tube, clr, followbar_pin_d) =
     frame_link_followbar_pos(tube, clr, followbar_pin_d) / frame_link_reach(tube, clr, followbar_pin_d);
 
-//! One frame link, lying on z = 0, pivot at the origin. `lock_pos` is where the die lock
-//! pin passes through, in this link's own frame - which is the world's, because the frame
-//! links are the parts that do not turn. Undef on a die with no drive holes to lock into.
-module frame_link(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d,
-                  lock_pos = undef, lock_pin_d = 0) {
+//! The profile one frame link is cut from, on z = 0 with the pivot at the origin.
+//! `lock_pos` is where the die lock pin passes through, in this link's own frame - which is
+//! the world's, because the frame links are the parts that do not turn. Undef on a die with
+//! no drive holes to lock into.
+module frame_link_2D(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d,
+                     lock_pos = undef, lock_pin_d = 0) {
     w    = frame_link_width(tube, clr, plate, moment_Nm, frame_pin_d, followbar_pin_d);
     fb   = frame_link_followbar_pos(tube, clr, followbar_pin_d);
-    axis = frame_link_axis(tube, clr, followbar_pin_d);
     lock = !is_undef(lock_pos);
 
-    render_2D_plate(plate)
-      plate_2D(plate,
-               (lock ? abs(fb[0]) + abs(lock_pos[0]) : abs(fb[0])) + w,
-               (lock ? abs(fb[1]) + abs(lock_pos[1]) : abs(fb[1])) + w)
+    plate_2D(plate,
+             (lock ? abs(fb[0]) + abs(lock_pos[0]) : abs(fb[0])) + w,
+             (lock ? abs(fb[1]) + abs(lock_pos[1]) : abs(fb[1])) + w)
         offset(0)
             difference() {
                 union() {

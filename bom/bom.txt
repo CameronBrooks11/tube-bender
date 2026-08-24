@@ -23,14 +23,16 @@ Vitamins:
  1|  1 Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm
 
 Printed:
- 1|  1 base.stl
  1|  1 clamp.stl
- 2|  2 die_plate.stl
- 2|  2 drive_link.stl
  1|  1 followbar.stl
  1|  1 forming_die.stl
- 2|  2 frame_link.stl
- 1|  1 pedestal.stl
+
+CNC cut:
+ 1|  1 base.dxf
+ 2|  2 die_plate.dxf
+ 2|  2 drive_link.dxf
+ 2|  2 frame_link.dxf
+ 1|  1 pedestal_foot.dxf
 
 Assemblies:
   1 main_assembly

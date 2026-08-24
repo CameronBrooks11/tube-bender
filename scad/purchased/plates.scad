@@ -53,7 +53,7 @@ function plate_smallest_at_least(t, from = plates) =
         len(above) == 0 ? undef
                         : [for (p = from) if (plate_thickness(p) == min(above)) p][0];
 
-use <plate.scad>; // plate_2D() declares the blank, render_2D_plate() extrudes the profile
+use <plate.scad>; // plate_2D() declares the blank, routed_plate() places the part
 
 //! The row called `name`, for a caller that has a string rather than a row.
 //!

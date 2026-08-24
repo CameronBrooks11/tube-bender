@@ -86,26 +86,28 @@ function pedestal_foot_bolt(post, force_N, height_mm, moment_Nm, yield_MPa, cand
         len(fits) == 0 ? undef
                        : [for (b = candidates) if (bolt_diameter(b) == min(fits)) b][0];
 
-//! The post and its foot, drawn with the top of the post at z = 0 and running down.
-module pedestal(post, plate, length, bolt_d) {
+//! The profile the foot is cut from, centred on the post's axis.
+//!
+//! The post is not here and neither is the weld. A pedestal is a WELDMENT - a purchased
+//! length of tube with a cut plate on the end of it - so the only thing this file makes is
+//! the plate, and the assembly is what puts the two together.
+//!
+//! The bore is the post's own INSIDE diameter, so the post's wall lands on the plate as an
+//! annulus rather than the post standing on a solid disc. What that buys is access: the
+//! joint can be run as a fillet outside the post and again inside the bore.
+module pedestal_foot_2D(post, plate, bolt_d) {
     s = pedestal_foot_size(post);
-    t = plate_thickness(plate);
 
-    translate_z(-length)
-        structural_tube(post, length);
+    plate_2D(plate, s[0], s[1])
+        offset(0)
+            difference() {
+                square(s, center = true);
 
-    translate_z(-length - t)
-        render_2D_plate(plate)
-          plate_2D(plate, s[0], s[1])
-            offset(0)
-                difference() {
-                    square(s, center = true);
+                circle(d = structural_id(post));
 
-                    circle(d = structural_id(post));
-
-                    for (p = pedestal_foot_bolts(post, bolt_d))
-                        translate(p) circle(d = bolt_clearance_hole_d(bolt_d));
-                }
+                for (p = pedestal_foot_bolts(post, bolt_d))
+                    translate(p) circle(d = bolt_clearance_hole_d(bolt_d));
+            }
 }
 
 //! Echo what the pedestal comes out as.

@@ -872,3 +872,45 @@ A die too small to carry drive holes is not indexed at all. JD2 drives those on 
 pin instead [JD2-M32 p.7], the link really does swing the whole arc, and there is nothing to
 lock into. **1/8 in and 1/4 in get no die lock.** That is what those sizes *are*, not a band
 they fall outside, so it is reported as a plain fact and not as a departure.
+
+## 18. What actually leaves the repo: cut files
+
+Everything above decides what the machine *is*. This section is about what a shop is handed.
+
+### The flat parts are cut, not printed
+
+Seven of the fifteen made parts are a 2D outline in plate: the two frame links, the two
+drive links, the two die plates, the base, and the pedestal foot. A laser, waterjet or
+plasma table makes those from a **DXF**, and until now the model emitted them only as STL —
+a mesh nobody can quote from.
+
+They are now `dxf()` parts. `just build` writes `dxfs/*.dxf`, and the BOM files them under
+**"CNC cut"** instead of under "Printed". What is left under "Printed" — the forming die,
+the clamp, the followbar — are the three parts with real depth to cut, and those genuinely
+want a solid model.
+
+### The profile is the deliverable, and the picture is drawn from it
+
+Each flat part's file now yields a `<part>_2D()` profile and nothing else; the extrusion
+belongs to whoever places it. `routed_plate()` is what places one, and it does four things
+at once: names the part on the BOM, declares the DXF, extrudes the profile for the assembly
+view, and colours it.
+
+The fourth thing is the one worth writing down. When NopSCADlib poses the assembly for the
+manual's renders it **imports the exported DXF** in place of the module's children. So the
+picture in `readme.md` is drawn from the cut file itself, not from a parallel description of
+it. A cut file that does not match the assembly cannot sit there quietly; it changes the
+picture.
+
+### Two things the DXF does not carry
+
+**Curves are polylines.** OpenSCAD writes a DXF at the current `$fn`, so every eye and every
+bolt hole arrives as a 90-segment polyline rather than an arc. Cutter CAM reads it fine and
+cuts it fine, and it is worth knowing before someone opens the file and wonders. Raise
+`facets` before exporting production files if the finish matters.
+
+**The sliced die is still not exported.** Its slice count varies with the tube — 14 at
+1-1/2 in — and NopSCADlib names a made part through a module, one module per file. A count
+that is a function of the configuration does not fit that, so the sliced die remains a
+report and a preview only. It is the last part of the machine with no cut file, and it is
+the one that needs the most of them.

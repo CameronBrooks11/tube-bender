@@ -76,9 +76,10 @@ function die_plate_bolt_positions(tube, clr, frame_pin_d, drive_pin_d, bolt_d, b
 function die_plate_bolt_shear_N(moment_Nm, clr, radius_mm, n) =
     bend_clamp_force_N(moment_Nm, clr) / n + moment_Nm * 1000 / (n * radius_mm);
 
-//! The plate, lying on z = 0, pivot at the origin, in the die's own frame.
-module die_plate(tube, clr, plate, bend_angle, frame_pin_d, drive_pin_d, clamp_pin_d,
-                 bolt_d, n_bolts) {
+//! The profile the plate is cut from, on z = 0, pivot at the origin, in the die's own
+//! frame.
+module die_plate_2D(tube, clr, plate, bend_angle, frame_pin_d, drive_pin_d, clamp_pin_d,
+                    bolt_d, n_bolts) {
     arc   = forming_die_arc(bend_angle);
     lc    = forming_die_tail_length(tube, clr);
     edge  = die_plate_tail_edge(tube, clr, clamp_pin_d);
@@ -87,8 +88,7 @@ module die_plate(tube, clr, plate, bend_angle, frame_pin_d, drive_pin_d, clamp_p
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
     r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);
 
-    render_2D_plate(plate)
-      plate_2D(plate, 2 * clr, clr + lc)
+    plate_2D(plate, 2 * clr, clr + lc)
         offset(0)
             difference() {
                 union() {

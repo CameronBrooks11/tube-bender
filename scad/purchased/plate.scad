@@ -4,7 +4,7 @@
  * @author Cameron K. Brooks
  * @copyright 2026
  * @description A plate part is a 2D profile and a thickness. The profile is the caller's -
- * these modules only declare what stock it consumes and extrude it.
+ * these modules only declare what stock it consumes, name it for the cutter, and extrude it.
  *
  * plate_2D() names the BLANK, not the finished profile, because a blank is what you order
  * and what a cutting shop quotes. A part list that says "one 1/4 in plate part" cannot be
@@ -48,11 +48,27 @@ module plate_2D(type, w, d) {
     children();
 }
 
-//! Extrude a 2D profile to the plate's thickness and give it the plate's colour, sitting
-//! on z = 0.
-module render_2D_plate(type) {
-    color(plate_colour(type))
+//! Put a plate part where it belongs in an assembly: colour it, name it for the BOM and
+//! for the DXF export, and extrude the profile that comes back.
+//!
+//! **The profile is the deliverable.** A flat part is CUT, not printed - it goes to a
+//! laser, waterjet or plasma table as a 2D outline - so it is billed as a routed part and
+//! the solid drawn in the assembly is made from the same profile the cutter gets, rather
+//! than being a second description of it. NopSCADlib swaps in the exported DXF itself when
+//! it poses the assembly for a render, which is what makes that a check rather than a
+//! claim: if the two ever disagree, the picture is the one that changes.
+//!
+//! `colour` is this part's colour in the assembly, the way stl_colour() is for a made
+//! part. NopSCADlib has no dxf_colour() to mirror that, so it is set here - on the geometry
+//! for the assembly view, and on $dxf_colour for the part's own render. Left off, a part
+//! is the colour of the stock it is cut from.
+module routed_plate(type, name, colour = undef) {
+    c = is_undef(colour) ? plate_colour(type) : colour;
+    $dxf_colour = c;
+
+    color(c)
         render()
             linear_extrude(plate_thickness(type))
-                children();
+                dxf(name)
+                    children();
 }

@@ -444,29 +444,74 @@ module forming_die_stl()
         forming_die(tube, clr, bend_angle, pin_diameter(frame_pin),
                     pin_diameter(drive_pin), plate_bolt_pos, bolt_diameter(plate_bolt));
 
-module die_plate_stl()
-    die_plate(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
-              pin_diameter(drive_pin), pin_diameter(ustrap_pin),
-              bolt_diameter(plate_bolt), die_plate_bolts);
-
 module clamp_stl()
     clamp(tube, clr, pin_diameter(ustrap_pin), bolt_diameter(clamp_bolt));
 
-module drive_link_stl()
-    drive_link(tube, clr, drive_plate, pin_diameter(frame_pin), pin_diameter(drive_pin),
-               drive_hole_r, bend_operator_force_N(moment, handle), handle,
-               pin_diameter(spacer_bolt));
-
-module frame_link_stl()
-    frame_link(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d,
-               lock_pos, pin_diameter(lock_pin));
-
 module followbar_stl() followbar(tube, fb_pin_d);
 
-module pedestal_stl() pedestal(post, base_plate, post_length, bolt_diameter(foot_bolt));
+//
+// The flat parts. These are CUT, not made - a laser, waterjet or plasma table takes a 2D
+// outline - so each one is a `<name>_dxf` module, which NopSCADlib exports to dxfs/<name>.dxf
+// and bills under "CNC cut" rather than under "Printed".
+//
+// The solid drawn in the assembly is extruded from the same profile, and when the manual's
+// views are posed NopSCADlib swaps in the exported FILE in its place. That is what makes it
+// a check rather than a claim: if the cut file and the picture ever disagree, the picture
+// is the one that changes.
+//
+// NOTE: OpenSCAD writes curves into a DXF as polylines at the current $fn, so a cutter gets
+// whatever `facets` was set to. Put it back to 90 before exporting anything a shop will
+// quote from.
+//
+module die_plate_dxf()
+    die_plate_2D(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
+                 pin_diameter(drive_pin), pin_diameter(ustrap_pin),
+                 bolt_diameter(plate_bolt), die_plate_bolts);
 
-module base_stl()
-    base(tube, clr, base_plate, link_w, fb_pin_d, bolt_diameter(anchor_bolt));
+module drive_link_dxf()
+    drive_link_2D(tube, clr, drive_plate, pin_diameter(frame_pin), pin_diameter(drive_pin),
+                  drive_hole_r, bend_operator_force_N(moment, handle), handle,
+                  pin_diameter(spacer_bolt));
+
+module frame_link_dxf()
+    frame_link_2D(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d,
+                  lock_pos, pin_diameter(lock_pin));
+
+module base_dxf()
+    base_2D(tube, clr, base_plate, link_w, fb_pin_d, bolt_diameter(anchor_bolt));
+
+module pedestal_foot_dxf()
+    pedestal_foot_2D(post, base_plate, bolt_diameter(foot_bolt));
+
+//
+// The same parts, placed: which stock each is cut from, what it is called on the BOM, and
+// what colour it takes in the manual. Written once here rather than at each use, because
+// the three travel together and drift if they are copied.
+//
+module base_part()
+    routed_plate(base_plate, "base", pp4_colour) base_dxf();
+
+module die_plate_part()
+    routed_plate(die_plate_stock, "die_plate", pp4_colour) die_plate_dxf();
+
+module drive_link_part()
+    routed_plate(drive_plate, "drive_link", pp2_colour) drive_link_dxf();
+
+module frame_link_part()
+    routed_plate(frame_plate, "frame_link", pp3_colour) frame_link_dxf();
+
+module pedestal_foot_part()
+    routed_plate(base_plate, "pedestal_foot", pp3_colour) pedestal_foot_dxf();
+
+//! The pedestal is a WELDMENT, not a part: a purchased post with a cut foot welded to it.
+//! Drawn with the top of the post at z = 0, running down.
+module pedestal_weldment() {
+    translate_z(-post_length)
+        structural_tube(post, post_length);
+
+    translate_z(-post_length - plate_thickness(base_plate))
+        pedestal_foot_part();
+}
 
 //! The stack, with the tube where it goes in. The handle, the followbar, the U-strap and
 //! the base are not built yet.
@@ -476,7 +521,7 @@ assembly("main") {
 
     for (layer = ["die plate lower", "die plate upper"])
         translate_z(layout_z(layers, layer))
-            stl_colour(pp4_colour) stl("die_plate") die_plate_stl();
+            die_plate_part();
 
     translate([clr, 0, 0])
         stl_colour(pp2_colour) stl("clamp") clamp_stl();
@@ -493,7 +538,7 @@ assembly("main") {
     for (layer = ["drive link lower", "drive link upper"])
         translate_z(layout_z(layers, layer))
             rotate(drive_angle)
-                stl_colour(pp2_colour) stl("drive_link") drive_link_stl();
+                drive_link_part();
 
     translate(concat(frame_link_followbar_pos(tube, clr, fb_pin_d)
                          - [followbar_pin_offset(tube, fb_pin_d), 0], [0]))
@@ -505,15 +550,15 @@ assembly("main") {
 
     for (layer = ["frame link lower", "frame link upper"])
         translate_z(layout_z(layers, layer))
-            stl_colour(pp3_colour) stl("frame_link") frame_link_stl();
+            frame_link_part();
 
     if (mount == "pedestal")
         translate_z(layout_z(layers, "base"))
-            stl_colour(pp3_colour) stl("pedestal") pedestal_stl();
+            pedestal_weldment();
 
     translate_z(layout_z(layers, "base"))
         rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1], frame_link_axis(tube, clr, fb_pin_d)[0]))
-            stl_colour(pp4_colour) stl("base") base_stl();
+            base_part();
 
     translate_z(layout_z(layers, "frame link lower"))
         pin(frame_pin, layout_pin_length(layers, "frame link lower"));
@@ -557,18 +602,19 @@ assembly("main") {
 }
 
 //! Draw whatever `show` asks for. NopSCADlib's make_all does not come through here - it
-//! generates its own wrapper and calls the assembly and the `*_stl()` modules directly -
-//! so this is purely the interactive view, and a part selector costs the build nothing.
+//! generates its own wrapper and calls the assembly and the `*_stl()` and `*_dxf()` modules
+//! directly - so this is purely the interactive view, and a part selector costs the build
+//! nothing.
 module show_part(name) {
     if      (name == "assembly")    main_assembly();
     else if (name == "forming_die") forming_die_stl();
-    else if (name == "die_plate")   die_plate_stl();
+    else if (name == "die_plate")   die_plate_part();
     else if (name == "clamp")       clamp_stl();
     else if (name == "followbar")   followbar_stl();
-    else if (name == "drive_link")  drive_link_stl();
-    else if (name == "frame_link")  frame_link_stl();
-    else if (name == "base")        base_stl();
-    else if (name == "pedestal")    pedestal_stl();
+    else if (name == "drive_link")  drive_link_part();
+    else if (name == "frame_link")  frame_link_part();
+    else if (name == "base")        base_part();
+    else if (name == "pedestal")    pedestal_weldment();
     else assert(false, str("show: no such part - ", name));
 }
 

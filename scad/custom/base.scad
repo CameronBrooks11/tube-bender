@@ -107,8 +107,9 @@ function base_anchor_bolt(tube, clr, link_width, followbar_pin_d, moment_Nm, for
 //! mild steel shrugs at 1 MPa and softwood does not.
 function base_bearing_MPa(force_N, size) = force_N / (size[0] * size[1]);
 
-//! The base plate, lying on z = 0 with its long axis along the frame link.
-module base(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
+//! The profile the base plate is cut from, on z = 0 with its long axis along the frame
+//! link.
+module base_2D(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
     size  = base_size(tube, clr, link_width, followbar_pin_d);
     inset = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1;
     mid   = frame_link_reach(tube, clr, followbar_pin_d) / 2;
@@ -116,8 +117,7 @@ module base(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
     assert(inset * 2 < min(size),
            "base: the anchor bolts do not fit inside the plate - the frame link is too small for this load");
 
-    render_2D_plate(plate)
-      plate_2D(plate, size[0], size[1])
+    plate_2D(plate, size[0], size[1])
         offset(0)
             difference() {
                 translate([mid, 0])

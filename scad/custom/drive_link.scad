@@ -135,9 +135,10 @@ function drive_link_handle_interface(tube, clr, handle_force_N, handle_length_mm
     let (r = drive_link_socket_radius(tube, clr))
         [r, handle_force_N * (handle_length_mm - r), handle_force_N];
 
-//! One drive link, lying on z = 0, pivot at the origin, drive hole out along +x.
-module drive_link(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm,
-                  handle_force_N, handle_length_mm, spacer_bolt_d) {
+//! The profile one drive link is cut from, on z = 0, pivot at the origin, drive hole out
+//! along +x.
+module drive_link_2D(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm,
+                     handle_force_N, handle_length_mm, spacer_bolt_d) {
     w  = drive_link_width(plate, handle_force_N, handle_length_mm, drive_radius_mm,
                           frame_pin_d, drive_pin_d);
     rs = drive_link_socket_radius(tube, clr);
@@ -152,8 +153,7 @@ module drive_link(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm,
     assert(sp[0] > rs,
            "drive link: the spacer bolts land inside the die's sweep - the handle is too short to grip");
 
-    render_2D_plate(plate)
-      plate_2D(plate, handle_length_mm + w, w)
+    plate_2D(plate, handle_length_mm + w, w)
         // offset(0) for the same reason the die needs one: the hull and the eyes meet on
         // seams that union leaves degenerate, and the extrusion of that will not build.
         offset(0)

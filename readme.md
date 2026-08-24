@@ -76,15 +76,17 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm |
 | &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;27&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  | | **3D printed parts** |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;die_plate.stl |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;drive_link.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
 | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;forming_die.stl |
-| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;frame_link.stl |
-| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;pedestal.stl |
-| &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;11&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+| &nbsp;&nbsp;3&nbsp; | &nbsp;&nbsp;3&nbsp; | &nbsp;&nbsp;Total 3D printed parts count |
+|  | | **CNC routed parts** |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;base.dxf |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;die_plate.dxf |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;drive_link.dxf |
+| &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;frame_link.dxf |
+| &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;pedestal_foot.dxf |
+| &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp;Total CNC routed parts count |
 
 <span></span>
 [Top](#TOP)
@@ -117,19 +119,22 @@ started from actually measured, and which of its features survived, is in
 
 ### 3D Printed parts
 
-| 1 x [base.stl](stls/base.stl) | 1 x [clamp.stl](stls/clamp.stl) | 2 x [die_plate.stl](stls/die_plate.stl) |
+| 1 x [clamp.stl](stls/clamp.stl) | 1 x [followbar.stl](stls/followbar.stl) | 1 x [forming_die.stl](stls/forming_die.stl) |
 |---|---|---|
-| ![base.stl](stls/base.png) | ![clamp.stl](stls/clamp.png) | ![die_plate.stl](stls/die_plate.png) 
+| ![clamp.stl](stls/clamp.png) | ![followbar.stl](stls/followbar.png) | ![forming_die.stl](stls/forming_die.png) 
 
 
-| 2 x [drive_link.stl](stls/drive_link.stl) | 1 x [followbar.stl](stls/followbar.stl) | 1 x [forming_die.stl](stls/forming_die.stl) |
+
+### CNC Routed parts
+
+| 1 x [base.dxf](dxfs/base.dxf) | 2 x [die_plate.dxf](dxfs/die_plate.dxf) | 2 x [drive_link.dxf](dxfs/drive_link.dxf) |
 |---|---|---|
-| ![drive_link.stl](stls/drive_link.png) | ![followbar.stl](stls/followbar.png) | ![forming_die.stl](stls/forming_die.png) 
+| ![base.dxf](dxfs/base.png) | ![die_plate.dxf](dxfs/die_plate.png) | ![drive_link.dxf](dxfs/drive_link.png) 
 
 
-| 2 x [frame_link.stl](stls/frame_link.stl) | 1 x [pedestal.stl](stls/pedestal.stl) |
+| 2 x [frame_link.dxf](dxfs/frame_link.dxf) | 1 x [pedestal_foot.dxf](dxfs/pedestal_foot.dxf) |
 |---|---|
-| ![frame_link.stl](stls/frame_link.png) | ![pedestal.stl](stls/pedestal.png) 
+| ![frame_link.dxf](dxfs/frame_link.png) | ![pedestal_foot.dxf](dxfs/pedestal_foot.png) 
 
 
 

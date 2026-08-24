@@ -115,12 +115,28 @@ Clipper's cleanup and the same model builds. `render()` does not fix it.
 Note also that **exporting `.csg` does not build the mesh**, so `just check-scad` cannot
 catch this class of fault at all. Export an STL or a PNG when the geometry is in question.
 
-## The BOM says "Printed" for machined parts
+## A flat part is a DXF, a machined part is an STL
 
-NopSCADlib has two categories for a made part, `stl()` and `dxf()`. The forming die is
-machined, so it goes under `stl()` and the BOM files it under "Printed". The stock it is
-cut from is declared separately as a `vitamin()`, because a parts list has to say what to
-*buy*.
+NopSCADlib has two categories for a made part and they are not interchangeable here:
+
+- **`dxf()` → "CNC cut"** for anything a laser, waterjet or plasma table makes from a 2D
+  outline: both links, the die plates, the base, the pedestal foot. The profile lives in a
+  `<part>_2D()` module in the part's own file; `<name>_dxf()` in `tube_bender.scad` is what
+  `dxfs.py` finds and exports, and the module name IS the file name.
+- **`stl()` → "Printed"** for anything with real depth to cut: the forming die, the clamp,
+  the followbar. "Printed" is NopSCADlib's word, not ours; these are machined.
+
+Place a cut part with `routed_plate(stock, name, colour)`, never by extruding the profile
+by hand. It names the part for the BOM, declares the DXF, extrudes the profile for the
+assembly view **and** sets the colour — and when the manual's views are posed NopSCADlib
+imports the exported file instead of the children, so the picture in the manual is drawn
+from the cut file itself. That is the check: the two cannot drift apart quietly.
+
+Whichever category a part is in, the stock it comes from is declared separately as a
+`vitamin()`, because a parts list has to say what to *buy*.
+
+**DXF arcs are polylines at the current `$fn`.** A cutter gets whatever `facets` was set to
+when the file was written.
 
 ## Units: imperial identity, millimetre arithmetic, and one place that converts
 
