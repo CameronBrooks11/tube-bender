@@ -207,6 +207,21 @@ threaded through signatures that have nothing else to do with it. Unset means me
 fault in one is invisible from the other. `check-sizes` stays metric on purpose: undef
 reaches the report whatever the units, and a units fault does not depend on the size.
 
+## Clear space between the frame links is derived, not chosen
+
+Two things now have to live in the gap between the frame links without ever being hit — the
+die lock pin and the frame ties — and both find their place the same way: take out everything
+that turns or sits there, and what is left is the window.
+
+Everything blocked starts at the front of the machine, so it merges into one band containing
+zero, and the window is its complement. The three blockers are the die plate's **tail** (which
+reaches half again as far as the CLR and carries that through the die's whole rotation), the
+**drive links** (swing plus their own half-width, asked at the radius in question), and the
+**followbar** (fixed, but big, and often the one that sets the limit).
+
+Do not place anything in that gap by picking coordinates. Derive it, and report the window's
+width so a configuration that closes it says so.
+
 ## The three gates, and what each one cannot see
 
 `check-scad` evaluates every file once, at its defaults, in both directions. It cannot see

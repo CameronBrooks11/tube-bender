@@ -7,7 +7,7 @@
         "count": 1,
         "assemblies": {},
         "vitamins": {
-            "plate_2D(plate_0p375in, 283, 174): Plate mild steel 3/8 in, blank 283.44 x 173.85 mm": {
+            "plate_2D(plate_0p375in, 417, 259): Plate mild steel 3/8 in, blank 416.59 x 258.61 mm": {
                 "count": 1
             },
             "structural_tube(structural_2p250x0p120, 898): Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm": {
@@ -16,7 +16,7 @@
             "plate_2D(plate_0p375in, 171, 171): Plate mild steel 3/8 in, blank 171.45 x 171.45 mm": {
                 "count": 1
             },
-            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309.09 x 232.97 mm": {
+            "plate_2D(plate_0p250in, 369, 211): Plate mild steel 1/4 in, blank 368.73 x 210.75 mm": {
                 "count": 1
             }
         },
@@ -121,14 +121,23 @@
             "pin(pin_0p750in, 89): Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868": {
                 "count": 1
             },
-            "plate_2D(plate_0p250in, 309, 233): Plate mild steel 1/4 in, blank 309.09 x 232.97 mm": {
+            "plate_2D(plate_0p250in, 369, 211): Plate mild steel 1/4 in, blank 368.73 x 210.75 mm": {
                 "count": 1
             },
             "pin(pin_1p125in, 89): Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1
             },
+            "bolt(bolt_0p3125in, 127): Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 2
+            },
+            "structural_tube(structural_0p500x0p065, 72): Tube 1/2 in OD x 0.065 in wall, mild steel, length 71.85 mm": {
+                "count": 2
+            },
+            "bolt(bolt_0p3125in, 44): Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
+                "count": 4
+            },
             "bolt(bolt_0p500in, 44): Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
-                "count": 8
+                "count": 4
             },
             "pin(pin_0p875in, 89): Pin clevis 7/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 1

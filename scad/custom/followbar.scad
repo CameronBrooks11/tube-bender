@@ -66,6 +66,24 @@ function followbar_height(tube) = forming_die_thickness(tube);
 //! put "1/4 in plate, faced to 44.45 mm" on the bill of materials.
 function followbar_blank(tube) = plate_smallest_at_least(followbar_height(tube));
 
+//! The angles the block occupies as seen from the pivot, [min, max] SIGNED degrees.
+//!
+//! The followbar does not turn, but it is a big block sitting between the frame links and it
+//! lands right where the space behind the die runs out - at 1-1/2 in it spans -55 to -27
+//! degrees, and the die's tail only reaches -43. So anything looking for clear air between
+//! the frame links has to take the followbar out as well as the parts that move, and it is
+//! the followbar that sets the limit rather than the die.
+//!
+//! Signed rather than wrapped to 0-360, because every corner is outboard and downstream of
+//! the pivot - x is at least the CLR and y is at most half the block short of the station -
+//! so all four angles sit in the fourth quadrant and there is no wrap to handle.
+function followbar_angles(tube, clr, pin_d) =
+    let (d  = followbar_depth(tube, pin_d),
+         lf = bend_followbar_length(tube),
+         st = bend_followbar_station(tube, clr),
+         a  = [for (x = [clr, clr + d], y = [-st - lf / 2, -st + lf / 2]) atan2(y, x)])
+        [min(a), max(a)];
+
 //! Bearing pressure on the tube, MPa, taken over the projected area the groove presses on.
 //! Reported, not checked - the tube is being deliberately deformed a few millimetres away,
 //! so there is no meaningful allowable here, only a number worth seeing.

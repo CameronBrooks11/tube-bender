@@ -32,15 +32,19 @@ use <../utils/units.scad>
 use <../purchased/plate.scad>
 use <../utils/weld.scad>
 use <frame_link.scad>
+use <forming_die.scad>   // die_web(), the margin the plate stands out by
 
 include <../utils/bend.scad>;
 
-//! How far the plate stands out past the bolts and the frame link, mm.
+//! How far the plate stands out past the frame link it is welded to, mm.
 //!
-//! REASONED, NOT CITED: one bolt diameter beyond the bolt's own edge distance. It is a
-//! spreader, so more is better and the limit is only material; this is the least that
-//! looks deliberate.
-function base_margin(bolt_d) = bolt_clearance_hole_d(bolt_d);
+//! Enough for an anchor bolt to sit outside the link with a web to spare: the bolt keeps its
+//! own edge distance off the plate's edge, and this puts its centre one web clear of the
+//! link's outline. So the margin is derived rather than chosen - the only reasoned part is
+//! the web, and that is `die_web()`, the dimension this model uses everywhere for "leave a
+//! bit of room beside something".
+function base_margin(tube, bolt_d) =
+    plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1 + die_web(tube);
 
 // There was a base_nominal_anchor_radius() here, to size a first bolt against a nominal
 // inset before the real one was known. base_anchor_bolt() stopped needing it when the
@@ -50,29 +54,39 @@ function base_margin(bolt_d) = bolt_clearance_hole_d(bolt_d);
 // called it, so nothing noticed. This is the missing-argument failure AGENTS.md warns
 // about, sitting in the file for however long.
 
-//! The radius a bolt of `bolt_d` actually gets, once its own edge distance is taken out of
-//! the plate. Always SMALLER than the nominal, so the load goes UP when a bolt is chosen -
-//! which is why one sizing pass is not enough. A 3/8 in bolt picked against the nominal
-//! radius came out 1.6 % over its own allowable at the radius it then had.
-function base_actual_anchor_radius(tube, clr, link_width, followbar_pin_d, bolt_d) =
-    base_anchor_radius(tube, clr, link_width, followbar_pin_d,
-                       plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1);
+//! The plate, as [[x0, y0], [x1, y1]] mm in the frame link's own frame - which IS the
+//! world's, so nothing has to be rotated to place it.
+//!
+//! It is the link's bounding box plus a margin. Set by the footprint it has to weld to and
+//! stand on, not by any fastener - though the margin has to know the bolt, because the bolt
+//! has to fit outside the link.
+function base_rect(extents, tube, bolt_d) =
+    let (m = base_margin(tube, bolt_d))
+        [extents[0] - [m, m], extents[1] + [m, m]];
 
-//! Plan size of the plate, [length, width] mm, along the frame link's axis and across it.
-//! Set by the footprint it has to weld to and stand on, not by any fastener.
-function base_size(tube, clr, link_width, followbar_pin_d) =
-    [frame_link_reach(tube, clr, followbar_pin_d) + link_width, 2 * link_width];
+//! Plan size of the plate, [x, y] mm.
+function base_size(rect) = rect[1] - rect[0];
 
-//! The four anchor bolts, [x, y] each, in the plate's own frame - one inset at each corner.
-function base_anchor_positions(tube, clr, link_width, followbar_pin_d, inset) =
-    let (size = base_size(tube, clr, link_width, followbar_pin_d))
+//! Centre of the plate, [x, y] mm. NOT the pivot: the link is a star with three arms on one
+//! side, so its box is nowhere near centred on the pin everything turns about.
+function base_centre(rect) = (rect[0] + rect[1]) / 2;
+
+//! The four anchor bolts, [x, y] each - one inset at each corner.
+function base_anchor_positions(rect, bolt_d) =
+    let (i = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1,
+         c = base_centre(rect),
+         s = base_size(rect))
         [for (sx = [-1, 1], sy = [-1, 1])
-             [sx * (size[0] / 2 - inset), sy * (size[1] / 2 - inset)]];
+             c + [sx * (s[0] / 2 - i), sy * (s[1] / 2 - i)]];
 
 //! Distance from the pattern's centre to each anchor bolt, mm - the arm the torque works
 //! on. FOUR bolts, not two: the shear in each is `M / (4 r)`.
-function base_anchor_radius(tube, clr, link_width, followbar_pin_d, inset) =
-    norm(base_anchor_positions(tube, clr, link_width, followbar_pin_d, inset)[0]);
+//!
+//! Measured from the bolt group's own centroid, not from the pivot, which is right because
+//! a couple is a free vector: the drive torque about the pin is the same torque about the
+//! group, and it is the group that has to resist it.
+function base_anchor_radius(rect, bolt_d) =
+    norm(base_anchor_positions(rect, bolt_d)[0] - base_centre(rect));
 
 //! Shear in each of the four anchor bolts, N.
 function base_anchor_shear_N(moment_Nm, radius_mm, force_N) =
@@ -90,12 +104,14 @@ function base_anchor_shear_N(moment_Nm, radius_mm, force_N) =
 //! Testing each candidate against its own consequences settles it in one go and cannot be
 //! marginal by construction. `candidates` is passed rather than defaulted because a
 //! default argument cannot see a list this file does not own.
-function base_anchor_bolt(tube, clr, link_width, followbar_pin_d, moment_Nm, force_N,
-                          yield_MPa, candidates) =
+//! Its own consequences now include the PLATE: a bigger bolt wants a bigger margin, which
+//! makes the plate bigger, which makes its radius bigger. That pulls the opposite way to the
+//! edge distance and does not change the shape of the answer.
+function base_anchor_bolt(extents, tube, moment_Nm, force_N, yield_MPa, candidates) =
     let (fits = [for (b = candidates)
                      if (base_anchor_shear_N(moment_Nm,
-                             base_actual_anchor_radius(tube, clr, link_width,
-                                                       followbar_pin_d, bolt_diameter(b)),
+                             base_anchor_radius(base_rect(extents, tube, bolt_diameter(b)),
+                                                bolt_diameter(b)),
                              force_N)
                          <= bend_anchor_bolt_allowable_N(bolt_diameter(b), yield_MPa))
                          bolt_diameter(b)])
@@ -127,12 +143,11 @@ function base_weld_load_N_per_mm(tube, clr, link_width, followbar_pin_d, moment_
 //! mild steel shrugs at 1 MPa and softwood does not.
 function base_bearing_MPa(force_N, size) = force_N / (size[0] * size[1]);
 
-//! The profile the base plate is cut from, on z = 0 with its long axis along the frame
-//! link.
-module base_2D(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
-    size  = base_size(tube, clr, link_width, followbar_pin_d);
+//! The profile the base plate is cut from, on z = 0, in the frame link's own frame - which
+//! is the world's, so it is drawn where it goes and nothing rotates it.
+module base_2D(rect, plate, bolt_d) {
+    size  = base_size(rect);
     inset = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1;
-    mid   = frame_link_reach(tube, clr, followbar_pin_d) / 2;
 
     assert(inset * 2 < min(size),
            "base: the anchor bolts do not fit inside the plate - the frame link is too small for this load");
@@ -140,21 +155,20 @@ module base_2D(tube, clr, plate, link_width, followbar_pin_d, bolt_d) {
     plate_2D(plate, size[0], size[1])
         offset(0)
             difference() {
-                translate([mid, 0])
-                    square([size[0], size[1]], center = true);
+                translate(base_centre(rect))
+                    square(size, center = true);
 
-                for (p = base_anchor_positions(tube, clr, link_width, followbar_pin_d, inset))
-                    translate(p + [mid, 0])
+                for (p = base_anchor_positions(rect, bolt_d))
+                    translate(p)
                         circle(d = bolt_clearance_hole_d(bolt_d));
             }
 }
 
 //! Echo what the anchorage comes out as.
-module base_report(tube, clr, plate, link_plate, link_width, followbar_pin_d, moment_Nm,
-                   force_N, bolt, bolt_yield, working_height) {
-    size   = base_size(tube, clr, link_width, followbar_pin_d);
-    inset  = plate_eye_radius(bolt_clearance_hole_d(bolt_diameter(bolt))) + 1;
-    r      = base_anchor_radius(tube, clr, link_width, followbar_pin_d, inset);
+module base_report(rect, tube, clr, plate, link_plate, link_width, followbar_pin_d,
+                   moment_Nm, force_N, bolt, bolt_yield, working_height) {
+    size   = base_size(rect);
+    r      = base_anchor_radius(rect, bolt_diameter(bolt));
     shear  = base_anchor_shear_N(moment_Nm, r, force_N);
     allow  = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
     // The weld runs along the frame link's EDGE, on top of this plate: a lap joint, so the

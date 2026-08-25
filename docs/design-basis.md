@@ -547,11 +547,15 @@ What replaced it:
   member.
 - The torque leaves through **four anchor bolts at the base plate's corners**. Four bolts
   on a wide rectangle instead of two on a narrow one divides the shear by four and roughly
-  doubles the arm at the same time. At 1-1/2 in that is 1890 N per bolt against 3167 N
-  allowable, on 1/2 in bolts.
+  doubles the arm at the same time.
 
 The plate's size comes from the footprint it has to weld to and stand on, not from any
 fastener, which is what breaks the circularity.
+
+> **The second bullet was wrong, and §23 replaces it.** Those pins are plain and loose:
+> they *locate* the pair, they do not *join* it. The frame bolts came back — not to react
+> the torque, which is what they were wrongly sized for and rightly failed at, but to hold
+> the two links at a fixed gap. The first and third bullets stand.
 
 ### Sizing anything against its own edge distance needs two passes
 
@@ -1172,3 +1176,109 @@ JD2 has both — loose pins *and* 3/4 in bolts through 1 in OD spacer tubes clam
 pair. Their frame bolts do not react the drive torque; they clamp the pair and set its
 spacing, and §14 sized them for the wrong job before deleting them. Whether to put them back
 is a separate decision and is not made here.
+
+## 23. The frame ties, and a bullet that was wrong
+
+§14 deleted the frame bolts and gave three reasons. Two of them were right. The middle one —
+that the pair "is already joined at both ends, by the frame pin at the pivot, the followbar
+pin at the far end" — assumed those pins **join** the frame. §22 established that they are
+plain, loose, drop-in pins. They *locate* the pair. Nothing joined it.
+
+So until now the upper frame link was a 6 kg plate resting on three pin heads, and pulling
+the frame pin to change a die took it off with them.
+
+### The job the frame bolts actually do
+
+§14 sized them to react the drive torque out through the mounting surface, found the span
+impossible at both ends of the range, and deleted them. **That was the wrong job.** On the
+reference machine the frame bolts do not react the drive torque either — they clamp the two
+frame links to a fixed spacing through a length of tube, and they happen to continue on
+through the base to nuts underneath, which is what anchors the machine. One set of fasteners,
+two jobs, and §14 only analysed the second.
+
+This machine keeps the two jobs apart: four anchor bolts at the base plate's corners react
+the torque (that reasoning still stands, and the arm is better), and two frame ties hold the
+frame together. What makes a tie a *bolt through a tube* rather than just a bolt is that the
+tube sets the gap — so a tie can be pulled up hard without pinching the die and the drive
+links between the frame plates.
+
+### The load nobody had derived: the handle's own weight
+
+**THE LINK IS THE HANDLE** (§14). There is no separate lever to pick up and put down, so two
+metres and nine kilos of drive link hang off this machine permanently, and that weight has to
+go somewhere. Nothing in the model carried it.
+
+Where it goes: the pair sags, and a sagging cantilever pivots about whatever it last touches —
+the die plate's outer edge, which the upper drive link lies on. Everything inboard of that
+edge goes **up**, including the drive link's own tail behind the pivot, which then bears on
+the upper frame link. Nothing else is above it.
+
+```
+lift = W (r_centroid - r_bearing) / (r_bearing + w/2)
+```
+
+with the centroid integrated over the same taper the mass is. It scales alarmingly, because
+both the handle's length and its mass grow with the tube:
+
+| tube | handle | pair | lift |
+|---|---|---|---|
+| 1/2 in | 151 mm | 0.5 kg | **0 N** — the handle does not reach past the die |
+| 1 in | 590 mm | 2.7 kg | 22 N |
+| 1-1/2 in | 1947 mm | 9.0 kg | **336 N** |
+| 2 in | 4403 mm | 26.4 kg | **2129 N** |
+
+Two kilonewtons trying to lift the top plate off, at the top of the range, from nothing but
+gravity. That is a real load and it is a direct consequence of the integral handle — a machine
+with a lift-off lever, which is what both reference machines have, does not have it at all
+while the lever is off the bench.
+
+### Where they can go: a window, not a guess
+
+Everything between the frame links either turns or sits there, and all of it starts at the
+front of the machine, so it merges into **one blocked band containing zero**:
+
+- the **die plate's tail**, which reaches half again as far as the CLR and carries that reach
+  through the die's whole rotation;
+- the **drive links**, over their swing plus their own half-width at the radius asked about;
+- the **followbar**, which does not move but is a big block — and at 1-1/2 in it spans −55° to
+  −27° where the tail only reaches −43°, so it is the followbar that sets the limit, not
+  anything that moves.
+
+What is left is the arc behind the die, and it is 125° to 190° wide across the whole range —
+much more room than it sounds like there should be. The ties go in it, symmetrically about its
+middle and as far apart as it allows, each keeping its own half-width plus a web off the
+boundary so that a tie is never the thing a passing tail has to miss by a hair.
+
+**One tie where two will not fit apart.** On the two sizes with no drive holes the link swings
+the whole arc instead of one pitch, the window collapses to 40–57°, and pushing a pair as far
+apart as that allows puts them **0.65 mm** from each other — which is not two fastenings, it
+is one slot. A single tie still holds the plate down, which is the job. What it gives up is
+resisting rotation about itself, and the frame pin bearing in its hole does that at every
+size anyway.
+
+### The base plate had to follow
+
+The plate is what the lower frame link is **welded to**, and the link had just grown two arms.
+Its size was still a rectangle drawn round the followbar arm from when that was the only arm
+there was — so one tie landed on it and the other hung over the edge, where a nut has the
+thickness of the base plate to fit in.
+
+It is now cut to the link's own bounding box plus a margin, in the link's own frame, which is
+the world's — so it is drawn where it goes and nothing rotates it any more. At 1-1/2 in it
+goes from 283 × 174 to 417 × 259 mm.
+
+**The anchor bolts got smaller, which is the right surprise.** Four bolts on a bigger
+rectangle sit on a 225 mm radius instead of 137, so the shear in each nearly halved and the
+selection dropped from 1/2 in to 5/16. A bigger plate and smaller bolts is what sizing the
+plate honestly does.
+
+### What the ties are sized on, and what actually decides it
+
+The lift, shared equally between them — conservative, because the pins take some of it and
+are not counted on for any. It never governs: even 2129 N shared two ways asks for a **3 mm**
+bolt. So the size comes from a floor, and the floor is the drive links' own spacer bolt — the
+same job, in the same plate, on the same machine. A frame tie smaller than the handle's own
+spacer would be an odd thing to build.
+
+The reference machine uses 3/4 in here and this uses 5/16. That is not a disagreement: theirs
+are also the anchor bolts.

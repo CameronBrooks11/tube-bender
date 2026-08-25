@@ -107,6 +107,41 @@ function drive_link_mass(plate, taper, width_mm) =
                                * (taper[i][0] - taper[i - 1][0])]))
         area * plate_thickness(plate) * 7850 / 1e9;
 
+//! Distance from the pivot to the centre of mass of ONE link, mm.
+//!
+//! Integrated over the taper, the same way the mass is. It matters because THE LINK IS THE
+//! HANDLE: there is no separate lever to pick up and put down, so two metres and nine kilos
+//! of it hang off this machine permanently, and where that weight acts decides what it does
+//! to the rest.
+function drive_link_centroid_radius(taper, width_mm) =
+    let (root_l = taper[0][0] + width_mm,
+         root_a = width_mm * root_l,
+         // The root block runs from -width/2 to taper[0][0] + width/2, so its centre is at
+         // taper[0][0] / 2.
+         root_m = root_a * taper[0][0] / 2,
+         seg_a  = [for (i = [1 : len(taper) - 1])
+                       (taper[i][1] + taper[i - 1][1]) / 2 * (taper[i][0] - taper[i - 1][0])],
+         seg_m  = [for (i = [1 : len(taper) - 1])
+                       seg_a[i - 1] * (taper[i][0] + taper[i - 1][0]) / 2])
+        (root_m + sumv(seg_m)) / (root_a + sumv(seg_a));
+
+//! Force with which the drive pair's overhang LIFTS its own pivot end, N.
+//!
+//! Nothing pushes the handle up, so it sags, and a sagging cantilever pivots about whatever
+//! it last touches. That is the die plate's outer edge - the upper drive link lies on it -
+//! and everything inboard of that edge goes UP, including the drive link's own tail behind
+//! the pivot. The tail then bears on the upper frame link, which is the only thing above it.
+//!
+//! `bearing_radius_mm` is that edge; the tail reaches half a link width behind the pivot, so
+//! the lever the lift acts on is `bearing + width / 2`.
+//!
+//! This is a load nothing else in the model carries, and it exists because the handle is
+//! integral. A machine with a lift-off handle - which is what both reference machines have -
+//! does not have it at all while the handle is off the bench.
+function drive_link_overhang_lift_N(mass_kg, centroid_r_mm, bearing_radius_mm, width_mm) =
+    max(0, 2 * mass_kg * 9.80665 * (centroid_r_mm - bearing_radius_mm)
+               / (bearing_radius_mm + width_mm / 2));
+
 //! Peak bending moment in ONE link, N.mm, at the drive hole.
 function drive_link_moment_Nmm(handle_force_N, handle_length_mm, drive_radius_mm) =
     handle_force_N * (handle_length_mm - drive_radius_mm) / 2;

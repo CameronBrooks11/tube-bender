@@ -297,8 +297,8 @@ op_force     = bend_operator_force_N(moment, handle);
 fb_pin_d     = pin_diameter(followbar_pin);
 link_w       = frame_link_width(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
                                 fb_pin_d);
-anchor_bolt  = base_anchor_bolt(tube, clr, link_w, fb_pin_d, moment, op_force,
-                                bolt_material_yield, bolts);
+// anchor_bolt now depends on the frame link's whole footprint, which depends on the ties,
+// so it is derived below with them rather than here.
 
 // The die lock. One pitch past the last drive hole, on the drive circle - the one angle a
 // hole reaches at the end of every stroke. The frame link grows an arm to it.
@@ -316,34 +316,6 @@ assert(!is_undef(frame_pin),     "no registered pin is big enough for the FRAME 
 assert(!is_undef(followbar_pin), "no registered pin is big enough for the FOLLOWBAR pin - extend pins.scad");
 assert(!is_undef(ustrap_pin),    "no registered pin is big enough for the U-STRAP pin - extend pins.scad");
 assert(!is_undef(spacer_bolt),   "no registered pin is big enough for the SPACER bolts - extend pins.scad");
-
-bend_report(tube, clr, handle);
-forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
-                   pin_diameter(drive_pin));
-drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
-                  pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle),
-                  handle, pin_diameter(spacer_bolt));
-frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d);
-followbar_report(tube, clr, fb_pin_d, followbar_force);
-die_plate_report(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
-                 pin_diameter(drive_pin), pin_diameter(ustrap_pin), plate_bolt,
-                 bolt_material_yield, die_plate_bolts, moment);
-clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
-sliced_die_report(tube, clr, slice_plate);
-base_report(tube, clr, base_plate, frame_plate, link_w, fb_pin_d, moment, op_force,
-            anchor_bolt, bolt_material_yield, layout_working_height(layers));
-
-// The pedestal post carries the operator's pull as bending and the drive torque as
-// torsion, at the same time.
-post          = structural_smallest_for_combined(op_force * pedestal_height_mm, moment * 1000,
-                                                 pin_allowable_shear_fraction * 250);
-post_length   = pedestal_height_mm - layout_working_height(layers);
-foot_bolt     = pedestal_foot_bolt(post, op_force, pedestal_height_mm, moment,
-                                   bolt_material_yield, bolts);
-
-if (mount == "pedestal")
-    pedestal_report(post, base_plate, post_length, foot_bolt, bolt_material_yield,
-                    op_force, pedestal_height_mm, moment);
 
 // The drive links turn with the die; the followbar and its pin do not move. What has to
 // fit between the followbar's keep-outs is ONE STROKE, not the whole bend - the link is
@@ -370,6 +342,95 @@ stroke_overrun = bend_stroke_overrun(bend_angle, n_drive_holes, forming_die_driv
 drive_home_deg = drive_inset;
 followbar_deg  = atan2(frame_link_followbar_pos(tube, clr, fb_pin_d)[1],
                        frame_link_followbar_pos(tube, clr, fb_pin_d)[0]);
+
+// The frame ties. Two bolts through spacer tubes, holding the frame links at a fixed gap so
+// the frame stays a frame when a pin is pulled - and reacting the handle's own weight, which
+// tries to lift the drive pair's tail off the upper frame link. See design-basis section 23.
+//
+// Sized like the drive pin's radius was: the spacer tube depends on the bolt and the tie's
+// radius depends on the spacer, so a nominal bolt gets a first radius, and the real one
+// follows from the bolt that comes out.
+drive_taper  = drive_link_taper(drive_plate, op_force, handle,
+                                is_undef(drive_hole_r) ? 0 : drive_hole_r,
+                                pin_diameter(frame_pin), pin_diameter(drive_pin),
+                                pin_diameter(spacer_bolt));
+drive_mass   = drive_link_mass(drive_plate, drive_taper, drive_w_peak);
+drive_lift   = drive_link_overhang_lift_N(drive_mass,
+                                          drive_link_centroid_radius(drive_taper, drive_w_peak),
+                                          clr, drive_w_peak);
+// Floored at the drive links' own spacer bolt. The load never governs - it asks for about
+// 3 mm even at 2 in - and the two spacers are the same job in the same plate on the same
+// machine, so a frame tie smaller than the handle's own would be an odd thing to build.
+tie_bolt     = bolt_smallest_at_least(
+                   max(frame_link_tie_diameter(frame_link_tie_load_N(drive_lift, 2),
+                                               bolt_material_yield),
+                       pin_diameter(spacer_bolt)));
+tie_tube     = structural_smallest_for_bore(bolt_clearance_hole_d(bolt_diameter(tie_bolt)));
+tie_radius   = frame_link_tie_radius(tube, clr, structural_od(tie_tube));
+
+// Where they can go. Everything that turns or sits between the frame links is taken out and
+// what is left is the window; the ties are placed symmetrically in it, as far apart as it
+// allows. A die with no drive holes swings the whole arc rather than one pitch, so its
+// rotation and its drive band are both the arc.
+die_rotation = n_drive_holes ? bend_indexed_rotation(n_drive_holes, forming_die_drive_pitch())
+                             : forming_die_arc(bend_angle);
+drive_swing  = n_drive_holes ? forming_die_drive_pitch() : forming_die_arc(bend_angle);
+drive_w_tie  = drive_link_width_at(drive_plate, op_force, handle,
+                                   is_undef(drive_hole_r) ? 0 : drive_hole_r,
+                                   pin_diameter(frame_pin), pin_diameter(drive_pin),
+                                   pin_diameter(spacer_bolt), tie_radius);
+drive_hw_tie = bend_angular_half_width(drive_w_tie, tie_radius);
+drive_band   = [drive_home_deg - drive_hw_tie, drive_home_deg + drive_swing + drive_hw_tie];
+tie_window   = frame_link_tie_window(
+                   die_plate_tail_angles(tube, clr, pin_diameter(ustrap_pin)),
+                   die_rotation, drive_band,
+                   followbar_angles(tube, clr, fb_pin_d));
+tie_angles   = frame_link_tie_angles(tie_window, tie_radius, structural_od(tie_tube),
+                                     frame_link_tie_gap(tube));
+tie_pos      = frame_link_tie_positions(tie_angles, tie_radius);
+
+// The pedestal post carries the operator's pull as bending and the drive torque as
+// torsion, at the same time.
+post          = structural_smallest_for_combined(op_force * pedestal_height_mm, moment * 1000,
+                                                 pin_allowable_shear_fraction * 250);
+post_length   = pedestal_height_mm - layout_working_height(layers);
+foot_bolt     = pedestal_foot_bolt(post, op_force, pedestal_height_mm, moment,
+                                   bolt_material_yield, bolts);
+
+
+// How much bolt to leave below the base plate for whatever it is bolted through and a nut,
+// mm. REASONED, NOT CITED, and an allowance rather than a dimension: what the machine is
+// mounted ON is not the model's to know. A thicker bench wants a longer bolt.
+mount_allowance = 30;
+
+// The base plate is cut to the frame link's own footprint - it is what the lower link is
+// WELDED to - so it cannot be known until the link's last arm is placed. That is the ties,
+// which is why the anchor bolt is chosen here rather than up with the other fasteners.
+link_extents = frame_link_extents(tube, clr, frame_plate, moment, pin_diameter(frame_pin),
+                                  fb_pin_d, lock_pos, tie_pos);
+anchor_bolt  = base_anchor_bolt(link_extents, tube, moment, op_force, bolt_material_yield,
+                                bolts);
+base_rect_mm = base_rect(link_extents, tube, bolt_diameter(anchor_bolt));
+
+bend_report(tube, clr, handle);
+forming_die_report(tube, clr, bend_angle, pin_diameter(frame_pin),
+                   pin_diameter(drive_pin));
+drive_link_report(tube, clr, drive_plate, pin_diameter(frame_pin),
+                  pin_diameter(drive_pin), drive_hole_r, bend_operator_force_N(moment, handle),
+                  handle, pin_diameter(spacer_bolt));
+frame_link_report(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d);
+followbar_report(tube, clr, fb_pin_d, followbar_force);
+die_plate_report(tube, clr, die_plate_stock, bend_angle, pin_diameter(frame_pin),
+                 pin_diameter(drive_pin), pin_diameter(ustrap_pin), plate_bolt,
+                 bolt_material_yield, die_plate_bolts, moment);
+clamp_report(tube, clr, pin_diameter(ustrap_pin), clamp_bolt, clamp_force);
+sliced_die_report(tube, clr, slice_plate);
+base_report(base_rect_mm, tube, clr, base_plate, frame_plate, link_w, fb_pin_d, moment,
+            op_force, anchor_bolt, bolt_material_yield, layout_working_height(layers));
+
+if (mount == "pedestal")
+    pedestal_report(post, base_plate, post_length, foot_bolt, bolt_material_yield,
+                    op_force, pedestal_height_mm, moment);
 
 for (d = bend_mechanism_departures(bend_angle, drive_w, bend_followbar_length(tube),
                                    fb_radius, forming_die_drive_pitch(), n_drive_holes,
@@ -399,6 +460,42 @@ for (d = die_lock_departures(forming_die_drive_pitch(), n_drive_holes,
                                                      n_drive_holes),
                              lock_clearance, lock_arm_w, link_w))
     echo(str("DEPARTURE: ", d));
+
+//
+// The frame ties. Reported after the lock because they live in the same window it does.
+//
+echo(str("frame tie: ", len(tie_pos), " x ", bolt_size(tie_bolt), " through ",
+         structural_size(tie_tube), " spacers, on r ", fmt_length(tie_radius),
+         len(tie_pos) == 0 ? " - NOWHERE, the window behind the die will not take one"
+                           : str(" at ", [for (a = tie_angles) round(a)], " deg")));
+echo(str("           the window behind the die is ", round(tie_window[1] - tie_window[0]),
+         " deg wide, from ", round(tie_window[0]), " to ", round(tie_window[1]),
+         " - clear of the tail, the drive band and the followbar"));
+echo(str("           holding ", fmt_force(drive_lift), " of handle trying to lift the drive",
+         " pair's tail off the upper frame link, ",
+         fmt_force(frame_link_tie_load_N(drive_lift, len(tie_pos))), " per tie"));
+echo(str("           handle is ", fmt_mass(2 * drive_mass), " with its centre of mass ",
+         fmt_length(drive_link_centroid_radius(drive_taper, drive_w_peak)),
+         " out, bearing on the die plate at r ", fmt_length(clr)));
+
+tie_chord = frame_link_tie_chord(tie_angles, tie_radius);
+
+if (len(tie_pos) == 0)
+    echo("DEPARTURE: the frame links cannot be tied together - nothing but the pin heads holds the upper one down");
+
+// A pair closer together than the link is wide is worth reporting but is not a departure.
+// A tie's job is to hold the plate DOWN, which even one can do; what a short chord gives up
+// is resisting rotation about the tie line, and the frame pin bearing in its hole does that
+// at every size whether the ties are far apart or not.
+else if (len(tie_pos) == 1)
+    echo(str("           ONE tie, not two: this die has no drive holes, so the link swings",
+             " the whole arc and leaves too little behind it to separate a pair"));
+else
+    echo(str("           the pair stands ", fmt_length(tie_chord), " apart, against a link ",
+             fmt_length(link_w), " wide",
+             tie_chord < link_w
+                 ? " - closer than the link is wide, so lean on the frame pin for the rotation"
+                 : ""));
 
 // pin_size() is the pin's NAME - "7/8 in dia" in both systems, because that is what you
 // order. The load beside it is a measurement and converts.
@@ -454,11 +551,6 @@ if (n_drive_holes) {
              " round in one go on the U-strap pin"));
 }
 
-// The base is drawn in the frame link's own frame, so its features have to be turned onto
-// the link's axis to sit under it.
-function rotate_pt(axis, p) = [axis[0] * p[0] - axis[1] * p[1],
-                               axis[1] * p[0] + axis[0] * p[1]];
-
 plate_bolt_pos = die_plate_bolt_positions(tube, clr, pin_diameter(frame_pin),
                                           pin_diameter(drive_pin),
                                           bolt_diameter(plate_bolt), bend_angle,
@@ -504,10 +596,10 @@ module drive_link_dxf()
 
 module frame_link_dxf()
     frame_link_2D(tube, clr, frame_plate, moment, pin_diameter(frame_pin), fb_pin_d,
-                  lock_pos, pin_diameter(lock_pin));
+                  lock_pos, pin_diameter(lock_pin), tie_pos, bolt_diameter(tie_bolt));
 
 module base_dxf()
-    base_2D(tube, clr, base_plate, link_w, fb_pin_d, bolt_diameter(anchor_bolt));
+    base_2D(base_rect_mm, base_plate, bolt_diameter(anchor_bolt));
 
 module pedestal_foot_dxf()
     pedestal_foot_2D(post, base_plate, bolt_diameter(foot_bolt));
@@ -558,8 +650,11 @@ module pedestal_weldment() {
 //! and this is the joint the whole drive torque leaves through, so it is worth getting
 //! right before anything else exists to be in the way.
 //!
-//! Fillet **both edges** of the link where it lands on the plate, over the full run from
-//! the pivot to the followbar eye. The leg is not written here on purpose - it is a
+//! Fillet **both edges** of the link where it lands on the plate, everywhere it lands - the
+//! run from the pivot to the followbar eye is what the report sizes, and the lock and tie
+//! arms want the same bead round them. The plate is cut to the link's own outline plus a
+//! margin, so if an arm is hanging over an edge something has gone wrong before the welder
+//! got here. The leg is not written here on purpose - it is a
 //! function of the plate you chose, so `just report` is where it lives and a number in this
 //! sentence would be a lie for every configuration but one. It comes out at the code
 //! minimum for every size in the range, with a factor of about six in hand on the load, so
@@ -574,9 +669,7 @@ module pedestal_weldment() {
 module base_assembly()
 assembly("base") {
     translate_z(layout_z(layers, "base"))
-        rotate(atan2(frame_link_axis(tube, clr, fb_pin_d)[1],
-                     frame_link_axis(tube, clr, fb_pin_d)[0]))
-            base_part();
+        base_part();
 
     // Not exploded. The post is obviously a separate piece, and moving it would leave the
     // foot bolts - which are placed in the main assembly, like the anchor bolts, because
@@ -663,6 +756,19 @@ assembly("handle") {
 //! The frame, followbar and lock pins land on the base plate. The drive, U-strap and spacer
 //! pins hang in the stack, where the head is the only thing holding them up.
 //!
+//! **The frame ties go in before the pins do.** Two bolts down through the upper frame link,
+//! a spacer tube, the lower link and the base plate, to nuts underneath. The TUBE is what
+//! sets the gap, so they can be pulled up hard without pinching the die and the drive links
+//! between the frame plates - and they have to be pulled up hard, because they are what makes
+//! the frame a frame. Without them the top plate is resting on three loose pins and comes off
+//! with the first one you pull.
+//!
+//! Copy the reference machine's order exactly, because it is a good one: **ties hand tight,
+//! pins in, then tighten the ties** - "as tightly as possible, while insuring the two pins
+//! are perfectly vertical and slide easily through their respective holes" [JD2-M32 p.1].
+//! The pins are the gauge. A pin that binds once the ties are down means the plates are not
+//! parallel, and it is much easier to find out now than after the die is in.
+//!
 //! Last, the four anchor bolts at the base's corners, heads up, down through the mounting
 //! surface to nuts underneath. **Do not use the machine before those are in.** They are the
 //! only thing reacting the drive torque, and everything above them is sized on the
@@ -724,23 +830,36 @@ assembly("main") {
     translate_z(layout_z(layers, "frame link lower"))
         pin(frame_pin, layout_pin_grip(layers, "frame link lower"), "base");
 
+    // The frame ties: two bolts down through the upper link, a spacer tube, the lower link
+    // and the base plate, to nuts underneath. The tube is what sets the gap, so tightening
+    // them cannot pinch the die and the drive links between the frame plates - which is the
+    // whole reason a tie here is a bolt through a tube rather than just a bolt.
+    for (t = tie_pos)
+        translate(concat(t, [layout_z(layers, "frame link upper")
+                                 + layout_thickness(layers, "frame link upper")])) {
+            rotate([180, 0, 0])
+                bolt(tie_bolt, layout_z(layers, "frame link upper")
+                                   + layout_thickness(layers, "frame link upper")
+                                   - layout_z(layers, "base") + mount_allowance);
+
+            translate_z(-(layout_thickness(layers, "frame link upper")
+                          + layout_frame_gap(layers)))
+                structural_tube(tie_tube, layout_frame_gap(layers));
+        }
+
     // Four anchor bolts at the base's corners, heads up, running down through whatever
     // the machine is bolted to.
-    for (p = base_anchor_positions(tube, clr, link_w, fb_pin_d,
-                                   plate_eye_radius(bolt_clearance_hole_d(
-                                       bolt_diameter(anchor_bolt))) + 1))
-        translate(concat(rotate_pt(frame_link_axis(tube, clr, fb_pin_d),
-                                   p + [frame_link_reach(tube, clr, fb_pin_d) / 2, 0]),
-                         [layout_z(layers, "base") + layout_thickness(layers, "base")]))
+    for (p = base_anchor_positions(base_rect_mm, bolt_diameter(anchor_bolt)))
+        translate(concat(p, [layout_z(layers, "base") + layout_thickness(layers, "base")]))
             rotate([180, 0, 0])
-                bolt(anchor_bolt, layout_thickness(layers, "base") + 30);
+                bolt(anchor_bolt, layout_thickness(layers, "base") + mount_allowance);
 
     // Four more through the pedestal's foot, the same way.
     if (mount == "pedestal")
         for (p = pedestal_foot_bolts(post, bolt_diameter(foot_bolt)))
             translate(concat(p, [layout_z(layers, "base") - post_length]))
                 rotate([180, 0, 0])
-                    bolt(foot_bolt, plate_thickness(base_plate) + 30);
+                    bolt(foot_bolt, plate_thickness(base_plate) + mount_allowance);
 
     // The die lock, through the whole stack into whichever drive hole is under it. The
     // assembly is drawn with the die at zero, and at zero the lock is just past the die's

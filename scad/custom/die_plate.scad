@@ -52,6 +52,22 @@ function die_plate_clamp_pins(tube, clr, clamp_pin_d) =
          lc = forming_die_tail_length(tube, clr))
         [[x, -lc / 4], [x, -3 * lc / 4]];
 
+//! The angles the tail occupies in the die's OWN frame, [start, 0] signed degrees. It hangs
+//! below the x axis, so the start is negative.
+//!
+//! This, swept through the die's rotation, is what decides where anything fixed can live
+//! between the frame links - the plate's body is only as big as the CLR, but its tail
+//! reaches half as far again and carries that reach round with it.
+function die_plate_tail_angles(tube, clr, clamp_pin_d) =
+    [atan2(-forming_die_tail_length(tube, clr),
+           die_plate_tail_edge(tube, clr, clamp_pin_d) - (clr - forming_die_tail_depth(tube))),
+     0];
+
+//! Radius of the plate's farthest corner, mm - the outboard end of the tail, and so the
+//! biggest circle anything turning with the die ever sweeps.
+function die_plate_swept_radius(tube, clr, clamp_pin_d) =
+    norm([die_plate_tail_edge(tube, clr, clamp_pin_d), forming_die_tail_length(tube, clr)]);
+
 //! Radius of the circle that bolts the plates to the die, mm - inside the drive holes,
 //! outside the hub, with a web each way.
 function die_plate_bolt_radius(tube, clr, frame_pin_d, drive_pin_d, bolt_d) =

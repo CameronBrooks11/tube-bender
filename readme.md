@@ -67,9 +67,11 @@ started from actually measured, and which of its features survived, is in
 | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Base</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Die</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Handle</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">Main</span> | <span style="writing-mode: vertical-rl; text-orientation: mixed;">TOTALS</span> |  |
 |---:|---:|---:|---:|---:|:---|
 |  |  |  |  | | **Vitamins** |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;8&nbsp; |  &nbsp;&nbsp;8&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 57.15 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868 |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
@@ -81,13 +83,14 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 2034.1 x 86.93 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 228.6 x 190.5 mm |
-| &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 309.09 x 232.97 mm |
+| &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Plate mild steel 1/4 in, blank 368.73 x 210.75 mm |
 | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 171.45 x 171.45 mm |
-| &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 283.44 x 173.85 mm |
+| &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Plate mild steel 3/8 in, blank 416.59 x 258.61 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm |
+| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 71.85 mm |
 | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm |
-| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;19&nbsp; | &nbsp;&nbsp;38&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;23&nbsp; | &nbsp;&nbsp;42&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  |  |  |  | | **3D printed parts** |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
@@ -110,9 +113,9 @@ started from actually measured, and which of its features survived, is in
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|1| Plate mild steel 1/4 in, blank 309.09 x 232.97 mm|
+|1| Plate mild steel 1/4 in, blank 368.73 x 210.75 mm|
 |1| Plate mild steel 3/8 in, blank 171.45 x 171.45 mm|
-|1| Plate mild steel 3/8 in, blank 283.44 x 173.85 mm|
+|1| Plate mild steel 3/8 in, blank 416.59 x 258.61 mm|
 |1| Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm|
 
 
@@ -131,8 +134,11 @@ started from actually measured, and which of its features survived, is in
 and this is the joint the whole drive torque leaves through, so it is worth getting
 right before anything else exists to be in the way.
 
-Fillet **both edges** of the link where it lands on the plate, over the full run from
-the pivot to the followbar eye. The leg is not written here on purpose - it is a
+Fillet **both edges** of the link where it lands on the plate, everywhere it lands - the
+run from the pivot to the followbar eye is what the report sizes, and the lock and tie
+arms want the same bead round them. The plate is cut to the link's own outline plus a
+margin, so if an arm is hanging over an edge something has gone wrong before the welder
+got here. The leg is not written here on purpose - it is a
 function of the plate you chose, so `just report` is where it lives and a number in this
 sentence would be a lie for every configuration but one. It comes out at the code
 minimum for every size in the range, with a factor of about six in hand on the load, so
@@ -235,8 +241,10 @@ the die assembly slides in at the next stage.
 ### Vitamins
 |Qty|Description|
 |---:|:----------|
-|8| Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
+|4| Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
+|2| Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
+|4| Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868|
 |2| Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
@@ -244,8 +252,9 @@ the die assembly slides in at the next stage.
 |1| Pin clevis 7/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm|
 |1| Plate mild steel 1-3/4 in, blank 57.55 x 76.2 mm, faced to 44.45 mm|
-|1| Plate mild steel 1/4 in, blank 309.09 x 232.97 mm|
+|1| Plate mild steel 1/4 in, blank 368.73 x 210.75 mm|
 |1| Tube 1-1/2 in OD x 0.095 in wall, ASTM A513 Type 1 ERW mild steel, as-welded, length 600 mm|
+|2| Tube 1/2 in OD x 0.065 in wall, mild steel, length 71.85 mm|
 
 
 ### 3D Printed parts
@@ -296,6 +305,19 @@ frame pin to change a die, the drive pin at every stroke, the lock pin by hand.
 
 The frame, followbar and lock pins land on the base plate. The drive, U-strap and spacer
 pins hang in the stack, where the head is the only thing holding them up.
+
+**The frame ties go in before the pins do.** Two bolts down through the upper frame link,
+a spacer tube, the lower link and the base plate, to nuts underneath. The TUBE is what
+sets the gap, so they can be pulled up hard without pinching the die and the drive links
+between the frame plates - and they have to be pulled up hard, because they are what makes
+the frame a frame. Without them the top plate is resting on three loose pins and comes off
+with the first one you pull.
+
+Copy the reference machine's order exactly, because it is a good one: **ties hand tight,
+pins in, then tighten the ties** - "as tightly as possible, while insuring the two pins
+are perfectly vertical and slide easily through their respective holes" [JD2-M32 p.1].
+The pins are the gauge. A pin that binds once the ties are down means the plates are not
+parallel, and it is much easier to find out now than after the die is in.
 
 Last, the four anchor bolts at the base's corners, heads up, down through the mounting
 surface to nuts underneath. **Do not use the machine before those are in.** They are the
