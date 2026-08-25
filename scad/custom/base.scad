@@ -194,7 +194,11 @@ module base_report(rect, tube, clr, plate, link_plate, link_width, followbar_pin
     assert(shear <= allow,
            "base: the anchor bolts are over their allowable at the radius they end up with - size up");
 
-    echo(str("         4 x ", bolt_size(bolt), " anchor bolts on r ", fmt_length(r), ", ",
+    // The plate is drilled for these whichever mount it ends up on, but they only carry
+    // anything on a bench: a pedestal has the post welded underneath and the torque leaves
+    // through the foot bolts instead.
+    echo(str("         4 x ", bolt_size(bolt), " anchor bolts for a BENCH mount, on r ",
+             fmt_length(r), ", ",
              fmt_force(shear), " each against ", fmt_force(allow),
              " allowable at a safety factor of ", bend_anchor_safety_factor));
     // What it bears ONTO is a bench or a floor, so this is a contact pressure - psi.

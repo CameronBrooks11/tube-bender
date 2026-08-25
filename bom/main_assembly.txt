@@ -1,7 +1,6 @@
 main_assembly:
 Vitamins:
   2 Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM
-  4 Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM
   1 Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM
   4 Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM
   1 Plate mild steel 1-3/4 in, blank 54.37 x 76.2 mm, faced to 44.45 mm

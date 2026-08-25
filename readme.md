@@ -71,7 +71,6 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp; Bolt hex head 3/8 in x 57.15 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
-| &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;4&nbsp; |  &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp; Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868 |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Pin clevis 5/16 in dia x 82.55 mm usable, NO ORDER NUMBER - this row is a hole in the BOM |
@@ -90,7 +89,7 @@ started from actually measured, and which of its features survived, is in
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 58.15 mm |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;2&nbsp; |  &nbsp;&nbsp;2&nbsp; | &nbsp;&nbsp; Tube 1/2 in OD x 0.065 in wall, mild steel, length 71.85 mm |
 | &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp; Tube 2-1/4 in OD x 0.120 in wall, mild steel, length 898.2 mm |
-| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;23&nbsp; | &nbsp;&nbsp;42&nbsp; | &nbsp;&nbsp;Total vitamins count |
+| &nbsp;&nbsp;4&nbsp; | &nbsp;&nbsp;9&nbsp; | &nbsp;&nbsp;6&nbsp; | &nbsp;&nbsp;19&nbsp; | &nbsp;&nbsp;38&nbsp; | &nbsp;&nbsp;Total vitamins count |
 |  |  |  |  | | **3D printed parts** |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;clamp.stl |
 | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;.&nbsp; | &nbsp;&nbsp;1&nbsp; |  &nbsp;&nbsp;1&nbsp; | &nbsp;&nbsp;followbar.stl |
@@ -244,7 +243,6 @@ the die assembly slides in at the next stage.
 |4| Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Bolt hex head 3/8 in x 38.1 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |2| Bolt hex head 5/16 in x 127 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
-|4| Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 1-1/8 in dia x 88.9 mm usable, seats on the base plate, NO ORDER NUMBER - this row is a hole in the BOM|
 |1| Pin clevis 3/4 in dia x 88.9 mm usable, seats on the base plate, 98306A868|
 |2| Pin clevis 5/8 in dia x 57.15 mm usable, NO ORDER NUMBER - this row is a hole in the BOM|
@@ -319,10 +317,12 @@ are perfectly vertical and slide easily through their respective holes" [JD2-M32
 The pins are the gauge. A pin that binds once the ties are down means the plates are not
 parallel, and it is much easier to find out now than after the die is in.
 
-Last, the four anchor bolts at the base's corners, heads up, down through the mounting
-surface to nuts underneath. **Do not use the machine before those are in.** They are the
-only thing reacting the drive torque, and everything above them is sized on the
-assumption that the base does not move.
+Last, bolt it down: on a bench, the four anchor bolts at the base plate's corners, heads
+up, down through the mounting surface to nuts underneath; on a pedestal, the four bolts
+through the foot, because the base plate is welded to the post and the corner holes go to
+nothing. **Do not use the machine before those are in.** They are the only thing reacting
+the drive torque, and everything above them is sized on the assumption that the base does
+not move.
 
 Take the pins as the alignment gauge while you tighten them, which is JD2's own
 procedure and worth copying exactly: bolts hand tight, pins in, then "tighten the nuts

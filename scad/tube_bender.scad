@@ -769,10 +769,12 @@ assembly("handle") {
 //! The pins are the gauge. A pin that binds once the ties are down means the plates are not
 //! parallel, and it is much easier to find out now than after the die is in.
 //!
-//! Last, the four anchor bolts at the base's corners, heads up, down through the mounting
-//! surface to nuts underneath. **Do not use the machine before those are in.** They are the
-//! only thing reacting the drive torque, and everything above them is sized on the
-//! assumption that the base does not move.
+//! Last, bolt it down: on a bench, the four anchor bolts at the base plate's corners, heads
+//! up, down through the mounting surface to nuts underneath; on a pedestal, the four bolts
+//! through the foot, because the base plate is welded to the post and the corner holes go to
+//! nothing. **Do not use the machine before those are in.** They are the only thing reacting
+//! the drive torque, and everything above them is sized on the assumption that the base does
+//! not move.
 //!
 //! Take the pins as the alignment gauge while you tighten them, which is JD2's own
 //! procedure and worth copying exactly: bolts hand tight, pins in, then "tighten the nuts
@@ -847,8 +849,12 @@ assembly("main") {
                 structural_tube(tie_tube, layout_frame_gap(layers));
         }
 
-    // Four anchor bolts at the base's corners, heads up, running down through whatever
-    // the machine is bolted to.
+    // Four anchor bolts at the base's corners, heads up, running down through whatever the
+    // machine is bolted to. ONLY ON A BENCH: a pedestal build has the post welded to the
+    // underside of this plate and nothing else beneath it, so these four would be bolted to
+    // thin air. The holes stay in the plate either way - it is one cut part, and which mount
+    // it ends up on is not the cutter's business.
+    if (mount == "bench")
     for (p = base_anchor_positions(base_rect_mm, bolt_diameter(anchor_bolt)))
         translate(concat(p, [layout_z(layers, "base") + layout_thickness(layers, "base")]))
             rotate([180, 0, 0])

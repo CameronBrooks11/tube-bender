@@ -133,9 +133,6 @@
             "structural_tube(structural_0p500x0p065, 72): Tube 1/2 in OD x 0.065 in wall, mild steel, length 71.85 mm": {
                 "count": 2
             },
-            "bolt(bolt_0p3125in, 44): Bolt hex head 5/16 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
-                "count": 4
-            },
             "bolt(bolt_0p500in, 44): Bolt hex head 1/2 in x 44.45 mm, with nut and washers, NO ORDER NUMBER - this row is a hole in the BOM": {
                 "count": 4
             },
