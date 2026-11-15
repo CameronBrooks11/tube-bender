@@ -1,0 +1,6 @@
+[project]
+name = "tube-bender"
+
+[dependencies.NopSCADlib]
+git = "https://github.com/nophead/NopSCADlib"
+tag = "v21.41.1"
