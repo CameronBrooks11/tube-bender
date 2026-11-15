@@ -32,6 +32,13 @@
 //! and the handle together - and the arithmetic behind that is echoed rather than hidden.
 //! `just report` prints it, or read the console after any render.
 //!
+//! ## NopSCADlib
+//!
+//! The model is built on [NopSCADlib](https://github.com/nophead/NopSCADlib) `v21.41.1`, pinned
+//! in `scadman.lock`. With [scadman](https://github.com/CameronBrooks11/scadman) installed,
+//! `just setup` puts it in `.scadman/env/`, which every recipe uses. Without scadman, clone
+//! NopSCADlib at that tag into `.scadman/env/NopSCADlib`.
+//!
 //! ## Two words in the parts list that are NopSCADlib's, not ours
 //!
 //! Nothing here is printed. The list has a **"3D printed parts"** heading because that is

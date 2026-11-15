@@ -1,10 +1,20 @@
 OPENSCAD    := env("OPENSCAD", "openscad")
-LIBRARIES   := env("OPENSCADPATH", env("HOME") + "/.local/share/OpenSCAD/libraries")
+# The libraries scadman.lock pins, installed by `just setup`. Project-local, so a render
+# uses the pinned NopSCADlib or fails, never whatever is installed globally.
+LIBRARIES   := justfile_directory() + "/.scadman/env"
 NOPSCADLIB  := LIBRARIES + "/NopSCADlib"
+
+# NopSCADlib's scripts run from the library itself, which is scadman's shared store; Python
+# must not write __pycache__ there.
+export PYTHONDONTWRITEBYTECODE := "1"
 
 # List available recipes.
 default:
     @just --list
+
+# Install the libraries scadman.lock pins into .scadman/env. Needs scadman.
+setup:
+    scadman sync
 
 # Everything CI runs.
 check: check-scad check-customizer check-sizes check-report
