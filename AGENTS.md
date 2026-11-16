@@ -6,7 +6,8 @@ these take precedence where they conflict.
 ## Commands
 
 - `just setup` — `scadman sync`: NopSCADlib at the commit `scadman.lock` pins, in `.scadman/env/`.
-- `just check` — the CI gate. Runs `check-scad`, `check-sizes` and `check-report`.
+- `just check` — the CI gate (`.github/workflows/check.yml`). Runs `check-scad`,
+  `check-customizer`, `check-sizes` and `check-report`.
 - `just report` — echo what the current configuration implies, drawing nothing.
 - `just build` — NopSCADlib `make_all`: BOM, DXFs, STLs, assembly views, `readme.md`.
 - `just bom` — regenerate just the BOM.
