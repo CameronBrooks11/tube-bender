@@ -39,24 +39,26 @@ layout_running_clearance = 0.5;
 //! The stack, bottom to top, as `[name, z of underside, thickness]`. Everything that
 //! places a part reads this rather than adding thicknesses up again.
 function layout_layers(tube, drive_plate, frame_plate, base_plate, die_plate) =
-    let (td  = forming_die_thickness(tube),
-         tdp = plate_thickness(die_plate),
-         tdl = plate_thickness(drive_plate),
-         tfl = plate_thickness(frame_plate),
-         tb  = plate_thickness(base_plate),
-         c   = layout_running_clearance,
-         // The die plates are bolted hard to the die, so they move with it and take no
-         // clearance against it. Everything outside them turns relative to it and does.
-         fl  = -td / 2 - tdp - c - tdl - c - tfl)
+    let (
+        td = forming_die_thickness(tube),
+        tdp = plate_thickness(die_plate),
+        tdl = plate_thickness(drive_plate),
+        tfl = plate_thickness(frame_plate),
+        tb = plate_thickness(base_plate),
+        c = layout_running_clearance,
+        // The die plates are bolted hard to the die, so they move with it and take no
+        // clearance against it. Everything outside them turns relative to it and does.
+        fl = -td / 2 - tdp - c - tdl - c - tfl
+    )
     [
-        ["base",             fl - tb,           tb ],
-        ["frame link lower", fl,                tfl],
-        ["drive link lower", -td / 2 - tdp - c - tdl, tdl],
-        ["die plate lower",  -td / 2 - tdp,     tdp],
-        ["forming die",      -td / 2,           td ],
-        ["die plate upper",   td / 2,           tdp],
-        ["drive link upper",  td / 2 + tdp + c, tdl],
-        ["frame link upper",  td / 2 + tdp + c + tdl + c, tfl],
+            ["base", fl - tb, tb],
+            ["frame link lower", fl, tfl],
+            ["drive link lower", -td / 2 - tdp - c - tdl, tdl],
+            ["die plate lower", -td / 2 - tdp, tdp],
+            ["forming die", -td / 2, td],
+            ["die plate upper", td / 2, tdp],
+            ["drive link upper", td / 2 + tdp + c, tdl],
+            ["frame link upper", td / 2 + tdp + c + tdl + c, tfl],
     ];
 
 //! Underside of a named layer, mm.
@@ -77,9 +79,7 @@ function layout_thickness(layers, name) =
 //! governs every pin here, so that is not a rounding error: at 1-1/2 in it put the frame
 //! pin at 1 in where the span it actually crosses wants 1-1/8.
 function layout_central_thickness(layers) =
-    layout_thickness(layers, "forming die")
-        + layout_thickness(layers, "die plate lower")
-        + layout_thickness(layers, "die plate upper");
+    layout_thickness(layers, "forming die") + layout_thickness(layers, "die plate lower") + layout_thickness(layers, "die plate upper");
 
 //! Underside of the whole stack, mm - the face that sits on the mounting surface.
 function layout_bottom(layers) = layers[0][1];
@@ -108,11 +108,9 @@ function layout_pin_grip(layers, from_layer) =
 //! Clear distance between the frame links' inner faces, mm. Anything mounted between the
 //! frame links - the followbar, the handle - is this thick.
 function layout_frame_gap(layers) =
-    layout_z(layers, "frame link upper") -
-    (layout_z(layers, "frame link lower") + layout_thickness(layers, "frame link lower"));
+    layout_z(layers, "frame link upper") - (layout_z(layers, "frame link lower") + layout_thickness(layers, "frame link lower"));
 
 //! Clear distance between the drive links' inner faces, mm - what a spacer tube between
 //! them has to be, and the span a bolt through them has to cross.
 function layout_drive_gap(layers) =
-    layout_z(layers, "drive link upper") -
-    (layout_z(layers, "drive link lower") + layout_thickness(layers, "drive link lower"));
+    layout_z(layers, "drive link upper") - (layout_z(layers, "drive link lower") + layout_thickness(layers, "drive link lower"));

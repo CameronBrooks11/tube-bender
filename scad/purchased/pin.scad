@@ -56,14 +56,14 @@ include <NopSCADlib/core.scad>;
 
 use <../utils/units.scad>
 
-function pin_name(type)            = type[0];  //! Registry name
-function pin_size(type)            = type[1];  //! Imperial size, the identity you order by
-function pin_diameter(type)        = type[2];  //! Shank diameter, mm
-function pin_head_diameter(type)   = type[3];  //! Head diameter, mm, or undef if unlooked-up
-function pin_head_thickness(type)  = type[4];  //! Head thickness, mm, or undef
-function pin_cotter_hole(type)     = type[5];  //! Cotter pin hole diameter, mm, or undef
-function pin_cotter_from_end(type) = type[6];  //! Cotter hole centre to the pin's end, mm
-function pin_part_no(type)         = type[7];  //! Order number, or undef if none is known
+function pin_name(type) = type[0]; //! Registry name
+function pin_size(type) = type[1]; //! Imperial size, the identity you order by
+function pin_diameter(type) = type[2]; //! Shank diameter, mm
+function pin_head_diameter(type) = type[3]; //! Head diameter, mm, or undef if unlooked-up
+function pin_head_thickness(type) = type[4]; //! Head thickness, mm, or undef
+function pin_cotter_hole(type) = type[5]; //! Cotter pin hole diameter, mm, or undef
+function pin_cotter_from_end(type) = type[6]; //! Cotter hole centre to the pin's end, mm
+function pin_part_no(type) = type[7]; //! Order number, or undef if none is known
 
 //! Whether this row describes something a second builder could actually order.
 function pin_is_orderable(type) = !is_undef(pin_part_no(type));
@@ -83,7 +83,7 @@ pin_pivot_clearance = 0.4;
 //! because their bender is ONE size covering 1/2 to 2 in tube while this one scales. An
 //! absolute 3.2 mm on the 6 mm drive pin a 3/8 in bender wants is not a clearance, it is
 //! a slot.
-pin_index_clearance_fraction = (1/8) / (7/8);
+pin_index_clearance_fraction = (1 / 8) / (7 / 8);
 
 //! Hole diameter for a pin that turns in it.
 function pin_pivot_hole(diameter) = diameter + pin_pivot_clearance;
@@ -96,7 +96,7 @@ function pin_index_hole(diameter) = diameter * (1 + pin_index_clearance_fraction
 //! CATALOGUED: a clevis pin carries several cotter holes "spaced 1/4 inch apart", and which
 //! one the cotter goes through is what sets the usable length [MCMASTER-CLEVIS]. So the
 //! series is not a list of part numbers, it is an increment.
-pin_length_step = inch(1/4);
+pin_length_step = inch(1 / 4);
 
 //! The usable length to order for a pin that has to grip `mm` of stack.
 function pin_usable_length(mm) = ceil(mm / pin_length_step - 1e-9) * pin_length_step;
@@ -129,19 +129,22 @@ function pin_head_is_known(type) = !is_undef(pin_head_diameter(type));
 //! honest rather than convenient: nothing is holding that pin up, in the drawing or on the
 //! bench, until somebody looks the part up.
 module pin(type, grip, seat = "stack") {
-    d      = pin_diameter(type);
+    d = pin_diameter(type);
     headed = pin_head_is_known(type);
     length = pin_usable_length(grip);
 
     // The key before the colon is the BOM's own identity for this part and stays in
     // millimetres in both systems, the way a part number would - it is what groups
     // identical items, not something anybody measures. Only the human half converts.
-    vitamin(str("pin(", pin_name(type), ", ", round(length), "): Pin clevis ",
-                pin_size(type), " x ", fmt_length(length), " usable",
-                seat == "base" ? ", seats on the base plate" : "",
-                pin_is_orderable(type)
-                    ? str(", ", pin_part_no(type))
-                    : ", NO ORDER NUMBER - this row is a hole in the BOM"));
+    vitamin(
+        str(
+            "pin(", pin_name(type), ", ", round(length), "): Pin clevis ",
+            pin_size(type), " x ", fmt_length(length), " usable",
+            seat == "base" ? ", seats on the base plate" : "",
+            pin_is_orderable(type) ? str(", ", pin_part_no(type))
+            : ", NO ORDER NUMBER - this row is a hole in the BOM"
+        )
+    );
 
     color("silver") {
         // On TOP. Every pin here goes in head up: on a stack-seated pin the head is the
@@ -149,8 +152,8 @@ module pin(type, grip, seat = "stack") {
         // by and the stop that keeps the plate above from lifting.
         if (headed)
             translate_z(length)
-                cylinder(d = pin_head_diameter(type), h = pin_head_thickness(type));
+                cylinder(d=pin_head_diameter(type), h=pin_head_thickness(type));
 
-        cylinder(d = d, h = length + (headed ? 0 : pin_end_allowance));
+        cylinder(d=d, h=length + (headed ? 0 : pin_end_allowance));
     }
 }

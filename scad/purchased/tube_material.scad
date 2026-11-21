@@ -8,10 +8,10 @@
  * ask for the end they need and say which end they asked for.
  */
 
-function tube_material_name(type)        = type[0];  //! Registry name
-function tube_material_description(type) = type[1];  //! What to write on the BOM and the order
-function tube_material_yield(type)       = type[2];  //! Yield strength band [min, max] MPa
-function tube_material_colour(type)      = type[3];  //! Preview colour
+function tube_material_name(type) = type[0]; //! Registry name
+function tube_material_description(type) = type[1]; //! What to write on the BOM and the order
+function tube_material_yield(type) = type[2]; //! Yield strength band [min, max] MPa
+function tube_material_colour(type) = type[3]; //! Preview colour
 
 //! Bottom of the yield band - the easiest tube of this specification to bend.
 function tube_material_yield_min(type) = tube_material_yield(type)[0];

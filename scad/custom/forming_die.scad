@@ -59,7 +59,7 @@ include <../utils/bend.scad>;
 //! quarter inch thicker than the tube - which, because tube ODs step in eighths, lands
 //! every die in this machine's range on a stock plate thickness. That is a happy
 //! coincidence rather than a reason, but it is why this number rather than 3 mm.
-die_rim_land = inch(1/8);
+die_rim_land = inch(1 / 8);
 
 //! Material left between a hole and the nearest edge or groove.
 //!
@@ -149,23 +149,27 @@ function forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d) =
 //! because there is no room to drill them" [JD2-M32 p.4] - but their pins are one size for
 //! the whole 1/2 to 2 in range, so their cutoff is not ours. This derives it.
 function forming_die_has_drive_holes(tube, clr, frame_pin_d, drive_pin_d) =
-    forming_die_drive_radius(tube, clr, drive_pin_d)
-        >= forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d);
+    forming_die_drive_radius(tube, clr, drive_pin_d) >= forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d);
 
 //! Angle a drive hole must be inset from the die's radial edges to keep its web, degrees.
 function forming_die_drive_inset(tube, clr, drive_pin_d) =
-    let (r = forming_die_drive_radius(tube, clr, drive_pin_d),
-         clearance = pin_index_hole(drive_pin_d) / 2 + die_web(tube))
-        clearance >= r ? 90 : asin(clearance / r);
+    let (
+        r = forming_die_drive_radius(tube, clr, drive_pin_d),
+        clearance = pin_index_hole(drive_pin_d) / 2 + die_web(tube)
+    )
+    clearance >= r ? 90 : asin(clearance / r);
 
 //! The angles the drive holes sit at, degrees, or an empty list where none fit.
 function forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle) =
-    let (inset = forming_die_drive_inset(tube, clr, drive_pin_d),
-         span  = forming_die_arc(bend_angle) - 2 * inset)
-        !forming_die_has_drive_holes(tube, clr, frame_pin_d, drive_pin_d) || span < 0
-            ? []
-            : [for (i = [0 : floor(span / die_drive_hole_pitch)])
-                   inset + i * die_drive_hole_pitch];
+    let (
+        inset = forming_die_drive_inset(tube, clr, drive_pin_d),
+        span = forming_die_arc(bend_angle) - 2 * inset
+    )
+    !forming_die_has_drive_holes(tube, clr, frame_pin_d, drive_pin_d) || span < 0 ? []
+    : [
+        for (i = [0:floor(span / die_drive_hole_pitch)])
+        inset + i * die_drive_hole_pitch,
+    ];
 
 //! The plate the die is machined from, or `undef` if nothing in the registry is thick
 //! enough. Faced to thickness afterwards - stock does not step in eighths above an inch.
@@ -182,9 +186,9 @@ function forming_die_blank_plan(tube, clr) =
 // The die's plan outline: a sector from the pivot out to the CLR, the hub that encloses
 // the pivot, and the tangent tail that carries the clamp.
 module forming_die_outline(tube, clr, bend_angle, frame_pin_d) {
-    arc   = forming_die_arc(bend_angle);
+    arc = forming_die_arc(bend_angle);
     depth = forming_die_tail_depth(tube);
-    lc    = forming_die_tail_length(tube, clr);
+    lc = forming_die_tail_length(tube, clr);
     steps = max(8, ceil(arc / 3));
 
     // offset(0) is not decoration. Three regions meet along the seam at y = 0, and the
@@ -193,10 +197,14 @@ module forming_die_outline(tube, clr, bend_angle, frame_pin_d) {
     // merges the seam and the same model builds. Removing this brings the failure back.
     offset(0)
         union() {
-            polygon([[0, 0],
-                     for (i = [0 : steps]) let (a = arc * i / steps) clr * [cos(a), sin(a)]]);
+            polygon(
+                [
+                    [0, 0],
+                    for (i = [0:steps]) let (a = arc * i / steps) clr * [cos(a), sin(a)],
+                ]
+            );
 
-            circle(r = forming_die_hub_radius(tube, frame_pin_d));
+            circle(r=forming_die_hub_radius(tube, frame_pin_d));
 
             translate([clr - depth, -lc])
                 square([depth, lc]);
@@ -212,94 +220,139 @@ function forming_die_tap_drill(bolt_d) = 0.85 * bolt_d;
 //! The forming die. `plate_bolts` are the positions the die plates screw into, passed in
 //! rather than derived here because the plates are derived FROM the die and a file cannot
 //! read the file that reads it.
-module forming_die(tube, clr, bend_angle = 180,
-                   frame_pin_d, drive_pin_d,
-                   plate_bolts = [], plate_bolt_d = 0) {
-    t      = forming_die_thickness(tube);
-    gr     = forming_die_groove_radius(tube);
-    arc    = forming_die_arc(bend_angle);
-    lc     = forming_die_tail_length(tube, clr);
+module forming_die(
+    tube,
+    clr,
+    bend_angle = 180,
+    frame_pin_d,
+    drive_pin_d,
+    plate_bolts = [],
+    plate_bolt_d = 0
+) {
+    t = forming_die_thickness(tube);
+    gr = forming_die_groove_radius(tube);
+    arc = forming_die_arc(bend_angle);
+    lc = forming_die_tail_length(tube, clr);
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
-    r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);
+    r_drv = forming_die_drive_radius(tube, clr, drive_pin_d);
 
-    assert(clr > gr + die_web(tube),
-           "forming die: the groove would cut through the pivot - CLR is too small for this tube");
-    assert(!is_undef(forming_die_blank(tube)),
-           "forming die: no registered plate is thick enough for this blank");
-    assert(forming_die_hub_radius(tube, frame_pin_d)
-               < forming_die_root_radius(tube, clr) - die_web(tube),
-           "forming die: the pivot hub reaches the groove - the frame pin is too big for this die");
-    assert(forming_die_tail_depth(tube) < clr,
-           "forming die: the tail is deeper than the die's radius - the groove would cut past the pivot");
+    assert(
+        clr > gr + die_web(tube),
+        "forming die: the groove would cut through the pivot - CLR is too small for this tube"
+    );
+    assert(
+        !is_undef(forming_die_blank(tube)),
+        "forming die: no registered plate is thick enough for this blank"
+    );
+    assert(
+        forming_die_hub_radius(tube, frame_pin_d) < forming_die_root_radius(tube, clr) - die_web(tube),
+        "forming die: the pivot hub reaches the groove - the frame pin is too big for this die"
+    );
+    assert(
+        forming_die_tail_depth(tube) < clr,
+        "forming die: the tail is deeper than the die's radius - the groove would cut past the pivot"
+    );
 
     // The BOM has to say what to BUY, not only what to make. NopSCADlib files the .stl
     // under "Printed" because those are its only two categories for a made part; this die
     // is machined, and the line below is the stock it is machined from.
     blank = forming_die_blank(tube);
-    plan  = forming_die_blank_plan(tube, clr);
+    plan = forming_die_blank_plan(tube, clr);
     // The BOM is a cut list, so it follows the units too - a shop working in inches cannot
     // use a blank size in millimetres. The stock SIZE stays imperial: that is its name.
-    vitamin(str("forming_die_blank(", plate_name(blank), "): ", plate_description(blank),
-                " ", plate_size(blank), ", blank ", fmt_bare_length(plan[0]), " x ",
-                fmt_length(plan[1]), ", faced to ", fmt_length(t)));
+    vitamin(
+        str(
+            "forming_die_blank(", plate_name(blank), "): ", plate_description(blank),
+            " ", plate_size(blank), ", blank ", fmt_bare_length(plan[0]), " x ",
+            fmt_length(plan[1]), ", faced to ", fmt_length(t)
+        )
+    );
 
     difference() {
-        linear_extrude(t, center = true)
+        linear_extrude(t, center=true)
             forming_die_outline(tube, clr, bend_angle, frame_pin_d);
 
         // The groove, round the bend and on down the tail.
-        rotate_extrude(angle = arc)
+        rotate_extrude(angle=arc)
             translate([clr, 0])
-                circle(r = gr);
+                circle(r=gr);
 
         translate([clr, -lc - eps, 0])
             rotate([-90, 0, 0])
-                cylinder(r = gr, h = lc + 2 * eps);
+                cylinder(r=gr, h=lc + 2 * eps);
 
         // The pivot the whole machine turns on.
-        cylinder(d = pin_pivot_hole(frame_pin_d), h = t + 2 * eps, center = true);
+        cylinder(d=pin_pivot_hole(frame_pin_d), h=t + 2 * eps, center=true);
 
         // Drive holes, deliberately loose - the pin is repositioned by hand mid-bend.
         for (a = drives)
             rotate(a)
                 translate([r_drv, 0])
-                    cylinder(d = pin_index_hole(drive_pin_d), h = t + 2 * eps, center = true);
+                    cylinder(d=pin_index_hole(drive_pin_d), h=t + 2 * eps, center=true);
 
         // Tapped through for the die plates, one from each face.
         for (p = plate_bolts)
             translate(p)
-                cylinder(d = forming_die_tap_drill(plate_bolt_d), h = t + 2 * eps,
-                         center = true);
+                cylinder(
+                    d=forming_die_tap_drill(plate_bolt_d), h=t + 2 * eps,
+                    center=true
+                );
     }
 }
 
 //! Echo what the die comes out as, before it is drawn.
 module forming_die_report(tube, clr, bend_angle, frame_pin_d, drive_pin_d) {
-    blank  = forming_die_blank(tube);
+    blank = forming_die_blank(tube);
     drives = forming_die_drive_angles(tube, clr, frame_pin_d, drive_pin_d, bend_angle);
-    r_drv  = forming_die_drive_radius(tube, clr, drive_pin_d);
-    plan   = forming_die_blank_plan(tube, clr);
-    force  = bend_drive_pin_force_N(bend_plastic_moment_Nm(tube), r_drv);
+    r_drv = forming_die_drive_radius(tube, clr, drive_pin_d);
+    plan = forming_die_blank_plan(tube, clr);
+    force = bend_drive_pin_force_N(bend_plastic_moment_Nm(tube), r_drv);
 
-    echo(str("die:     radius ", fmt_length(clr), " x ",
-             fmt_length(forming_die_thickness(tube)), " thick, ",
-             forming_die_arc(bend_angle), " deg of groove"));
-    echo(str("         groove r ", fmt_length(forming_die_groove_radius(tube)), ", root at ",
-             fmt_length(forming_die_root_radius(tube, clr)), ", tail ",
-             fmt_length(forming_die_tail_length(tube, clr)), " long"));
-    echo(str("         clamp grips ", fmt_length(bend_clamp_length(tube, clr)), " = ",
-             bend_clamp_length(tube, clr) / tube_od(tube), " x OD, smooth cavity"));
-    echo(str("blank:   ", is_undef(blank) ? "NONE THICK ENOUGH IN THE REGISTRY"
-                                          : str(plate_size(blank), " plate, ",
-                                                fmt_bare_length(plan[0]), " x ",
-                                                fmt_length(plan[1]))));
+    echo(
+        str(
+            "die:     radius ", fmt_length(clr), " x ",
+            fmt_length(forming_die_thickness(tube)), " thick, ",
+            forming_die_arc(bend_angle), " deg of groove"
+        )
+    );
+    echo(
+        str(
+            "         groove r ", fmt_length(forming_die_groove_radius(tube)), ", root at ",
+            fmt_length(forming_die_root_radius(tube, clr)), ", tail ",
+            fmt_length(forming_die_tail_length(tube, clr)), " long"
+        )
+    );
+    echo(
+        str(
+            "         clamp grips ", fmt_length(bend_clamp_length(tube, clr)), " = ",
+            bend_clamp_length(tube, clr) / tube_od(tube), " x OD, smooth cavity"
+        )
+    );
+    echo(
+        str(
+            "blank:   ", is_undef(blank) ? "NONE THICK ENOUGH IN THE REGISTRY"
+            : str(
+                plate_size(blank), " plate, ",
+                fmt_bare_length(plan[0]), " x ",
+                fmt_length(plan[1])
+            )
+        )
+    );
 
     if (len(drives))
-        echo(str("drive:   ", len(drives), " holes on r ", fmt_length(r_drv), " at ",
-                 die_drive_hole_pitch, " deg pitch, ", fmt_force(force), " on the pin"));
+        echo(
+            str(
+                "drive:   ", len(drives), " holes on r ", fmt_length(r_drv), " at ",
+                die_drive_hole_pitch, " deg pitch, ", fmt_force(force), " on the pin"
+            )
+        );
     else
-        echo(str("drive:   no room for drive holes - needs r ",
-                 fmt_length(forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d)),
-                 ", the groove root only allows ", fmt_length(r_drv),
-                 ". Drive on the U-strap pin, as JD2 does for small dies."));
+        echo(
+            str(
+                "drive:   no room for drive holes - needs r ",
+                fmt_length(forming_die_drive_radius_min(tube, frame_pin_d, drive_pin_d)),
+                ", the groove root only allows ", fmt_length(r_drv),
+                ". Drive on the U-strap pin, as JD2 does for small dies."
+            )
+        );
 }

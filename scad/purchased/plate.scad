@@ -17,12 +17,12 @@ include <NopSCADlib/core.scad>;
 
 use <../utils/units.scad>
 
-function plate_name(type)        = type[0];  //! Registry name
-function plate_size(type)        = type[1];  //! Imperial thickness, the identity you order by
-function plate_description(type) = type[2];  //! What to write on the BOM
-function plate_thickness(type)   = type[3];  //! Thickness, mm
-function plate_colour(type)      = type[4];  //! Preview colour
-function plate_yield(type)       = type[5];  //! Specified minimum yield strength, MPa
+function plate_name(type) = type[0]; //! Registry name
+function plate_size(type) = type[1]; //! Imperial thickness, the identity you order by
+function plate_description(type) = type[2]; //! What to write on the BOM
+function plate_thickness(type) = type[3]; //! Thickness, mm
+function plate_colour(type) = type[4]; //! Preview colour
+function plate_yield(type) = type[5]; //! Specified minimum yield strength, MPa
 
 //! Distance from a hole's centre to the edge of the plate around it, mm.
 //!
@@ -42,9 +42,13 @@ module plate_2D(type, w, d) {
     // The key before the colon is the BOM's own identity for this part and stays in
     // millimetres in both systems, the way a part number would - it is what groups
     // identical items, not something anybody measures. Only the human half converts.
-    vitamin(str("plate_2D(", plate_name(type), ", ", round(w), ", ", round(d), "): ",
-                plate_description(type), " ", plate_size(type), ", blank ",
-                fmt_bare_length(w), " x ", fmt_length(d)));
+    vitamin(
+        str(
+            "plate_2D(", plate_name(type), ", ", round(w), ", ", round(d), "): ",
+            plate_description(type), " ", plate_size(type), ", blank ",
+            fmt_bare_length(w), " x ", fmt_length(d)
+        )
+    );
     children();
 }
 

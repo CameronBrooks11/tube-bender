@@ -32,23 +32,23 @@ use <../purchased/tube.scad>
 // would look exactly like a sourced one.
 //
 clr_catalogue = [
-    [inch(1/8),     [inch(9/16)]],
-    [inch(1/4),     [inch(9/16), inch(3/4)]],
-    [inch(5/16),    [inch(15/16)]],
-    [inch(3/8),     [inch(15/16)]],
-    [inch(1/2),     [inch(1 + 1/2)]],
-    [inch(3/4),     [inch(3), inch(3 + 1/2)]],
-    [inch(7/8),     [inch(3), inch(3 + 1/2), inch(4), inch(4 + 1/2)]],
-    [inch(1),       [inch(3), inch(3 + 1/2), inch(4), inch(4 + 1/2)]],
-    [inch(1 + 1/8), [inch(3), inch(3 + 1/2), inch(4), inch(4 + 1/2)]],
-    [inch(1 + 1/4), [inch(4), inch(4 + 1/2), inch(5), inch(6)]],
-    [inch(1 + 3/8), [inch(4 + 1/2), inch(5), inch(6)]],
-    [inch(1 + 1/2), [inch(4 + 1/2), inch(5), inch(6), inch(7)]],
-    [inch(1 + 5/8), [inch(6), inch(7)]],
-    [inch(1 + 3/4), [inch(6), inch(7)]],
-    [inch(2),       [inch(6), inch(7)]],
-    [inch(2 + 1/4), [inch(7)]],
-    [inch(2 + 1/2), [inch(7)]],
+    [inch(1 / 8), [inch(9 / 16)]],
+    [inch(1 / 4), [inch(9 / 16), inch(3 / 4)]],
+    [inch(5 / 16), [inch(15 / 16)]],
+    [inch(3 / 8), [inch(15 / 16)]],
+    [inch(1 / 2), [inch(1 + 1 / 2)]],
+    [inch(3 / 4), [inch(3), inch(3 + 1 / 2)]],
+    [inch(7 / 8), [inch(3), inch(3 + 1 / 2), inch(4), inch(4 + 1 / 2)]],
+    [inch(1), [inch(3), inch(3 + 1 / 2), inch(4), inch(4 + 1 / 2)]],
+    [inch(1 + 1 / 8), [inch(3), inch(3 + 1 / 2), inch(4), inch(4 + 1 / 2)]],
+    [inch(1 + 1 / 4), [inch(4), inch(4 + 1 / 2), inch(5), inch(6)]],
+    [inch(1 + 3 / 8), [inch(4 + 1 / 2), inch(5), inch(6)]],
+    [inch(1 + 1 / 2), [inch(4 + 1 / 2), inch(5), inch(6), inch(7)]],
+    [inch(1 + 5 / 8), [inch(6), inch(7)]],
+    [inch(1 + 3 / 4), [inch(6), inch(7)]],
+    [inch(2), [inch(6), inch(7)]],
+    [inch(2 + 1 / 4), [inch(7)]],
+    [inch(2 + 1 / 2), [inch(7)]],
 ];
 
 //! Every catalogued radius for this tube's OD, or an empty list where neither catalogue
@@ -56,10 +56,10 @@ clr_catalogue = [
 //! conversions and an exact float comparison would miss.
 function clr_catalogued(tube) =
     let (hits = [for (row = clr_catalogue) if (abs(row[0] - tube_od(tube)) < 0.1) row[1]])
-        len(hits) ? hits[0] : [];
+    len(hits) ? hits[0] : [];
 
 //! The smallest catalogued radius at or above `floor_mm`, or `undef` if none reaches it.
 //! `undef` propagates, which is the point - a caller that gets one has to decide.
 function clr_smallest_at_least(tube, floor_mm) =
     let (above = [for (r = clr_catalogued(tube)) if (r >= floor_mm - 0.01) r])
-        len(above) ? min(above) : undef;
+    len(above) ? min(above) : undef;

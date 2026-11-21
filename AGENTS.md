@@ -6,13 +6,15 @@ these take precedence where they conflict.
 ## Commands
 
 - `just setup` — `scadman sync`: NopSCADlib at the commit `scadman.lock` pins, in `.scadman/env/`.
-- `just check` — the CI gate (`.github/workflows/check.yml`). Runs `check-scad`,
-  `check-customizer`, `check-sizes` and `check-report`.
+- `just check` — `fmt-check` (topiary), `check-scad` and `check-customizer`.
+- `just test` — `check-sizes` and `check-report`. CI (`.github/workflows/test.yml`) runs
+  `just check` then `just test`.
+- `just fmt` — format the `.scad` files with topiary 0.8.0 (`.topiary/languages.ncl`).
 - `just report` — echo what the current configuration implies, drawing nothing.
 - `just build` — NopSCADlib `make_all`: BOM, DXFs, STLs, assembly views, `readme.md`.
 - `just bom` — regenerate just the BOM.
 
-Run `just check` before every commit. `just build` needs ImageMagick 7 (`magick`) and the
+Run `just check` and `just test` before every commit. `just build` needs ImageMagick 7 (`magick`) and the
 Python `markdown` and `codespell` modules.
 
 ## `readme.md` is generated

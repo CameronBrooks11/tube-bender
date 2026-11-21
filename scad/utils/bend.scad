@@ -16,7 +16,7 @@
  */
 
 include <NopSCADlib/core.scad>;
-include <pin_sizing.scad>;   // the allowable fractions are variables
+include <pin_sizing.scad>; // the allowable fractions are variables
 
 use <units.scad>
 use <../purchased/tube.scad>
@@ -39,7 +39,7 @@ bend_min_d_of_bend = 3;
 //! The OD band in which a manual machine is the right answer. The lower end is where the
 //! Swagelok hand bender starts, the upper is where both reference manual benders stop and
 //! where the derived handle length stops being a hand tool.
-bend_od_range = [inch(1/8), inch(2)];
+bend_od_range = [inch(1 / 8), inch(2)];
 
 //! Safety factor on base anchor bolt shear. REASONED, NOT CITED: nothing found sets a
 //! factor for a hand-operated bender, and the failure mode is a machine that walks across
@@ -68,7 +68,7 @@ function bend_min_clr(tube) = bend_min_d_of_bend * tube_od(tube);
 //! not a default, and bend_departures() names it.
 function bend_default_clr(tube) =
     let (c = clr_smallest_at_least(tube, bend_min_clr(tube)))
-        is_undef(c) ? bend_min_clr(tube) : c;
+    is_undef(c) ? bend_min_clr(tube) : c;
 
 //! Whether this radius is one somebody sells for this OD.
 function bend_clr_is_catalogued(tube, clr) =
@@ -105,8 +105,10 @@ bend_clamp_rigidity_k = 5;
 //! the sources describe. Every die in this machine's range sits at 3 D or above, so the
 //! floor governs; the formula is kept because the floor is not the reason it governs.
 function bend_clamp_length(tube, clr) =
-    max(tube_od(tube) * bend_clamp_rigidity_k - clr,
-        bend_grip_factor * tube_od(tube));
+    max(
+        tube_od(tube) * bend_clamp_rigidity_k - clr,
+        bend_grip_factor * tube_od(tube)
+    );
 
 //! Degrees of overbend the die must carry past the target angle so the tube springs back
 //! to it. JD2 measures 3 to 4 degrees on 1-1/2 in x 0.120 in welded mild steel and says
@@ -153,8 +155,11 @@ bend_handle_grip_length = 100;
 //! Where the grip governs, the operator simply pulls less than the ceiling. Ask for the
 //! real figure with bend_operator_force_N() and report it - it is the more interesting
 //! number anyway, because it says how hard the machine actually is to work.
-function bend_handle_length_mm(moment_Nm, socket_radius_mm,
-                               force_N = bend_operator_force_ceiling) =
+function bend_handle_length_mm(
+    moment_Nm,
+    socket_radius_mm,
+    force_N = bend_operator_force_ceiling
+) =
     max(moment_Nm / force_N * 1000, socket_radius_mm + bend_handle_grip_length);
 
 //! Operator pull, N, implied by a handle of `length_mm`. The inverse, for checking a
@@ -231,7 +236,7 @@ function bend_followbar_force_N(moment_Nm, station_mm) = moment_Nm / (station_mm
 //! whole bend is one pull.
 function bend_strokes(bend_angle, hole_pitch_deg, n_holes) =
     n_holes == 0 ? 1
-                 : min(n_holes, ceil((bend_angle + bend_overbend_degrees) / hole_pitch_deg));
+    : min(n_holes, ceil((bend_angle + bend_overbend_degrees) / hole_pitch_deg));
 
 //! How far the end of the handle travels in one stroke, mm.
 function bend_stroke_travel_mm(hole_pitch_deg, handle_length_mm) =
@@ -256,8 +261,9 @@ function bend_indexed_rotation(n_holes, pitch_deg) = n_holes * pitch_deg;
 //! IS the whole arc, and bend_mechanism_departures() checks that case on its own terms.
 function bend_stroke_overrun(bend_angle, n_holes, pitch_deg) =
     n_holes == 0 ? 0
-                 : max(0, bend_angle + bend_overbend_degrees
-                              - bend_indexed_rotation(n_holes, pitch_deg));
+    : max(
+        0, bend_angle + bend_overbend_degrees - bend_indexed_rotation(n_holes, pitch_deg)
+    );
 
 //
 // Sweep. The drive links turn with the die; the followbar, its pin, and anything else the
@@ -282,8 +288,7 @@ function bend_drive_band(swing_deg, link_width_mm, radius_mm) =
 //! Degrees of sector the drive link must be kept clear of, either side of the followbar:
 //! the link's own half-width plus the followbar's, at the followbar's radius.
 function bend_followbar_keepout(link_width_mm, followbar_length_mm, radius_mm) =
-    bend_angular_half_width(link_width_mm, radius_mm)
-        + bend_angular_half_width(followbar_length_mm, radius_mm);
+    bend_angular_half_width(link_width_mm, radius_mm) + bend_angular_half_width(followbar_length_mm, radius_mm);
 
 //! Degrees of swing left for the drive link once the followbar's keep-out is taken out of
 //! the circle.
@@ -310,13 +315,15 @@ function plate_section_modulus(t, w, d = 0) = t * (pow(w, 3) - pow(d, 3)) / (6 *
 //! `w <- cbrt(ws^2 w + d^3)` from `w = ws` is well converged - the map is a contraction
 //! near the root and the residual is under a hundredth of a millimetre by the fourth.
 function plate_width_for_moment(moment_Nmm, t, fb, d = 0) =
-    let (ws = sqrt(6 * moment_Nmm / (fb * t)),
-         w1 = pow(ws * ws * ws + pow(d, 3), 1/3),
-         w2 = pow(ws * ws * w1 + pow(d, 3), 1/3),
-         w3 = pow(ws * ws * w2 + pow(d, 3), 1/3),
-         w4 = pow(ws * ws * w3 + pow(d, 3), 1/3),
-         w5 = pow(ws * ws * w4 + pow(d, 3), 1/3))
-        w5;
+    let (
+        ws = sqrt(6 * moment_Nmm / (fb * t)),
+        w1 = pow(ws * ws * ws + pow(d, 3), 1 / 3),
+        w2 = pow(ws * ws * w1 + pow(d, 3), 1 / 3),
+        w3 = pow(ws * ws * w2 + pow(d, 3), 1 / 3),
+        w4 = pow(ws * ws * w3 + pow(d, 3), 1 / 3),
+        w5 = pow(ws * ws * w4 + pow(d, 3), 1 / 3)
+    )
+    w5;
 
 //
 // Anchorage. The tube's far end is free, so the base reacts a TORQUE about the vertical
@@ -341,8 +348,9 @@ function bend_anchor_bolt_allowable_N(d, yield_MPa) =
 
 //! Diameter, mm, an anchor bolt has to be to carry `force_N` at that allowable.
 function bend_anchor_bolt_diameter(force_N, yield_MPa) =
-    sqrt(4 * force_N * bend_anchor_safety_factor
-             / (PI * pin_allowable_shear_fraction * yield_MPa));
+    sqrt(
+        4 * force_N * bend_anchor_safety_factor / (PI * pin_allowable_shear_fraction * yield_MPa)
+    );
 
 //
 // Departures.
@@ -367,79 +375,111 @@ clr_tolerance = 0.01;
 //! hole - and `followbar_deg` is the direction the followbar stands in. With those the band
 //! is PLACED rather than merely sized, so the last check below asks whether it actually
 //! overlaps the followbar rather than only whether there was room for it somewhere.
-function bend_mechanism_departures(bend_angle, link_width_mm, followbar_length_mm,
-                                   radius_mm, pitch_deg, n_holes, home_deg,
-                                   followbar_deg) =
-    let (sweep = bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm),
-         arc   = bend_angle + bend_overbend_degrees,
-         over  = bend_stroke_overrun(bend_angle, n_holes, pitch_deg),
-         last  = pitch_deg + over,
-         // The band the link's material occupies, and the sector the followbar holds, both
-         // measured about the pivot. The band runs from the home angle to one stroke past
-         // it, widened by the link's own half-width; the last stroke is the long one.
-         bh    = bend_angular_half_width(link_width_mm, radius_mm),
-         fh    = bend_angular_half_width(followbar_length_mm, radius_mm),
-         lo    = home_deg - bh,
-         hi    = home_deg + last + bh,
-         // Two arcs overlap iff their midpoints are closer than the sum of their
-         // half-widths. Taken on midpoints rather than endpoints because endpoint
-         // comparisons on a circle need a case for every way the pair can wrap.
-         sep   = abs(((followbar_deg - (lo + hi) / 2 + 540) % 360) - 180))
+function bend_mechanism_departures(
+    bend_angle,
+    link_width_mm,
+    followbar_length_mm,
+    radius_mm,
+    pitch_deg,
+    n_holes,
+    home_deg,
+    followbar_deg
+) =
+    let (
+        sweep = bend_available_sweep(link_width_mm, followbar_length_mm, radius_mm),
+        arc = bend_angle + bend_overbend_degrees,
+        over = bend_stroke_overrun(bend_angle, n_holes, pitch_deg),
+        last = pitch_deg + over,
+        // The band the link's material occupies, and the sector the followbar holds, both
+        // measured about the pivot. The band runs from the home angle to one stroke past
+        // it, widened by the link's own half-width; the last stroke is the long one.
+        bh = bend_angular_half_width(link_width_mm, radius_mm),
+        fh = bend_angular_half_width(followbar_length_mm, radius_mm),
+        lo = home_deg - bh,
+        hi = home_deg + last + bh,
+        // Two arcs overlap iff their midpoints are closer than the sum of their
+        // half-widths. Taken on midpoints rather than endpoints because endpoint
+        // comparisons on a circle need a case for every way the pair can wrap.
+        sep = abs(( (followbar_deg - (lo + hi) / 2 + 540) % 360) - 180)
+    )
     [
-        if (n_holes == 0 && arc > sweep)
-            "the die has no drive holes, so the link must swing the whole bend - and it sweeps through the followbar doing it",
-        if (n_holes > 0 && last > sweep)
-            str("the last stroke needs ", round(last),
-                " deg to finish the arc and the followbar leaves only ", round(sweep)),
-        if (n_holes > 0 && last <= sweep && sep < (hi - lo) / 2 + fh)
-            str("the stroke overlaps the followbar where it stands - the band runs ",
+            if (n_holes == 0 && arc > sweep) "the die has no drive holes, so the link must swing the whole bend - and it sweeps through the followbar doing it",
+            if (n_holes > 0 && last > sweep) str(
+                "the last stroke needs ", round(last),
+                " deg to finish the arc and the followbar leaves only ", round(sweep)
+            ),
+            if (n_holes > 0 && last <= sweep && sep < (hi - lo) / 2 + fh) str(
+                "the stroke overlaps the followbar where it stands - the band runs ",
                 round(lo), " to ", round(hi), " deg and the followbar holds ",
-                round(followbar_deg - fh), " to ", round(followbar_deg + fh)),
+                round(followbar_deg - fh), " to ", round(followbar_deg + fh)
+            ),
     ];
 
-function bend_departures(tube, clr) = [
-    if (clr < bend_min_clr(tube) - clr_tolerance)
-        "D of bend below 3, needs a mandrel",
-    if (tube_od(tube) < bend_od_range[0]) "OD below the 1/8 in floor",
-    if (tube_od(tube) > bend_od_range[1]) "OD above the 2 in manual ceiling",
-    if (!bend_clr_is_catalogued(tube, clr))
-        len(clr_catalogued(tube)) == 0
-            ? "no catalogue covers this OD, so the CLR is the bare 3 x OD floor"
-            : is_undef(clr_smallest_at_least(tube, bend_min_clr(tube)))
-                ? "every radius sold for this OD is tighter than 3 x OD - the trade bends this size harder than the rule"
-                : "CLR is not one of the radii sold for this OD",
-];
+function bend_departures(tube, clr) =
+    [
+        if (clr < bend_min_clr(tube) - clr_tolerance) "D of bend below 3, needs a mandrel",
+        if (tube_od(tube) < bend_od_range[0]) "OD below the 1/8 in floor",
+        if (tube_od(tube) > bend_od_range[1]) "OD above the 2 in manual ceiling",
+        if (!bend_clr_is_catalogued(tube, clr)) len(clr_catalogued(tube)) == 0 ? "no catalogue covers this OD, so the CLR is the bare 3 x OD floor"
+        : is_undef(clr_smallest_at_least(tube, bend_min_clr(tube))) ? "every radius sold for this OD is tighter than 3 x OD - the trade bends this size harder than the rule"
+        : "CLR is not one of the radii sold for this OD",
+    ];
 
 //! Echo everything the configuration implies, before any of it is drawn.
 module bend_report(tube, clr, handle_length_mm, force_N = bend_operator_force_ceiling) {
-    fd  = bend_d_of_bend(tube, clr);
-    fw  = bend_wall_factor(tube);
-    mp  = bend_plastic_moment_Nm(tube);
-    l   = handle_length_mm;
-    f   = bend_operator_force_N(mp, l);
+    fd = bend_d_of_bend(tube, clr);
+    fw = bend_wall_factor(tube);
+    mp = bend_plastic_moment_Nm(tube);
+    l = handle_length_mm;
+    f = bend_operator_force_N(mp, l);
     dep = bend_departures(tube, clr);
 
     // tube_size() is an IDENTITY, not a measurement - it stays imperial in both systems,
     // because that is what is stamped on the die and typed into an order form.
-    echo(str("tube:    ", tube_size(tube), ", ",
-             tube_material_description(tube_material(tube))));
-    echo(str("         OD ", fmt_length(tube_od(tube)), ", wall ", fmt_length(tube_wall(tube)),
-             ", wall factor ", fw, " (a ratio, so it reads the same either way)"));
-    echo(str("bend:    CLR ", fmt_length(clr), " = ", fd,
-             " D of bend; minimum without a mandrel is ", fmt_length(bend_min_clr(tube))));
+    echo(
+        str(
+            "tube:    ", tube_size(tube), ", ",
+            tube_material_description(tube_material(tube))
+        )
+    );
+    echo(
+        str(
+            "         OD ", fmt_length(tube_od(tube)), ", wall ", fmt_length(tube_wall(tube)),
+            ", wall factor ", fw, " (a ratio, so it reads the same either way)"
+        )
+    );
+    echo(
+        str(
+            "bend:    CLR ", fmt_length(clr), " = ", fd,
+            " D of bend; minimum without a mandrel is ", fmt_length(bend_min_clr(tube))
+        )
+    );
     // A list, so the unit goes on the outside rather than onto every entry.
-    echo(str("         radii sold for this OD: ",
-             len(clr_catalogued(tube))
-                 ? str([for (r = clr_catalogued(tube)) fmt_bare_length(r)], " ",
-                       fmt_length_unit())
-                 : "none in either catalogue"));
-    echo(str("torque:  plastic moment ", fmt_moment(mp), " at yield ",
-             fmt_stress(tube_material_yield_max(tube_material(tube))),
-             " - a FLOOR, friction and hardening are not in it"));
+    echo(
+        str(
+            "         radii sold for this OD: ",
+            len(clr_catalogued(tube)) ? str(
+                    [for (r = clr_catalogued(tube)) fmt_bare_length(r)], " ",
+                    fmt_length_unit()
+                )
+            : "none in either catalogue"
+        )
+    );
+    echo(
+        str(
+            "torque:  plastic moment ", fmt_moment(mp), " at yield ",
+            fmt_stress(tube_material_yield_max(tube_material(tube))),
+            " - a FLOOR, friction and hardening are not in it"
+        )
+    );
     // The 1500 mm test is a threshold in the model's own units, not a reported number.
-    echo(str("handle:  ", fmt_length(l), ", needing ", fmt_force(f), " of pull - the ceiling",
-             " a designer may require is ", fmt_force(force_N),
-             l > 1500 ? "; this wants two hands and a braced stance" : ""));
+    echo(
+        str(
+            "handle:  ", fmt_length(l), ", needing ", fmt_force(f), " of pull - the ceiling",
+            " a designer may require is ", fmt_force(force_N),
+            l > 1500 ? "; this wants two hands and a braced stance" : ""
+        )
+    );
 
     if (len(dep) == 0)
         echo("checks:  inside every band checked");

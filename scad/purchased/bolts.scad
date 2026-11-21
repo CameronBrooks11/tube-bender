@@ -22,18 +22,27 @@ include <NopSCADlib/core.scad>; // inch()
 function HexBolt(name, size, diameter, part_no = undef) = [name, size, diameter, part_no];
 
 //                                                          dia            part no
-bolt_0p250in = HexBolt("bolt_0p250in", "1/4 in",  inch(1/4));
-bolt_0p3125in= HexBolt("bolt_0p3125in","5/16 in", inch(5/16));
-bolt_0p375in = HexBolt("bolt_0p375in", "3/8 in",  inch(3/8));
-bolt_0p500in = HexBolt("bolt_0p500in", "1/2 in",  inch(1/2));
-bolt_0p625in = HexBolt("bolt_0p625in", "5/8 in",  inch(5/8));
-bolt_0p750in = HexBolt("bolt_0p750in", "3/4 in",  inch(3/4),  "91236A849");
-bolt_0p875in = HexBolt("bolt_0p875in", "7/8 in",  inch(7/8));
-bolt_1p000in = HexBolt("bolt_1p000in", "1 in",    inch(1));
-bolt_1p250in = HexBolt("bolt_1p250in", "1-1/4 in",inch(1 + 1/4));
+bolt_0p250in = HexBolt("bolt_0p250in", "1/4 in", inch(1 / 4));
+bolt_0p3125in = HexBolt("bolt_0p3125in", "5/16 in", inch(5 / 16));
+bolt_0p375in = HexBolt("bolt_0p375in", "3/8 in", inch(3 / 8));
+bolt_0p500in = HexBolt("bolt_0p500in", "1/2 in", inch(1 / 2));
+bolt_0p625in = HexBolt("bolt_0p625in", "5/8 in", inch(5 / 8));
+bolt_0p750in = HexBolt("bolt_0p750in", "3/4 in", inch(3 / 4), "91236A849");
+bolt_0p875in = HexBolt("bolt_0p875in", "7/8 in", inch(7 / 8));
+bolt_1p000in = HexBolt("bolt_1p000in", "1 in", inch(1));
+bolt_1p250in = HexBolt("bolt_1p250in", "1-1/4 in", inch(1 + 1 / 4));
 
-bolts = [bolt_0p250in, bolt_0p3125in, bolt_0p375in, bolt_0p500in, bolt_0p625in,
-         bolt_0p750in, bolt_0p875in, bolt_1p000in, bolt_1p250in];
+bolts = [
+    bolt_0p250in,
+    bolt_0p3125in,
+    bolt_0p375in,
+    bolt_0p500in,
+    bolt_0p625in,
+    bolt_0p750in,
+    bolt_0p875in,
+    bolt_1p000in,
+    bolt_1p250in,
+];
 
 //
 // Bolt material. REGISTERED CONSERVATIVELY at A36's 250 MPa rather than at a fastener
@@ -47,8 +56,8 @@ bolt_material_yield = 250;
 //! The smallest registered bolt at least `d` mm across, or `undef` past the top of series.
 function bolt_smallest_at_least(d, from = bolts) =
     let (above = [for (b = from) if (bolt_diameter(b) >= d - 0.01) bolt_diameter(b)])
-        len(above) == 0 ? undef
-                        : [for (b = from) if (bolt_diameter(b) == min(above)) b][0];
+    len(above) == 0 ? undef
+    : [for (b = from) if (bolt_diameter(b) == min(above)) b][0];
 
 use <bolt.scad>; // bolt() draws the fastener these rows describe
 
@@ -63,8 +72,8 @@ use <bolt.scad>; // bolt() draws the fastener these rows describe
 //! stale dropdown, and undef would travel a long way from here before it surfaced.
 function bolt_by_name(name, from = bolts) =
     let (hit = [for (r = from) if (bolt_name(r) == name) r])
-        assert(len(hit) == 1, str("no such bolt in the registry: ", name))
-        hit[0];
+    assert(len(hit) == 1, str("no such bolt in the registry: ", name))
+    hit[0];
 
 //! Every registered name, in registry order - what a Customizer dropdown has to offer.
 function bolt_names(from = bolts) = [for (r = from) bolt_name(r)];

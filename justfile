@@ -16,8 +16,11 @@ default:
 setup:
     scadman sync
 
-# Everything CI runs.
-check: check-scad check-customizer check-sizes check-report
+# Formatting, every file evaluated, and the Customizer lists in step with the registries.
+check: fmt-check check-scad check-customizer
+
+# Drive the model at every tube size and in both unit systems.
+test: check-sizes check-report
 
 # Evaluate every SCAD file and report anything that does not build.
 check-scad:
@@ -184,3 +187,11 @@ check-report:
         fi
     done
     exit $failed
+
+# Format the .scad sources with topiary (.topiary/languages.ncl)
+fmt:
+    git ls-files -z '*.scad' | xargs -0 -r topiary format
+
+# Check the .scad sources are formatted, without changing them
+fmt-check:
+    git ls-files -z '*.scad' | xargs -0 -r -n1 topiary format --check

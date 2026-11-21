@@ -8,5 +8,5 @@
 include <../scad/purchased/tubes.scad>
 include <../scad/purchased/plates.scad>
 
-for (t = tubes)  echo(str("OPT|tube|",  tube_name(t),  "|", tube_size(t)));
+for (t = tubes) echo(str("OPT|tube|", tube_name(t), "|", tube_size(t)));
 for (p = plates) echo(str("OPT|plate|", plate_name(p), "|", plate_size(p)));

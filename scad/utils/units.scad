@@ -85,12 +85,12 @@ include <NopSCADlib/core.scad>;
 //   psi                     lbf / inch^2
 //
 
-units_mm_per_inch  = 25.4;
-units_kg_per_lb    = 0.45359237;
-units_N_per_lbf    = 0.45359237 * 9.80665;              // 4.4482216152605
-units_Nm_per_lbfft = units_N_per_lbf * 0.3048;          // 1.3558179483314
-units_MPa_per_ksi  = units_N_per_lbf / (0.0254 * 0.0254) / 1000;  // 6.89475729316836
-units_MPa_per_psi  = units_MPa_per_ksi / 1000;
+units_mm_per_inch = 25.4;
+units_kg_per_lb = 0.45359237;
+units_N_per_lbf = 0.45359237 * 9.80665; // 4.4482216152605
+units_Nm_per_lbfft = units_N_per_lbf * 0.3048; // 1.3558179483314
+units_MPa_per_ksi = units_N_per_lbf / (0.0254 * 0.0254) / 1000; // 6.89475729316836
+units_MPa_per_psi = units_MPa_per_ksi / 1000;
 
 //! Whether the report is being written in imperial. Unset is metric - a part file rendered
 //! on its own has no configuration to read.
@@ -108,12 +108,12 @@ function units_round(x, dp) = round(x * pow(10, dp)) / pow(10, dp);
 //! A length, from mm.
 function fmt_length(mm) =
     units_imperial() ? str(units_round(mm / units_mm_per_inch, 3), " in")
-                     : str(units_round(mm, 2), " mm");
+    : str(units_round(mm, 2), " mm");
 
 //! A force, from N.
 function fmt_force(N) =
     units_imperial() ? str(units_round(N / units_N_per_lbf, 1), " lbf")
-                     : str(units_round(N, 0), " N");
+    : str(units_round(N, 0), " N");
 
 //! Force per unit length, from N/mm - what one millimetre of a weld carries.
 //!
@@ -121,30 +121,29 @@ function fmt_force(N) =
 //! where metric takes a tenth; that puts the two within a factor of 1.75 of each other,
 //! which is the rule the rest of these follow.
 function fmt_force_per_length(N_per_mm) =
-    units_imperial()
-        ? str(units_round(N_per_mm * units_mm_per_inch / units_N_per_lbf, 0), " lbf/in")
-        : str(units_round(N_per_mm, 1), " N/mm");
+    units_imperial() ? str(units_round(N_per_mm * units_mm_per_inch / units_N_per_lbf, 0), " lbf/in")
+    : str(units_round(N_per_mm, 1), " N/mm");
 
 //! A moment or a torque, from N.m.
 function fmt_moment(Nm) =
     units_imperial() ? str(units_round(Nm / units_Nm_per_lbfft, 1), " lbf.ft")
-                     : str(units_round(Nm, 1), " N.m");
+    : str(units_round(Nm, 1), " N.m");
 
 //! A material stress or allowable, from MPa. See the header for why this is ksi and
 //! fmt_pressure() is psi.
 function fmt_stress(MPa) =
     units_imperial() ? str(units_round(MPa / units_MPa_per_ksi, 2), " ksi")
-                     : str(units_round(MPa, 1), " MPa");
+    : str(units_round(MPa, 1), " MPa");
 
 //! A bearing or contact pressure, from MPa.
 function fmt_pressure(MPa) =
     units_imperial() ? str(units_round(MPa / units_MPa_per_psi, 1), " psi")
-                     : str(units_round(MPa, 3), " MPa");
+    : str(units_round(MPa, 3), " MPa");
 
 //! A mass, from kg.
 function fmt_mass(kg) =
     units_imperial() ? str(units_round(kg / units_kg_per_lb, 2), " lb")
-                     : str(units_round(kg, 2), " kg");
+    : str(units_round(kg, 2), " kg");
 
 //! A length with no unit written on it, for a list or a coordinate pair where repeating the
 //! unit on every entry is noise. The CALLER must then say which it is - fmt_unit() gives

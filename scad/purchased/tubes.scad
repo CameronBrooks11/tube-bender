@@ -24,26 +24,39 @@ include <tube_materials.scad>
 function Tube(name, size, od, wall, material = A513_T1) = [name, size, od, wall, material];
 
 //                                                                       "name"              "size"                          od           wall
-tube_0p125x0p028 = Tube("tube_0p125x0p028", "1/8 in OD x 0.028 in wall",     inch(1/8),     inch(0.028));
-tube_0p250x0p035 = Tube("tube_0p250x0p035", "1/4 in OD x 0.035 in wall",     inch(1/4),     inch(0.035));
-tube_0p375x0p049 = Tube("tube_0p375x0p049", "3/8 in OD x 0.049 in wall",     inch(3/8),     inch(0.049));
-tube_0p500x0p049 = Tube("tube_0p500x0p049", "1/2 in OD x 0.049 in wall",     inch(1/2),     inch(0.049));
-tube_0p625x0p049 = Tube("tube_0p625x0p049", "5/8 in OD x 0.049 in wall",     inch(5/8),     inch(0.049));
-tube_0p750x0p065 = Tube("tube_0p750x0p065", "3/4 in OD x 0.065 in wall",     inch(3/4),     inch(0.065));
-tube_0p875x0p065 = Tube("tube_0p875x0p065", "7/8 in OD x 0.065 in wall",     inch(7/8),     inch(0.065));
-tube_1p000x0p065 = Tube("tube_1p000x0p065", "1 in OD x 0.065 in wall",       inch(1),       inch(0.065));
-tube_1p125x0p065 = Tube("tube_1p125x0p065", "1-1/8 in OD x 0.065 in wall",   inch(1 + 1/8), inch(0.065));
-tube_1p250x0p065 = Tube("tube_1p250x0p065", "1-1/4 in OD x 0.065 in wall",   inch(1 + 1/4), inch(0.065));
-tube_1p375x0p083 = Tube("tube_1p375x0p083", "1-3/8 in OD x 0.083 in wall",   inch(1 + 3/8), inch(0.083));
-tube_1p500x0p095 = Tube("tube_1p500x0p095", "1-1/2 in OD x 0.095 in wall",   inch(1 + 1/2), inch(0.095));
-tube_1p625x0p095 = Tube("tube_1p625x0p095", "1-5/8 in OD x 0.095 in wall",   inch(1 + 5/8), inch(0.095));
-tube_1p750x0p095 = Tube("tube_1p750x0p095", "1-3/4 in OD x 0.095 in wall",   inch(1 + 3/4), inch(0.095));
-tube_2p000x0p120 = Tube("tube_2p000x0p120", "2 in OD x 0.120 in wall",       inch(2),       inch(0.120));
+tube_0p125x0p028 = Tube("tube_0p125x0p028", "1/8 in OD x 0.028 in wall", inch(1 / 8), inch(0.028));
+tube_0p250x0p035 = Tube("tube_0p250x0p035", "1/4 in OD x 0.035 in wall", inch(1 / 4), inch(0.035));
+tube_0p375x0p049 = Tube("tube_0p375x0p049", "3/8 in OD x 0.049 in wall", inch(3 / 8), inch(0.049));
+tube_0p500x0p049 = Tube("tube_0p500x0p049", "1/2 in OD x 0.049 in wall", inch(1 / 2), inch(0.049));
+tube_0p625x0p049 = Tube("tube_0p625x0p049", "5/8 in OD x 0.049 in wall", inch(5 / 8), inch(0.049));
+tube_0p750x0p065 = Tube("tube_0p750x0p065", "3/4 in OD x 0.065 in wall", inch(3 / 4), inch(0.065));
+tube_0p875x0p065 = Tube("tube_0p875x0p065", "7/8 in OD x 0.065 in wall", inch(7 / 8), inch(0.065));
+tube_1p000x0p065 = Tube("tube_1p000x0p065", "1 in OD x 0.065 in wall", inch(1), inch(0.065));
+tube_1p125x0p065 = Tube("tube_1p125x0p065", "1-1/8 in OD x 0.065 in wall", inch(1 + 1 / 8), inch(0.065));
+tube_1p250x0p065 = Tube("tube_1p250x0p065", "1-1/4 in OD x 0.065 in wall", inch(1 + 1 / 4), inch(0.065));
+tube_1p375x0p083 = Tube("tube_1p375x0p083", "1-3/8 in OD x 0.083 in wall", inch(1 + 3 / 8), inch(0.083));
+tube_1p500x0p095 = Tube("tube_1p500x0p095", "1-1/2 in OD x 0.095 in wall", inch(1 + 1 / 2), inch(0.095));
+tube_1p625x0p095 = Tube("tube_1p625x0p095", "1-5/8 in OD x 0.095 in wall", inch(1 + 5 / 8), inch(0.095));
+tube_1p750x0p095 = Tube("tube_1p750x0p095", "1-3/4 in OD x 0.095 in wall", inch(1 + 3 / 4), inch(0.095));
+tube_2p000x0p120 = Tube("tube_2p000x0p120", "2 in OD x 0.120 in wall", inch(2), inch(0.120));
 
-tubes = [tube_0p125x0p028, tube_0p250x0p035, tube_0p375x0p049, tube_0p500x0p049,
-         tube_0p625x0p049, tube_0p750x0p065, tube_0p875x0p065, tube_1p000x0p065,
-         tube_1p125x0p065, tube_1p250x0p065, tube_1p375x0p083, tube_1p500x0p095,
-         tube_1p625x0p095, tube_1p750x0p095, tube_2p000x0p120];
+tubes = [
+    tube_0p125x0p028,
+    tube_0p250x0p035,
+    tube_0p375x0p049,
+    tube_0p500x0p049,
+    tube_0p625x0p049,
+    tube_0p750x0p065,
+    tube_0p875x0p065,
+    tube_1p000x0p065,
+    tube_1p125x0p065,
+    tube_1p250x0p065,
+    tube_1p375x0p083,
+    tube_1p500x0p095,
+    tube_1p625x0p095,
+    tube_1p750x0p095,
+    tube_2p000x0p120,
+];
 
 use <tube.scad>; // tube() draws the stock these rows describe
 
@@ -58,8 +71,8 @@ use <tube.scad>; // tube() draws the stock these rows describe
 //! stale dropdown, and undef would travel a long way from here before it surfaced.
 function tube_by_name(name, from = tubes) =
     let (hit = [for (r = from) if (tube_name(r) == name) r])
-        assert(len(hit) == 1, str("no such tube in the registry: ", name))
-        hit[0];
+    assert(len(hit) == 1, str("no such tube in the registry: ", name))
+    hit[0];
 
 //! Every registered name, in registry order - what a Customizer dropdown has to offer.
 function tube_names(from = tubes) = [for (r = from) tube_name(r)];
