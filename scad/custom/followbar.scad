@@ -41,7 +41,7 @@ use <../purchased/plate.scad>
 use <forming_die.scad>
 
 include <../utils/bend.scad>;
-include <../purchased/plates.scad>;   // plate_smallest_at_least searches a list
+include <../purchased/plates.scad>; // plate_smallest_at_least searches a list
 
 //! How far outboard of the TUBE'S AXIS the followbar's pin sits, mm.
 //!
@@ -78,11 +78,13 @@ function followbar_blank(tube) = plate_smallest_at_least(followbar_height(tube))
 //! the pivot - x is at least the CLR and y is at most half the block short of the station -
 //! so all four angles sit in the fourth quadrant and there is no wrap to handle.
 function followbar_angles(tube, clr, pin_d) =
-    let (d  = followbar_depth(tube, pin_d),
-         lf = bend_followbar_length(tube),
-         st = bend_followbar_station(tube, clr),
-         a  = [for (x = [clr, clr + d], y = [-st - lf / 2, -st + lf / 2]) atan2(y, x)])
-        [min(a), max(a)];
+    let (
+        d = followbar_depth(tube, pin_d),
+        lf = bend_followbar_length(tube),
+        st = bend_followbar_station(tube, clr),
+        a = [for (x = [clr, clr + d], y = [-st - lf / 2, -st + lf / 2]) atan2(y, x)]
+    )
+    [min(a), max(a)];
 
 //! Bearing pressure on the tube, MPa, taken over the projected area the groove presses on.
 //! Reported, not checked - the tube is being deliberately deformed a few millimetres away,
@@ -93,42 +95,54 @@ function followbar_bearing_MPa(force_N, tube) =
 //! The followbar, drawn about the TUBE'S axis: x runs outboard, y along the tube, and the
 //! tube's centreline is the z = 0 line at x = 0.
 module followbar(tube, pin_d) {
-    lf    = bend_followbar_length(tube);
-    d     = followbar_depth(tube, pin_d);
-    h     = followbar_height(tube);
-    gr    = forming_die_groove_radius(tube);
+    lf = bend_followbar_length(tube);
+    d = followbar_depth(tube, pin_d);
+    h = followbar_height(tube);
+    gr = forming_die_groove_radius(tube);
     blank = followbar_blank(tube);
 
     assert(!is_undef(blank), "followbar: no registered plate is thick enough for this blank");
 
-    vitamin(str("followbar_blank(", plate_name(blank), "): ", plate_description(blank),
-                " ", plate_size(blank), ", blank ", fmt_bare_length(d), " x ",
-                fmt_length(lf), ", faced to ", fmt_length(h)));
+    vitamin(
+        str(
+            "followbar_blank(", plate_name(blank), "): ", plate_description(blank),
+            " ", plate_size(blank), ", blank ", fmt_bare_length(d), " x ",
+            fmt_length(lf), ", faced to ", fmt_length(h)
+        )
+    );
 
     color(plate_colour(blank))
         render()
             difference() {
                 translate([d / 2, 0, 0])
-                    cube([d, lf, h], center = true);
+                    cube([d, lf, h], center=true);
 
                 rotate([90, 0, 0])
-                    cylinder(r = gr, h = lf + 2 * eps, center = true);
+                    cylinder(r=gr, h=lf + 2 * eps, center=true);
 
                 translate([followbar_pin_offset(tube, pin_d), 0, 0])
-                    cylinder(d = pin_pivot_hole(pin_d), h = h + 2 * eps, center = true);
+                    cylinder(d=pin_pivot_hole(pin_d), h=h + 2 * eps, center=true);
             }
 }
 
 //! Echo what the followbar comes out as.
 module followbar_report(tube, clr, pin_d, force_N) {
-    echo(str("followbar: ", fmt_bare_length(followbar_depth(tube, pin_d)), " x ",
-             fmt_bare_length(bend_followbar_length(tube)), " x ",
-             fmt_length(followbar_height(tube)), ", pin ",
-             fmt_length(followbar_pin_offset(tube, pin_d)),
-             " outboard of the tube's axis, from ",
-             plate_size(followbar_blank(tube)), " plate"));
+    echo(
+        str(
+            "followbar: ", fmt_bare_length(followbar_depth(tube, pin_d)), " x ",
+            fmt_bare_length(bend_followbar_length(tube)), " x ",
+            fmt_length(followbar_height(tube)), ", pin ",
+            fmt_length(followbar_pin_offset(tube, pin_d)),
+            " outboard of the tube's axis, from ",
+            plate_size(followbar_blank(tube)), " plate"
+        )
+    );
     // A contact pressure, so psi rather than ksi - see utils/units.scad.
-    echo(str("           ", fmt_force(force_N), " onto the tube at ",
-             fmt_pressure(followbar_bearing_MPa(force_N, tube)),
-             " over its projected area"));
+    echo(
+        str(
+            "           ", fmt_force(force_N), " onto the tube at ",
+            fmt_pressure(followbar_bearing_MPa(force_N, tube)),
+            " over its projected area"
+        )
+    );
 }

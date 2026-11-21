@@ -20,10 +20,10 @@
 //                       ["name"          "description"                          yield MPa    colour  ]
 //                                                                              [min,  max]
 
-A513_T1       = ["A513_T1",      "ASTM A513 Type 1 ERW mild steel, as-welded",  [207,  310], "silver"];
-A513_NORM     = ["A513_NORM",    "ASTM A513 mild steel, normalized",            [159,  276], "silver"];
-A513_T5_DOM   = ["A513_T5_DOM",  "ASTM A513 Type 5 DOM mild steel, as-drawn",   [345,  483], "silver"];
-A513_T5_SR    = ["A513_T5_SR",   "ASTM A513 Type 5 DOM, stress-relieved",       [310,  448], "silver"];
+A513_T1 = ["A513_T1", "ASTM A513 Type 1 ERW mild steel, as-welded", [207, 310], "silver"];
+A513_NORM = ["A513_NORM", "ASTM A513 mild steel, normalized", [159, 276], "silver"];
+A513_T5_DOM = ["A513_T5_DOM", "ASTM A513 Type 5 DOM mild steel, as-drawn", [345, 483], "silver"];
+A513_T5_SR = ["A513_T5_SR", "ASTM A513 Type 5 DOM, stress-relieved", [310, 448], "silver"];
 
 tube_materials = [A513_T1, A513_NORM, A513_T5_DOM, A513_T5_SR];
 

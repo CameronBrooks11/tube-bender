@@ -17,11 +17,11 @@ use <../utils/units.scad>
 
 use <tube_material.scad>
 
-function tube_name(type)     = type[0];  //! Registry name
-function tube_size(type)     = type[1];  //! Imperial size, the identity you order by
-function tube_od(type)       = type[2];  //! Outside diameter, mm
-function tube_wall(type)     = type[3];  //! Wall thickness, mm
-function tube_material(type) = type[4];  //! Row from tube_materials.scad
+function tube_name(type) = type[0]; //! Registry name
+function tube_size(type) = type[1]; //! Imperial size, the identity you order by
+function tube_od(type) = type[2]; //! Outside diameter, mm
+function tube_wall(type) = type[3]; //! Wall thickness, mm
+function tube_material(type) = type[4]; //! Row from tube_materials.scad
 
 function tube_id(type) = tube_od(type) - 2 * tube_wall(type); //! Inside diameter, mm
 
@@ -30,16 +30,20 @@ module tube(type, length) {
     // The key before the colon is the BOM's own identity for this part and stays in
     // millimetres in both systems, the way a part number would - it is what groups
     // identical items, not something anybody measures. Only the human half converts.
-    vitamin(str("tube(", tube_name(type), ", ", length, "): Tube ", tube_size(type), ", ",
-                tube_material_description(tube_material(type)), ", length ",
-                fmt_length(length)));
+    vitamin(
+        str(
+            "tube(", tube_name(type), ", ", length, "): Tube ", tube_size(type), ", ",
+            tube_material_description(tube_material(type)), ", length ",
+            fmt_length(length)
+        )
+    );
 
     colour = tube_material_colour(tube_material(type));
 
     color(colour)
         render()
             difference() {
-                cylinder(d = tube_od(type), h = length, center = true);
-                cylinder(d = tube_id(type), h = length + 2 * eps, center = true);
+                cylinder(d=tube_od(type), h=length, center=true);
+                cylinder(d=tube_id(type), h=length + 2 * eps, center=true);
             }
 }

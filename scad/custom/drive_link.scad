@@ -33,7 +33,7 @@ use <../purchased/pin.scad>
 use <../purchased/plate.scad>
 
 include <../utils/bend.scad>;
-include <../utils/pin_sizing.scad>;   // pin_allowable_bending_fraction is a variable, so include
+include <../utils/pin_sizing.scad>; // pin_allowable_bending_fraction is a variable, so include
 
 //! Radius at which the link stops being structure and starts being handle, mm.
 //!
@@ -58,7 +58,7 @@ function drive_link_socket_radius(tube, clr) = clr + tube_od(tube);
 //! smallest sizes asserted.
 function drive_link_spacer_radii(handle_length_mm, bolt_d) =
     let (e = plate_eye_radius(pin_pivot_hole(bolt_d)))
-        [handle_length_mm - bend_handle_grip_length + e, handle_length_mm - e];
+    [handle_length_mm - bend_handle_grip_length + e, handle_length_mm - e];
 
 //! How many steps the taper is drawn in.
 drive_link_taper_steps = 24;
@@ -66,16 +66,33 @@ drive_link_taper_steps = 24;
 //! Width the link needs at radius `r`, mm - the peak width inboard of the drive hole, and
 //! the section for the local moment outboard of it, floored where the grip needs to be
 //! held and the spacer bolts need their edge distance.
-function drive_link_width_at(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                             frame_pin_d, drive_pin_d, spacer_bolt_d, r) =
-    let (peak = drive_link_width(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                                 frame_pin_d, drive_pin_d),
-         fb   = pin_allowable_bending_fraction * plate_yield(plate),
-         tip  = 2 * plate_eye_radius(pin_pivot_hole(spacer_bolt_d)))
-        r <= drive_radius_mm ? peak
-        : max(tip, min(peak, plate_width_for_moment(
-                  handle_force_N * (handle_length_mm - r) / 2,
-                  plate_thickness(plate), fb)));
+function drive_link_width_at(
+    plate,
+    handle_force_N,
+    handle_length_mm,
+    drive_radius_mm,
+    frame_pin_d,
+    drive_pin_d,
+    spacer_bolt_d,
+    r
+) =
+    let (
+        peak = drive_link_width(
+            plate, handle_force_N, handle_length_mm, drive_radius_mm,
+            frame_pin_d, drive_pin_d
+        ),
+        fb = pin_allowable_bending_fraction * plate_yield(plate),
+        tip = 2 * plate_eye_radius(pin_pivot_hole(spacer_bolt_d))
+    )
+    r <= drive_radius_mm ? peak
+    : max(
+        tip, min(
+            peak, plate_width_for_moment(
+                handle_force_N * (handle_length_mm - r) / 2,
+                plate_thickness(plate), fb
+            )
+        )
+    );
 
 //! The taper's sample radii and the width at each, as `[r, w]`.
 //!
@@ -84,15 +101,31 @@ function drive_link_width_at(plate, handle_force_N, handle_length_mm, drive_radi
 //! sample therefore carries the width required one step further IN - the wider figure - so
 //! every straight segment of the hull envelopes the curve it is approximating rather than
 //! cutting the corner off it.
-function drive_link_taper(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                          frame_pin_d, drive_pin_d, spacer_bolt_d) =
-    let (n = drive_link_taper_steps,
-         step = (handle_length_mm - drive_radius_mm) / n)
-        [for (i = [0 : n])
-             let (r = drive_radius_mm + i * step)
-                 [r, drive_link_width_at(plate, handle_force_N, handle_length_mm,
-                                         drive_radius_mm, frame_pin_d, drive_pin_d,
-                                         spacer_bolt_d, max(drive_radius_mm, r - step))]];
+function drive_link_taper(
+    plate,
+    handle_force_N,
+    handle_length_mm,
+    drive_radius_mm,
+    frame_pin_d,
+    drive_pin_d,
+    spacer_bolt_d
+) =
+    let (
+        n = drive_link_taper_steps,
+        step = (handle_length_mm - drive_radius_mm) / n
+    )
+    [
+            for (i = [0:n])
+            let (r = drive_radius_mm + i * step)
+            [
+                    r,
+                    drive_link_width_at(
+                        plate, handle_force_N, handle_length_mm,
+                        drive_radius_mm, frame_pin_d, drive_pin_d,
+                        spacer_bolt_d, max(drive_radius_mm, r - step)
+                    ),
+            ],
+    ];
 
 //! Mass of one link, kg, at 7850 kg/m^3 - reported because a 2 m plate is a real thing to
 //! pick up and the model should say so rather than let it arrive as a surprise.
@@ -101,11 +134,15 @@ function drive_link_taper(plate, handle_force_N, handle_length_mm, drive_radius_
 //! the moment needs it and that falls off all the way out, so a constant-width figure is
 //! about half again too heavy.
 function drive_link_mass(plate, taper, width_mm) =
-    let (area = width_mm * (taper[0][0] + width_mm)
-                + sumv([for (i = [1 : len(taper) - 1])
-                           (taper[i][1] + taper[i - 1][1]) / 2
-                               * (taper[i][0] - taper[i - 1][0])]))
-        area * plate_thickness(plate) * 7850 / 1e9;
+    let (
+        area = width_mm * (taper[0][0] + width_mm) + sumv(
+            [
+                for (i = [1:len(taper) - 1])
+                (taper[i][1] + taper[i - 1][1]) / 2 * (taper[i][0] - taper[i - 1][0]),
+            ]
+        )
+    )
+    area * plate_thickness(plate) * 7850 / 1e9;
 
 //! Distance from the pivot to the centre of mass of ONE link, mm.
 //!
@@ -114,16 +151,22 @@ function drive_link_mass(plate, taper, width_mm) =
 //! of it hang off this machine permanently, and where that weight acts decides what it does
 //! to the rest.
 function drive_link_centroid_radius(taper, width_mm) =
-    let (root_l = taper[0][0] + width_mm,
-         root_a = width_mm * root_l,
-         // The root block runs from -width/2 to taper[0][0] + width/2, so its centre is at
-         // taper[0][0] / 2.
-         root_m = root_a * taper[0][0] / 2,
-         seg_a  = [for (i = [1 : len(taper) - 1])
-                       (taper[i][1] + taper[i - 1][1]) / 2 * (taper[i][0] - taper[i - 1][0])],
-         seg_m  = [for (i = [1 : len(taper) - 1])
-                       seg_a[i - 1] * (taper[i][0] + taper[i - 1][0]) / 2])
-        (root_m + sumv(seg_m)) / (root_a + sumv(seg_a));
+    let (
+        root_l = taper[0][0] + width_mm,
+        root_a = width_mm * root_l,
+        // The root block runs from -width/2 to taper[0][0] + width/2, so its centre is at
+        // taper[0][0] / 2.
+        root_m = root_a * taper[0][0] / 2,
+        seg_a = [
+            for (i = [1:len(taper) - 1])
+            (taper[i][1] + taper[i - 1][1]) / 2 * (taper[i][0] - taper[i - 1][0]),
+        ],
+        seg_m = [
+            for (i = [1:len(taper) - 1])
+            seg_a[i - 1] * (taper[i][0] + taper[i - 1][0]) / 2,
+        ]
+    )
+    (root_m + sumv(seg_m)) / (root_a + sumv(seg_a));
 
 //! Force with which the drive pair's overhang LIFTS its own pivot end, N.
 //!
@@ -139,8 +182,9 @@ function drive_link_centroid_radius(taper, width_mm) =
 //! integral. A machine with a lift-off handle - which is what both reference machines have -
 //! does not have it at all while the handle is off the bench.
 function drive_link_overhang_lift_N(mass_kg, centroid_r_mm, bearing_radius_mm, width_mm) =
-    max(0, 2 * mass_kg * 9.80665 * (centroid_r_mm - bearing_radius_mm)
-               / (bearing_radius_mm + width_mm / 2));
+    max(
+        0, 2 * mass_kg * 9.80665 * (centroid_r_mm - bearing_radius_mm) / (bearing_radius_mm + width_mm / 2)
+    );
 
 //! Peak bending moment in ONE link, N.mm, at the drive hole.
 function drive_link_moment_Nmm(handle_force_N, handle_length_mm, drive_radius_mm) =
@@ -152,41 +196,71 @@ function drive_link_moment_Nmm(handle_force_N, handle_length_mm, drive_radius_mm
 //! `drive_radius_mm` is undef on a die too small to carry drive holes. There is then no
 //! hole to weaken the section and no radius to measure the moment from, so the moment is
 //! taken at the pivot and the section is solid.
-function drive_link_width(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                          frame_pin_d, drive_pin_d) =
-    let (driven = !is_undef(drive_radius_mm),
-         hole = driven ? pin_index_hole(drive_pin_d) : 0,
-         fb   = pin_allowable_bending_fraction * plate_yield(plate),
-         wb   = plate_width_for_moment(
-                    drive_link_moment_Nmm(handle_force_N, handle_length_mm,
-                                          driven ? drive_radius_mm : 0),
-                    plate_thickness(plate), fb, hole))
-        max(wb,
-            driven ? 2 * plate_eye_radius(hole) : 0,
-            2 * plate_eye_radius(pin_pivot_hole(frame_pin_d)));
+function drive_link_width(
+    plate,
+    handle_force_N,
+    handle_length_mm,
+    drive_radius_mm,
+    frame_pin_d,
+    drive_pin_d
+) =
+    let (
+        driven = !is_undef(drive_radius_mm),
+        hole = driven ? pin_index_hole(drive_pin_d) : 0,
+        fb = pin_allowable_bending_fraction * plate_yield(plate),
+        wb = plate_width_for_moment(
+            drive_link_moment_Nmm(
+                handle_force_N, handle_length_mm,
+                driven ? drive_radius_mm : 0
+            ),
+            plate_thickness(plate), fb, hole
+        )
+    )
+    max(
+        wb,
+        driven ? 2 * plate_eye_radius(hole) : 0,
+        2 * plate_eye_radius(pin_pivot_hole(frame_pin_d))
+    );
 
 //! The handle interface: `[radius, moment N.mm, force N]` delivered to it.
 function drive_link_handle_interface(tube, clr, handle_force_N, handle_length_mm) =
     let (r = drive_link_socket_radius(tube, clr))
-        [r, handle_force_N * (handle_length_mm - r), handle_force_N];
+    [r, handle_force_N * (handle_length_mm - r), handle_force_N];
 
 //! The profile one drive link is cut from, on z = 0, pivot at the origin, drive hole out
 //! along +x.
-module drive_link_2D(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm,
-                     handle_force_N, handle_length_mm, spacer_bolt_d) {
-    w  = drive_link_width(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                          frame_pin_d, drive_pin_d);
+module drive_link_2D(
+    tube,
+    clr,
+    plate,
+    frame_pin_d,
+    drive_pin_d,
+    drive_radius_mm,
+    handle_force_N,
+    handle_length_mm,
+    spacer_bolt_d
+) {
+    w = drive_link_width(
+        plate, handle_force_N, handle_length_mm, drive_radius_mm,
+        frame_pin_d, drive_pin_d
+    );
     rs = drive_link_socket_radius(tube, clr);
     sp = drive_link_spacer_radii(handle_length_mm, spacer_bolt_d);
-    taper = drive_link_taper(plate, handle_force_N, handle_length_mm,
-                             is_undef(drive_radius_mm) ? 0 : drive_radius_mm,
-                             frame_pin_d, drive_pin_d, spacer_bolt_d);
+    taper = drive_link_taper(
+        plate, handle_force_N, handle_length_mm,
+        is_undef(drive_radius_mm) ? 0 : drive_radius_mm,
+        frame_pin_d, drive_pin_d, spacer_bolt_d
+    );
     drive_radius_mm_or_pivot = is_undef(drive_radius_mm) ? 0 : drive_radius_mm;
 
-    assert(is_undef(drive_radius_mm) || drive_radius_mm < rs,
-           "drive link: the drive hole is outside where the grip starts - check the die's drive radius");
-    assert(sp[0] > rs,
-           "drive link: the spacer bolts land inside the die's sweep - the handle is too short to grip");
+    assert(
+        is_undef(drive_radius_mm) || drive_radius_mm < rs,
+        "drive link: the drive hole is outside where the grip starts - check the die's drive radius"
+    );
+    assert(
+        sp[0] > rs,
+        "drive link: the spacer bolts land inside the die's sweep - the handle is too short to grip"
+    );
 
     plate_2D(plate, handle_length_mm + w, w)
         // offset(0) for the same reason the die needs one: the hull and the eyes meet on
@@ -195,18 +269,18 @@ module drive_link_2D(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm
             difference() {
                 union() {
                     hull() {
-                        circle(d = w);
-                        translate([drive_radius_mm_or_pivot, 0]) circle(d = w);
+                        circle(d=w);
+                        translate([drive_radius_mm_or_pivot, 0]) circle(d=w);
                     }
 
-                    for (i = [1 : len(taper) - 1])
+                    for (i = [1:len(taper) - 1])
                         hull() {
-                            translate([taper[i - 1][0], 0]) circle(d = taper[i - 1][1]);
-                            translate([taper[i][0], 0]) circle(d = taper[i][1]);
+                            translate([taper[i - 1][0], 0]) circle(d=taper[i - 1][1]);
+                            translate([taper[i][0], 0]) circle(d=taper[i][1]);
                         }
                 }
 
-                circle(d = pin_pivot_hole(frame_pin_d));
+                circle(d=pin_pivot_hole(frame_pin_d));
 
                 // No drive hole on a die too small to have any. JD2 drives those by
                 // running the link's leading edge against the U-strap pin instead
@@ -214,36 +288,62 @@ module drive_link_2D(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm
                 // link simply has nothing there rather than a hole with no mate.
                 if (!is_undef(drive_radius_mm))
                     translate([drive_radius_mm, 0])
-                        circle(d = pin_index_hole(drive_pin_d));
+                        circle(d=pin_index_hole(drive_pin_d));
 
                 for (r = sp)
                     translate([r, 0])
-                        circle(d = pin_pivot_hole(spacer_bolt_d));
+                        circle(d=pin_pivot_hole(spacer_bolt_d));
             }
 }
 
 //! Echo what the link comes out as.
-module drive_link_report(tube, clr, plate, frame_pin_d, drive_pin_d, drive_radius_mm,
-                         handle_force_N, handle_length_mm, spacer_bolt_d) {
-    w  = drive_link_width(plate, handle_force_N, handle_length_mm, drive_radius_mm,
-                          frame_pin_d, drive_pin_d);
-    m  = drive_link_moment_Nmm(handle_force_N, handle_length_mm,
-                               is_undef(drive_radius_mm) ? 0 : drive_radius_mm);
+module drive_link_report(
+    tube,
+    clr,
+    plate,
+    frame_pin_d,
+    drive_pin_d,
+    drive_radius_mm,
+    handle_force_N,
+    handle_length_mm,
+    spacer_bolt_d
+) {
+    w = drive_link_width(
+        plate, handle_force_N, handle_length_mm, drive_radius_mm,
+        frame_pin_d, drive_pin_d
+    );
+    m = drive_link_moment_Nmm(
+        handle_force_N, handle_length_mm,
+        is_undef(drive_radius_mm) ? 0 : drive_radius_mm
+    );
     hi = drive_link_handle_interface(tube, clr, handle_force_N, handle_length_mm);
-    tp = drive_link_taper(plate, handle_force_N, handle_length_mm,
-                          is_undef(drive_radius_mm) ? 0 : drive_radius_mm,
-                          frame_pin_d, drive_pin_d, spacer_bolt_d);
+    tp = drive_link_taper(
+        plate, handle_force_N, handle_length_mm,
+        is_undef(drive_radius_mm) ? 0 : drive_radius_mm,
+        frame_pin_d, drive_pin_d, spacer_bolt_d
+    );
 
-    echo(str("drive link: ", plate_size(plate), " plate, ", fmt_length(w), " wide, ",
-             fmt_length(handle_length_mm), " long - it IS the handle, grip beyond r ",
-             fmt_length(hi[0])));
-    echo(str("            ", fmt_mass(drive_link_mass(plate, tp, w)), " each, so ",
-             fmt_mass(2 * drive_link_mass(plate, tp, w)),
-             " of handle for the pair, tapered from ", fmt_bare_length(w), " to ",
-             fmt_length(tp[len(tp) - 1][1])));
-    echo(str("            peak moment ", fmt_moment(m / 1000), " per link ",
-             is_undef(drive_radius_mm) ? "at the pivot - NO DRIVE HOLE, this die is too small; the link must bear on the U-strap pin"
-                                       : "at the drive hole",
-             ", allowable ", fmt_stress(pin_allowable_bending_fraction * plate_yield(plate))));
-
+    echo(
+        str(
+            "drive link: ", plate_size(plate), " plate, ", fmt_length(w), " wide, ",
+            fmt_length(handle_length_mm), " long - it IS the handle, grip beyond r ",
+            fmt_length(hi[0])
+        )
+    );
+    echo(
+        str(
+            "            ", fmt_mass(drive_link_mass(plate, tp, w)), " each, so ",
+            fmt_mass(2 * drive_link_mass(plate, tp, w)),
+            " of handle for the pair, tapered from ", fmt_bare_length(w), " to ",
+            fmt_length(tp[len(tp) - 1][1])
+        )
+    );
+    echo(
+        str(
+            "            peak moment ", fmt_moment(m / 1000), " per link ",
+            is_undef(drive_radius_mm) ? "at the pivot - NO DRIVE HOLE, this die is too small; the link must bear on the U-strap pin"
+            : "at the drive hole",
+            ", allowable ", fmt_stress(pin_allowable_bending_fraction * plate_yield(plate))
+        )
+    );
 }

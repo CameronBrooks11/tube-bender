@@ -74,15 +74,18 @@ function pin_diameter_for_shear(force_N, yield_MPa) =
 
 //! Diameter, mm, at which the bending allowable is exactly reached.
 function pin_diameter_for_bending(force_N, t_centre, t_outer, yield_MPa) =
-    pow(32 * pin_bending_moment(force_N, t_centre, t_outer)
-            / (PI * pin_allowable_bending_fraction * yield_MPa), 1/3);
+    pow(
+        32 * pin_bending_moment(force_N, t_centre, t_outer) / (PI * pin_allowable_bending_fraction * yield_MPa), 1 / 3
+    );
 
 //! The diameter the pin actually has to be: whichever failure mode governs.
 function pin_required_diameter(force_N, t_centre, t_outer, yield_MPa) =
-    max(pin_diameter_for_shear(force_N, yield_MPa),
-        pin_diameter_for_bending(force_N, t_centre, t_outer, yield_MPa));
+    max(
+        pin_diameter_for_shear(force_N, yield_MPa),
+        pin_diameter_for_bending(force_N, t_centre, t_outer, yield_MPa)
+    );
 
 //! Which mode governs, as a name rather than a flag.
 function pin_governing_mode(force_N, t_centre, t_outer, yield_MPa) =
-    pin_diameter_for_bending(force_N, t_centre, t_outer, yield_MPa)
-        >= pin_diameter_for_shear(force_N, yield_MPa) ? "bending" : "shear";
+    pin_diameter_for_bending(force_N, t_centre, t_outer, yield_MPa) >= pin_diameter_for_shear(force_N, yield_MPa) ? "bending"
+    : "shear";

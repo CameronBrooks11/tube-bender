@@ -32,7 +32,7 @@ use <../utils/units.scad>
 use <../purchased/plate.scad>
 use <../utils/weld.scad>
 use <frame_link.scad>
-use <forming_die.scad>   // die_web(), the margin the plate stands out by
+use <forming_die.scad> // die_web(), the margin the plate stands out by
 
 include <../utils/bend.scad>;
 
@@ -62,7 +62,7 @@ function base_margin(tube, bolt_d) =
 //! has to fit outside the link.
 function base_rect(extents, tube, bolt_d) =
     let (m = base_margin(tube, bolt_d))
-        [extents[0] - [m, m], extents[1] + [m, m]];
+    [extents[0] - [m, m], extents[1] + [m, m]];
 
 //! Plan size of the plate, [x, y] mm.
 function base_size(rect) = rect[1] - rect[0];
@@ -73,11 +73,15 @@ function base_centre(rect) = (rect[0] + rect[1]) / 2;
 
 //! The four anchor bolts, [x, y] each - one inset at each corner.
 function base_anchor_positions(rect, bolt_d) =
-    let (i = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1,
-         c = base_centre(rect),
-         s = base_size(rect))
-        [for (sx = [-1, 1], sy = [-1, 1])
-             c + [sx * (s[0] / 2 - i), sy * (s[1] / 2 - i)]];
+    let (
+        i = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1,
+        c = base_centre(rect),
+        s = base_size(rect)
+    )
+    [
+            for (sx = [-1, 1], sy = [-1, 1])
+            c + [sx * (s[0] / 2 - i), sy * (s[1] / 2 - i)],
+    ];
 
 //! Distance from the pattern's centre to each anchor bolt, mm - the arm the torque works
 //! on. FOUR bolts, not two: the shear in each is `M / (4 r)`.
@@ -108,15 +112,23 @@ function base_anchor_shear_N(moment_Nm, radius_mm, force_N) =
 //! makes the plate bigger, which makes its radius bigger. That pulls the opposite way to the
 //! edge distance and does not change the shape of the answer.
 function base_anchor_bolt(extents, tube, moment_Nm, force_N, yield_MPa, candidates) =
-    let (fits = [for (b = candidates)
-                     if (base_anchor_shear_N(moment_Nm,
-                             base_anchor_radius(base_rect(extents, tube, bolt_diameter(b)),
-                                                bolt_diameter(b)),
-                             force_N)
-                         <= bend_anchor_bolt_allowable_N(bolt_diameter(b), yield_MPa))
-                         bolt_diameter(b)])
-        len(fits) == 0 ? undef
-                       : [for (b = candidates) if (bolt_diameter(b) == min(fits)) b][0];
+    let (
+        fits = [
+            for (b = candidates)
+            if (
+                base_anchor_shear_N(
+                    moment_Nm,
+                    base_anchor_radius(
+                        base_rect(extents, tube, bolt_diameter(b)),
+                        bolt_diameter(b)
+                    ),
+                    force_N
+                ) <= bend_anchor_bolt_allowable_N(bolt_diameter(b), yield_MPa)
+            ) bolt_diameter(b),
+        ]
+    )
+    len(fits) == 0 ? undef
+    : [for (b = candidates) if (bolt_diameter(b) == min(fits)) b][0];
 
 //! The weld group that holds the machine down: two runs of fillet along the two long edges
 //! of the lower frame link's followbar arm, where that arm lies on this plate.
@@ -132,10 +144,19 @@ function base_weld_group(tube, clr, link_width, followbar_pin_d) =
 //! into the world crosses this joint, then the plate, then the bolts. So the weld carries
 //! what the bolts carry - the drive torque about the pivot, and the operator's pull - and
 //! the overturning that pull makes about the working plane on top of it.
-function base_weld_load_N_per_mm(tube, clr, link_width, followbar_pin_d, moment_Nm, force_N,
-                                 working_height) =
-    weld_group_load(base_weld_group(tube, clr, link_width, followbar_pin_d),
-                    moment_Nm * 1000, force_N * working_height, force_N);
+function base_weld_load_N_per_mm(
+    tube,
+    clr,
+    link_width,
+    followbar_pin_d,
+    moment_Nm,
+    force_N,
+    working_height
+) =
+    weld_group_load(
+        base_weld_group(tube, clr, link_width, followbar_pin_d),
+        moment_Nm * 1000, force_N * working_height, force_N
+    );
 
 //! Bearing pressure the plate puts on whatever it is bolted to, MPa, if the operator's
 //! whole pull were taken as a compression over the plate's area. A crude figure, and
@@ -146,64 +167,106 @@ function base_bearing_MPa(force_N, size) = force_N / (size[0] * size[1]);
 //! The profile the base plate is cut from, on z = 0, in the frame link's own frame - which
 //! is the world's, so it is drawn where it goes and nothing rotates it.
 module base_2D(rect, plate, bolt_d) {
-    size  = base_size(rect);
+    size = base_size(rect);
     inset = plate_eye_radius(bolt_clearance_hole_d(bolt_d)) + 1;
 
-    assert(inset * 2 < min(size),
-           "base: the anchor bolts do not fit inside the plate - the frame link is too small for this load");
+    assert(
+        inset * 2 < min(size),
+        "base: the anchor bolts do not fit inside the plate - the frame link is too small for this load"
+    );
 
     plate_2D(plate, size[0], size[1])
         offset(0)
             difference() {
                 translate(base_centre(rect))
-                    square(size, center = true);
+                    square(size, center=true);
 
                 for (p = base_anchor_positions(rect, bolt_d))
                     translate(p)
-                        circle(d = bolt_clearance_hole_d(bolt_d));
+                        circle(d=bolt_clearance_hole_d(bolt_d));
             }
 }
 
 //! Echo what the anchorage comes out as.
-module base_report(rect, tube, clr, plate, link_plate, link_width, followbar_pin_d,
-                   moment_Nm, force_N, bolt, bolt_yield, working_height) {
-    size   = base_size(rect);
-    r      = base_anchor_radius(rect, bolt_diameter(bolt));
-    shear  = base_anchor_shear_N(moment_Nm, r, force_N);
-    allow  = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
+module base_report(
+    rect,
+    tube,
+    clr,
+    plate,
+    link_plate,
+    link_width,
+    followbar_pin_d,
+    moment_Nm,
+    force_N,
+    bolt,
+    bolt_yield,
+    working_height
+) {
+    size = base_size(rect);
+    r = base_anchor_radius(rect, bolt_diameter(bolt));
+    shear = base_anchor_shear_N(moment_Nm, r, force_N);
+    allow = bend_anchor_bolt_allowable_N(bolt_diameter(bolt), bolt_yield);
     // The weld runs along the frame link's EDGE, on top of this plate: a lap joint, so the
     // link's own thickness caps the fillet as well as setting the minimum.
     t_thin = min(plate_thickness(plate), plate_thickness(link_plate));
-    wf     = base_weld_load_N_per_mm(tube, clr, link_width, followbar_pin_d, moment_Nm,
-                                     force_N, working_height);
-    leg    = weld_leg(wf, t_thin);
-    run    = frame_link_reach(tube, clr, followbar_pin_d);
+    wf = base_weld_load_N_per_mm(
+        tube, clr, link_width, followbar_pin_d, moment_Nm,
+        force_N, working_height
+    );
+    leg = weld_leg(wf, t_thin);
+    run = frame_link_reach(tube, clr, followbar_pin_d);
 
-    echo(str("base:    ", plate_size(plate), " plate, ", fmt_bare_length(size[0]), " x ",
-             fmt_length(size[1]), ", lower frame link welded to it"));
-    assert(leg <= weld_max_edge_size(plate_thickness(link_plate)),
-           "base: the weld the load wants is bigger than the frame link's edge can take - thicker link plate");
-    assert(wf <= weld_base_metal_N_per_mm(t_thin, pin_allowable_shear_fraction * plate_yield(link_plate)),
-           "base: the weld is over what the plate it lands on can carry - thicker plate, not a bigger weld");
+    echo(
+        str(
+            "base:    ", plate_size(plate), " plate, ", fmt_bare_length(size[0]), " x ",
+            fmt_length(size[1]), ", lower frame link welded to it"
+        )
+    );
+    assert(
+        leg <= weld_max_edge_size(plate_thickness(link_plate)),
+        "base: the weld the load wants is bigger than the frame link's edge can take - thicker link plate"
+    );
+    assert(
+        wf <= weld_base_metal_N_per_mm(t_thin, pin_allowable_shear_fraction * plate_yield(link_plate)),
+        "base: the weld is over what the plate it lands on can carry - thicker plate, not a bigger weld"
+    );
 
-    echo(str("         weld ", fmt_length(leg), " fillet both sides of the link, ",
-             fmt_length(run), " each side, set by ", weld_governing_mode(wf, t_thin),
-             " - E70XX, ", fmt_stress(weld_allowable_MPa()), " on the throat"));
-    echo(str("         carrying ", fmt_force_per_length(wf), " against ",
-             fmt_force_per_length(weld_capacity_N_per_mm(leg)), " at that leg"));
-    assert(shear <= allow,
-           "base: the anchor bolts are over their allowable at the radius they end up with - size up");
+    echo(
+        str(
+            "         weld ", fmt_length(leg), " fillet both sides of the link, ",
+            fmt_length(run), " each side, set by ", weld_governing_mode(wf, t_thin),
+            " - E70XX, ", fmt_stress(weld_allowable_MPa()), " on the throat"
+        )
+    );
+    echo(
+        str(
+            "         carrying ", fmt_force_per_length(wf), " against ",
+            fmt_force_per_length(weld_capacity_N_per_mm(leg)), " at that leg"
+        )
+    );
+    assert(
+        shear <= allow,
+        "base: the anchor bolts are over their allowable at the radius they end up with - size up"
+    );
 
     // The plate is drilled for these whichever mount it ends up on, but they only carry
     // anything on a bench: a pedestal has the post welded underneath and the torque leaves
     // through the foot bolts instead.
-    echo(str("         4 x ", bolt_size(bolt), " anchor bolts for a BENCH mount, on r ",
-             fmt_length(r), ", ",
-             fmt_force(shear), " each against ", fmt_force(allow),
-             " allowable at a safety factor of ", bend_anchor_safety_factor));
+    echo(
+        str(
+            "         4 x ", bolt_size(bolt), " anchor bolts for a BENCH mount, on r ",
+            fmt_length(r), ", ",
+            fmt_force(shear), " each against ", fmt_force(allow),
+            " allowable at a safety factor of ", bend_anchor_safety_factor
+        )
+    );
     // What it bears ONTO is a bench or a floor, so this is a contact pressure - psi.
-    echo(str("         the work happens ", fmt_length(working_height),
-             " above the mounting surface, and it bears on it at ",
-             fmt_pressure(base_bearing_MPa(force_N, size)),
-             " - fine on steel, check it against a bench top"));
+    echo(
+        str(
+            "         the work happens ", fmt_length(working_height),
+            " above the mounting surface, and it bears on it at ",
+            fmt_pressure(base_bearing_MPa(force_N, size)),
+            " - fine on steel, check it against a bench top"
+        )
+    );
 }

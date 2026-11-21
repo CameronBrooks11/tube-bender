@@ -42,7 +42,7 @@
  * Sets no $fn.
  */
 
-include <NopSCADlib/core.scad>;   // inch()
+include <NopSCADlib/core.scad>; // inch()
 
 //! Nominal tensile strength of the filler metal, MPa. E70XX is 70 ksi.
 weld_electrode_MPa = 482.63;
@@ -67,7 +67,7 @@ function weld_size_for_load(f_per_mm) = f_per_mm * sqrt(2) / weld_allowable_MPa(
 //! Which is also the metric series in disguise - 1/8, 3/16, 1/4 and 5/16 in are 3.2, 4.8,
 //! 6.4 and 7.9 mm, and the fillets a metric shop runs are 3, 5, 6 and 8. Nobody sets a
 //! machine to 4.31.
-function weld_specified_size(mm) = ceil(mm / inch(1/16) - 1e-9) * inch(1/16);
+function weld_specified_size(mm) = ceil(mm / inch(1 / 16) - 1e-9) * inch(1 / 16);
 
 //! Smallest leg the code allows on a joint whose thinner part is `t` mm
 //! [AISC-360 Table J2.4], limited to that thickness where the table exceeds it.
@@ -81,35 +81,39 @@ function weld_specified_size(mm) = ceil(mm / inch(1/16) - 1e-9) * inch(1/16);
 //! chilled by the mass around it; on a 0.120 in post wall the LARGER figure is the
 //! dangerous one, because it burns through the very part the rule is protecting.
 function weld_min_size(t_thinner) =
-    min(t_thinner,
-        t_thinner <= inch(1/4) ? inch(1/8)
-      : t_thinner <= inch(1/2) ? inch(3/16)
-      : t_thinner <= inch(3/4) ? inch(1/4)
-      :                          inch(5/16));
+    min(
+        t_thinner,
+        t_thinner <= inch(1 / 4) ? inch(1 / 8)
+        : t_thinner <= inch(1 / 2) ? inch(3 / 16)
+        : t_thinner <= inch(3 / 4) ? inch(1 / 4)
+        : inch(5 / 16)
+    );
 
 //! Largest leg the code allows along the EDGE of a part `t` mm thick [AISC-360 J2.2b].
 //!
 //! Only where the weld runs along an edge - a lap joint, like the frame link lying on the
 //! base plate. A T-joint has no edge to melt back and its fillet may be larger than the
 //! member standing on it, which is why the post welds are not checked against this.
-function weld_max_edge_size(t) = t < inch(1/4) ? t : t - inch(1/16);
+function weld_max_edge_size(t) = t < inch(1 / 4) ? t : t - inch(1 / 16);
 
 //
 // Weld groups. Each is [length mm, weakest bending modulus mm^2, polar modulus mm^3,
 // distance to the farthest millimetre mm] - all of it weld-as-a-line, so the moduli are one
 // power of length down from their solid-section namesakes.
 //
-function weld_group_length(g)  = g[0];  //! Total length of weld, mm
-function weld_group_S(g)       = g[1];  //! Bending modulus about the weakest axis IN the group's plane
-function weld_group_J(g)       = g[2];  //! Polar modulus about the axis NORMAL to it
-function weld_group_r_max(g)   = g[3];  //! Distance from the centroid to the worst millimetre
+function weld_group_length(g) = g[0]; //! Total length of weld, mm
+function weld_group_S(g) = g[1]; //! Bending modulus about the weakest axis IN the group's plane
+function weld_group_J(g) = g[2]; //! Polar modulus about the axis NORMAL to it
+function weld_group_r_max(g) = g[3]; //! Distance from the centroid to the worst millimetre
 
 //! Two parallel runs of fillet, each `L` long and `d` apart.
 function weld_group_parallel(L, d) =
-    [2 * L,
-     min(L * d, L * L / 3),
-     L * d * d / 2 + L * L * L / 6,
-     norm([L, d]) / 2];
+    [
+        2 * L,
+        min(L * d, L * L / 3),
+        L * d * d / 2 + L * L * L / 6,
+        norm([L, d]) / 2,
+    ];
 
 //! A ring of fillet of radius `r`.
 function weld_group_ring(r) = [2 * PI * r, PI * r * r, 2 * PI * r * r * r, r];
@@ -123,10 +127,11 @@ function weld_group_ring(r) = [2 * PI * r, PI * r * r, 2 * PI * r * r * r, r];
 //! to both - it pulls the throat open rather than shearing it - so that one is combined as
 //! a vector rather than piled on top.
 function weld_group_load(group, torque_Nmm, bending_Nmm, shear_N) =
-    let (inplane = torque_Nmm * weld_group_r_max(group) / weld_group_J(group)
-                       + shear_N / weld_group_length(group),
-         normal  = bending_Nmm / weld_group_S(group))
-        norm([inplane, normal]);
+    let (
+        inplane = torque_Nmm * weld_group_r_max(group) / weld_group_J(group) + shear_N / weld_group_length(group),
+        normal = bending_Nmm / weld_group_S(group)
+    )
+    norm([inplane, normal]);
 
 //! What one millimetre of the part a weld lands on can carry, N/mm - an allowable over its
 //! thickness. A weld cannot be stronger than the metal it is welded to.
@@ -148,5 +153,5 @@ function weld_leg(f_per_mm, t_thinner) =
 //! Which of the two decided it - for the report, because a minimum-governed joint has
 //! margin and a load-governed one is at its limit.
 function weld_governing_mode(f_per_mm, t_thinner) =
-    weld_specified_size(weld_size_for_load(f_per_mm)) > weld_min_size(t_thinner)
-        ? "the load" : "the code minimum";
+    weld_specified_size(weld_size_for_load(f_per_mm)) > weld_min_size(t_thinner) ? "the load"
+    : "the code minimum";

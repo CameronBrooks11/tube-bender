@@ -54,46 +54,58 @@ function clamp_blank(tube) = plate_smallest_at_least(clamp_height(tube));
 //! The block, drawn about the TUBE'S axis: x outboard, y along the tube, tube centreline
 //! on the z = 0 line at x = 0.
 module clamp(tube, clr, pin_d, bolt_d) {
-    lc    = forming_die_tail_length(tube, clr);
-    d     = clamp_depth(tube, pin_d);
-    h     = clamp_height(tube);
-    gr    = forming_die_groove_radius(tube);
+    lc = forming_die_tail_length(tube, clr);
+    d = clamp_depth(tube, pin_d);
+    h = clamp_height(tube);
+    gr = forming_die_groove_radius(tube);
     blank = clamp_blank(tube);
-    px    = tube_od(tube) / 2 + die_web(tube) + pin_pivot_hole(pin_d) / 2;
+    px = tube_od(tube) / 2 + die_web(tube) + pin_pivot_hole(pin_d) / 2;
 
     assert(!is_undef(blank), "clamp: no registered plate is thick enough for this blank");
 
-    vitamin(str("clamp_blank(", plate_name(blank), "): ", plate_description(blank), " ",
-                plate_size(blank), ", blank ", fmt_bare_length(d), " x ", fmt_length(lc),
-                ", faced to ", fmt_length(h)));
+    vitamin(
+        str(
+            "clamp_blank(", plate_name(blank), "): ", plate_description(blank), " ",
+            plate_size(blank), ", blank ", fmt_bare_length(d), " x ", fmt_length(lc),
+            ", faced to ", fmt_length(h)
+        )
+    );
 
     color(plate_colour(blank))
         render()
             difference() {
                 translate([d / 2, -lc / 2, 0])
-                    cube([d, lc, h], center = true);
+                    cube([d, lc, h], center=true);
 
                 rotate([90, 0, 0])
-                    cylinder(r = gr, h = lc + 2 * eps, center = true);
+                    cylinder(r=gr, h=lc + 2 * eps, center=true);
 
                 for (y = [-lc / 4, -3 * lc / 4])
                     translate([px, y, 0])
-                        cylinder(d = pin_pivot_hole(pin_d), h = h + 2 * eps, center = true);
+                        cylinder(d=pin_pivot_hole(pin_d), h=h + 2 * eps, center=true);
 
                 // The bolt that stops the tube sliding, threaded in from outboard at the
                 // middle of the grip and aimed at the tube's centreline.
                 translate([d + eps, -lc / 2, 0])
                     rotate([0, -90, 0])
-                        cylinder(d = bolt_d, h = d - gr + 2 * eps);
+                        cylinder(d=bolt_d, h=d - gr + 2 * eps);
             }
 }
 
 //! Echo what the clamp comes out as.
 module clamp_report(tube, clr, pin_d, bolt, force_N) {
-    echo(str("clamp:   ", fmt_bare_length(clamp_depth(tube, pin_d)), " x ",
-             fmt_bare_length(forming_die_tail_length(tube, clr)), " x ",
-             fmt_length(clamp_height(tube)), " from ", plate_size(clamp_blank(tube)),
-             " plate, 2 pins and a ", bolt_size(bolt), " bolt"));
-    echo(str("         holding ", fmt_force(force_N),
-             " of tangential drag - the moment over the bend radius"));
+    echo(
+        str(
+            "clamp:   ", fmt_bare_length(clamp_depth(tube, pin_d)), " x ",
+            fmt_bare_length(forming_die_tail_length(tube, clr)), " x ",
+            fmt_length(clamp_height(tube)), " from ", plate_size(clamp_blank(tube)),
+            " plate, 2 pins and a ", bolt_size(bolt), " bolt"
+        )
+    );
+    echo(
+        str(
+            "         holding ", fmt_force(force_N),
+            " of tangential drag - the moment over the bend radius"
+        )
+    );
 }
