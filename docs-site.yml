@@ -1,3 +1,0 @@
-title: tube-bender
-description: A parametric manual rotary-draw tube bender in OpenSCAD, from 1/8 in to 2 in outside diameter
-models: scad/tube_bender.scad
